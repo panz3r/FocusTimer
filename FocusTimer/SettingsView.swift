@@ -114,17 +114,29 @@ struct SettingsView: View {
     }
 
     private var timerPane: some View {
-        card {
-            settingRow("Work session") {
-                Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+        VStack(alignment: .leading, spacing: 12) {
+            card {
+                settingRow("Work session") {
+                    Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+                }
+                Divider()
+                settingRow("Short break") {
+                    Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
+                }
+                Divider()
+                settingRow("Long break") {
+                    Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+                }
             }
-            Divider()
-            settingRow("Short break") {
-                Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
-            }
-            Divider()
-            settingRow("Long break") {
-                Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+
+            card {
+                settingRow("Sessions before long break") {
+                    Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
+                }
+                Divider()
+                settingRow("Daily goal") {
+                    Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
+                }
             }
         }
     }
@@ -133,14 +145,6 @@ struct SettingsView: View {
         card {
             settingRow("Launch at Login") {
                 Toggle("", isOn: $vm.launchAtLogin).labelsHidden()
-            }
-            Divider()
-            settingRow("Sessions before long break") {
-                Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
-            }
-            Divider()
-            settingRow("Daily goal") {
-                Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
             }
             Divider()
             settingRow("Auto-advance sessions") {
