@@ -1,157 +1,260 @@
 import AppKit
 import SwiftUI
 
+/// Two-pane settings (Area 2 follow-up): a fixed sidebar picks the section;
+/// the right pane shows that section's cards. The whole view is pinned to
+/// 560x620 — the hosting view height never changes, which keeps the
+/// layout-feedback-loop crash (see commit "Fix Settings crash…")
+/// structurally impossible. Overflow inside a pane scrolls.
 struct SettingsView: View {
     @ObservedObject var vm: TimerViewModel
 
+    enum Section: String, CaseIterable, Identifiable {
+        case timer     = "Timer"
+        case behavior  = "Behavior"
+        case shortcuts = "Shortcuts"
+        case data      = "Data"
+        case social    = "Social"
+
+        var id: String { rawValue }
+
+        var icon: String {
+            switch self {
+            case .timer:     return "clock"
+            case .behavior:  return "gearshape"
+            case .shortcuts: return "keyboard"
+            case .data:      return "externaldrive"
+            case .social:    return "person.2"
+            }
+        }
+    }
+
+    @State private var section: Section = .timer
+    @State private var socialConfig = SocialConfig.load()
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-
-            sectionLabel("Durations", icon: "clock")
-
-            card {
-                settingRow("Work session") {
-                    Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+        HStack(spacing: 0) {
+            sidebar
+            Divider()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    paneHeader
+                    content
                 }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .frame(width: 560, height: 620)
+    }
+
+    // MARK: - Sidebar
+
+    private var sidebar: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(Section.allCases) { item in
+                sidebarItem(item)
+            }
+            Spacer()
+            Divider()
+            Text("Version \(appVersion)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+        }
+        .padding(10)
+        .frame(width: 132)
+    }
+
+    private func sidebarItem(_ item: Section) -> some View {
+        Button {
+            section = item
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: item.icon)
+                    .frame(width: 16)
+                Text(item.rawValue)
+                Spacer()
+            }
+            .font(.callout)
+            .foregroundStyle(section == item ? .primary : .secondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(section == item ? Color.accentColor.opacity(0.18) : .clear)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    }
+
+    // MARK: - Content pane
+
+    private var paneHeader: some View {
+        Label(section.rawValue, systemImage: section.icon)
+            .font(.title3.weight(.semibold))
+            .padding(.bottom, 2)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch section {
+        case .timer:     timerPane
+        case .behavior:  behaviorPane
+        case .shortcuts: shortcutsPane
+        case .data:      dataPane
+        case .social:    socialPane
+        }
+    }
+
+    private var timerPane: some View {
+        card {
+            settingRow("Work session") {
+                Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+            }
+            Divider()
+            settingRow("Short break") {
+                Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
+            }
+            Divider()
+            settingRow("Long break") {
+                Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+            }
+        }
+    }
+
+    private var behaviorPane: some View {
+        card {
+            settingRow("Launch at Login") {
+                Toggle("", isOn: $vm.launchAtLogin).labelsHidden()
+            }
+            Divider()
+            settingRow("Sessions before long break") {
+                Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
+            }
+            Divider()
+            settingRow("Daily goal") {
+                Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
+            }
+            Divider()
+            settingRow("Auto-advance sessions") {
+                Toggle("", isOn: $vm.autoAdvance).labelsHidden()
+            }
+            Divider()
+            settingRow("Show label in menu bar") {
+                Toggle("", isOn: $vm.showTaskLabelInMenuBar).labelsHidden()
+            }
+            Divider()
+            settingRow("Pause when idle") {
+                Toggle("", isOn: $vm.idleDetectionEnabled).labelsHidden()
+            }
+            if vm.idleDetectionEnabled {
                 Divider()
-                settingRow("Short break") {
-                    Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
-                }
-                Divider()
-                settingRow("Long break") {
-                    Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+                settingRow("Idle threshold") {
+                    Stepper("\(vm.idlePauseThreshold) min", value: $vm.idlePauseThreshold, in: 2...30)
                 }
             }
-
-            sectionLabel("Behavior", icon: "gearshape")
-
-            card {
-                settingRow("Launch at Login") {
-                    Toggle("", isOn: $vm.launchAtLogin).labelsHidden()
-                }
-                Divider()
-                settingRow("Sessions before long break") {
-                    Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
-                }
-                Divider()
-                settingRow("Daily goal") {
-                    Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
-                }
-                Divider()
-                settingRow("Auto-advance sessions") {
-                    Toggle("", isOn: $vm.autoAdvance).labelsHidden()
-                }
-                Divider()
-                settingRow("Show label in menu bar") {
-                    Toggle("", isOn: $vm.showTaskLabelInMenuBar).labelsHidden()
-                }
-                Divider()
-                settingRow("Pause when idle") {
-                    Toggle("", isOn: $vm.idleDetectionEnabled).labelsHidden()
-                }
-                if vm.idleDetectionEnabled {
-                    Divider()
-                    settingRow("Idle threshold") {
-                        Stepper("\(vm.idlePauseThreshold) min", value: $vm.idlePauseThreshold, in: 2...30)
+            Divider()
+            settingRow("Notifications") {
+                Toggle("", isOn: $vm.notificationsEnabled)
+                    .labelsHidden()
+                    .onChange(of: vm.notificationsEnabled) { enabled in
+                        if enabled { NotificationManager.shared.requestPermission() }
                     }
+            }
+            if vm.notificationsEnabled {
+                Divider()
+                settingRow("Weekly digest") {
+                    Toggle("", isOn: $vm.weeklyDigestEnabled).labelsHidden()
                 }
                 Divider()
-                settingRow("Notifications") {
-                    Toggle("", isOn: $vm.notificationsEnabled)
+                settingRow("Sound") {
+                    HStack(spacing: 6) {
+                        Button { vm.notificationSound.preview() } label: {
+                            Image(systemName: "speaker.wave.2")
+                                .foregroundStyle(vm.notificationSound.canPreview ? .secondary : .tertiary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!vm.notificationSound.canPreview)
+
+                        Picker("", selection: $vm.notificationSound) {
+                            ForEach(NotificationSound.allCases, id: \.self) {
+                                Text($0.rawValue).tag($0)
+                            }
+                        }
                         .labelsHidden()
-                        .onChange(of: vm.notificationsEnabled) { enabled in
-                            if enabled { NotificationManager.shared.requestPermission() }
-                        }
-                }
-                if vm.notificationsEnabled {
-                    Divider()
-                    settingRow("Weekly digest") {
-                        Toggle("", isOn: $vm.weeklyDigestEnabled).labelsHidden()
-                    }
-                    Divider()
-                    settingRow("Sound") {
-                        HStack(spacing: 6) {
-                            Button { vm.notificationSound.preview() } label: {
-                                Image(systemName: "speaker.wave.2")
-                                    .foregroundStyle(vm.notificationSound.canPreview ? .secondary : .tertiary)
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(!vm.notificationSound.canPreview)
-
-                            Picker("", selection: $vm.notificationSound) {
-                                ForEach(NotificationSound.allCases, id: \.self) {
-                                    Text($0.rawValue).tag($0)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(width: 90)
-                        }
+                        .frame(width: 90)
                     }
                 }
             }
-            sectionLabel("Shortcuts", icon: "keyboard")
+        }
+    }
 
-            card {
-                settingRow("Global shortcuts") {
-                    Toggle("", isOn: $vm.hotkeysEnabled).labelsHidden()
-                }
-                if vm.hotkeysEnabled {
-                    Divider()
-                    settingRow("Start / Pause") {
-                        KeyRecorder(
-                            label: vm.toggleHotkeyLabel,
-                            onStartRecording: { HotkeyManager.shared.unregister() },
-                            onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
-                            onRecord: { code, mods, label in
-                                vm.updateToggleHotkey(code: code, mods: mods, label: label)
-                            }
-                        )
-                    }
-                    Divider()
-                    settingRow("Skip") {
-                        KeyRecorder(
-                            label: vm.skipHotkeyLabel,
-                            onStartRecording: { HotkeyManager.shared.unregister() },
-                            onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
-                            onRecord: { code, mods, label in
-                                vm.updateSkipHotkey(code: code, mods: mods, label: label)
-                            }
-                        )
-                    }
-                }
+    private var shortcutsPane: some View {
+        card {
+            settingRow("Global shortcuts") {
+                Toggle("", isOn: $vm.hotkeysEnabled).labelsHidden()
             }
-
-            sectionLabel("Data", icon: "externaldrive")
-
-            card {
-                settingRow("Export backup…") {
-                    Button("Export…") { SessionExport.runExportDialog(.jsonBackup) }
+            if vm.hotkeysEnabled {
+                Divider()
+                settingRow("Start / Pause") {
+                    KeyRecorder(
+                        label: vm.toggleHotkeyLabel,
+                        onStartRecording: { HotkeyManager.shared.unregister() },
+                        onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
+                        onRecord: { code, mods, label in
+                            vm.updateToggleHotkey(code: code, mods: mods, label: label)
+                        }
+                    )
                 }
                 Divider()
-                settingRow("Import backup…") {
-                    Button("Import…") {
-                        SessionExport.runImportDialog { vm.refreshFromStore() }
-                    }
-                }
-                Divider()
-                settingRow("Weekly auto-backup") {
-                    Toggle("", isOn: $vm.weeklyBackupEnabled).labelsHidden()
-                }
-                if vm.weeklyBackupEnabled {
-                    Divider()
-                    settingRow("Include Markdown summary") {
-                        Toggle("", isOn: $vm.weeklyBackupMarkdownEnabled).labelsHidden()
-                    }
-                    Divider()
-                    settingRow("Backup folder") {
-                        Button("Choose…") { chooseBackupFolder() }
-                    }
+                settingRow("Skip") {
+                    KeyRecorder(
+                        label: vm.skipHotkeyLabel,
+                        onStartRecording: { HotkeyManager.shared.unregister() },
+                        onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
+                        onRecord: { code, mods, label in
+                            vm.updateSkipHotkey(code: code, mods: mods, label: label)
+                        }
+                    )
                 }
             }
+        }
+    }
 
-            sectionLabel("Social", icon: "person.2")
+    private var dataPane: some View {
+        card {
+            settingRow("Export backup…") {
+                Button("Export…") { SessionExport.runExportDialog(.jsonBackup) }
+            }
+            Divider()
+            settingRow("Import backup…") {
+                Button("Import…") {
+                    SessionExport.runImportDialog { vm.refreshFromStore() }
+                }
+            }
+            Divider()
+            settingRow("Weekly auto-backup") {
+                Toggle("", isOn: $vm.weeklyBackupEnabled).labelsHidden()
+            }
+            if vm.weeklyBackupEnabled {
+                Divider()
+                settingRow("Include Markdown summary") {
+                    Toggle("", isOn: $vm.weeklyBackupMarkdownEnabled).labelsHidden()
+                }
+                Divider()
+                settingRow("Backup folder") {
+                    Button("Choose…") { chooseBackupFolder() }
+                }
+            }
+        }
+    }
 
+    private var socialPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
             card {
                 settingRow("Provider") {
                     Picker("", selection: socialProvider) {
@@ -167,13 +270,13 @@ struct SettingsView: View {
                     settingRow("Supabase URL") {
                         TextField("https://…supabase.co", text: supabaseURL)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 130)
+                            .frame(width: 170)
                     }
                     Divider()
                     settingRow("Anon key") {
                         SecureField("sb_publishable_…", text: anonKey)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 130)
+                            .frame(width: 170)
                     }
                 }
                 if socialProvider.wrappedValue == .webhook {
@@ -181,7 +284,7 @@ struct SettingsView: View {
                     settingRow("Webhook URL") {
                         TextField("https://…", text: webhookURL)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 130)
+                            .frame(width: 170)
                     }
                 }
                 if socialProvider.wrappedValue != .none {
@@ -189,13 +292,13 @@ struct SettingsView: View {
                     settingRow("Bearer token") {
                         SecureField("optional", text: bearerToken)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 130)
+                            .frame(width: 170)
                     }
                     Divider()
                     settingRow("Username") {
                         TextField("you", text: socialUsername)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 130)
+                            .frame(width: 170)
                             .autocorrectionDisabled()
                     }
                     Divider()
@@ -220,41 +323,11 @@ struct SettingsView: View {
                 Text("Friend list is stored locally — make sure these usernames exist on the selected backend.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .padding(.leading, 2)
             }
-
-            Divider()
-
-            HStack {
-                Text("Version")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
-                    .font(.callout.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 2)
         }
-        .padding(16)
-        .frame(width: 320)
-        }
-        // Area 2 crash fix: a fixed height pins the hosting view to the
-        // window, so SwiftUI content changes can't drive the window height
-        // back and forth (that layout feedback loop threw "more Update
-        // Constraints in Window passes than there are views" once the
-        // Social section made the content tall). Overflow scrolls.
-        .frame(height: 620)
     }
 
     // MARK: - Subviews
-
-    private func sectionLabel(_ text: String, icon: String) -> some View {
-        Label(text, systemImage: icon)
-            .font(.footnote.weight(.semibold))
-            .foregroundStyle(.secondary)
-            .padding(.leading, 2)
-    }
 
     private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(spacing: 0) { content() }
@@ -285,8 +358,6 @@ struct SettingsView: View {
     }
 
     // MARK: Social (Area 2)
-
-    @State private var socialConfig = SocialConfig.load()
 
     private var socialProvider: Binding<SocialConfig.Provider> {
         Binding(
