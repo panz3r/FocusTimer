@@ -124,8 +124,16 @@ struct SettingsView: View {
             sectionLabel("Data", icon: "externaldrive")
 
             card {
-                settingRow("Export backup…") {
-                    Button("Export…") { SessionExport.runExportDialog() }
+                settingRow("Export JSON backup…") {
+                    Button("Export…") { SessionExport.runExportDialog(.jsonBackup) }
+                }
+                Divider()
+                settingRow("Export CSV…") {
+                    Button("Export…") { SessionExport.runExportDialog(.csv) }
+                }
+                Divider()
+                settingRow("Export Markdown summary…") {
+                    Button("Export…") { SessionExport.runExportDialog(.markdown) }
                 }
                 Divider()
                 settingRow("Import backup…") {

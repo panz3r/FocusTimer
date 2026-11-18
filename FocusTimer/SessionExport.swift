@@ -235,16 +235,24 @@ enum SessionExport {
 
     // MARK: Panels (shared by Settings and Stats)
 
-    /// Save panel for a manual export. Format is inferred from the chosen
-    /// file extension. Returns true when a file was written.
+    /// Default filename per format, matching the plan's examples.
+    private static func defaultFileName(for format: ExportFormat) -> String {
+        switch format {
+        case .jsonBackup: return "FocusTimer-backup-\(fileStamp).json"
+        case .csv:        return "FocusTimer-sessions-\(fileStamp).csv"
+        case .markdown:   return "FocusTimer-week-\(fileStamp).md"
+        }
+    }
+
+    /// Save panel for a manual export in a specific format.
+    /// Returns true when a file was written.
     @discardableResult
-    static func runExportDialog() -> Bool {
+    static func runExportDialog(_ format: ExportFormat) -> Bool {
         let panel = NSSavePanel()
-        panel.allowedContentTypes = ExportFormat.allCases.map(\.utType)
-        panel.nameFieldStringValue = "FocusTimer-backup-\(fileStamp).json"
+        panel.allowedContentTypes = [format.utType]
+        panel.nameFieldStringValue = defaultFileName(for: format)
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return false }
-        let format = ExportFormat.allCases.first { url.pathExtension.lowercased() == $0.fileExtension } ?? .jsonBackup
         do {
             try export(to: url, format: format)
             return true

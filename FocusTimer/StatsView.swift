@@ -54,13 +54,17 @@ struct StatsView: View {
             Text("Stats History")
                 .font(.title2.weight(.semibold))
             Spacer()
-            Button {
-                SessionExport.runExportDialog()
+            Menu {
+                Button("JSON backup…") { SessionExport.runExportDialog(.jsonBackup) }
+                Button("CSV…") { SessionExport.runExportDialog(.csv) }
+                Button("Markdown summary…") { SessionExport.runExportDialog(.markdown) }
             } label: {
                 Image(systemName: "square.and.arrow.up")
             }
-            .buttonStyle(.plain)
-            .help("Export backup…")
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .frame(width: 22)
+            .help("Export…")
 
             Button {
                 SessionExport.runImportDialog { refreshToken += 1 }
