@@ -10,21 +10,23 @@ struct SettingsView: View {
     @ObservedObject var vm: TimerViewModel
 
     enum Section: String, CaseIterable, Identifiable {
-        case timer     = "Timer"
-        case behavior  = "Behavior"
-        case shortcuts = "Shortcuts"
-        case social    = "Social"
-        case data      = "Data"
+        case timer        = "Timer"
+        case behavior     = "Behavior"
+        case notifications = "Notifications"
+        case shortcuts    = "Shortcuts"
+        case social       = "Social"
+        case data         = "Data"
 
         var id: String { rawValue }
 
         var icon: String {
             switch self {
-            case .timer:     return "clock"
-            case .behavior:  return "gearshape"
-            case .shortcuts: return "keyboard"
-            case .data:      return "externaldrive"
-            case .social:    return "person.2"
+            case .timer:         return "clock"
+            case .behavior:      return "gearshape"
+            case .notifications: return "bell"
+            case .shortcuts:     return "keyboard"
+            case .data:          return "externaldrive"
+            case .social:        return "person.2"
             }
         }
     }
@@ -102,11 +104,12 @@ struct SettingsView: View {
     @ViewBuilder
     private var content: some View {
         switch section {
-        case .timer:     timerPane
-        case .behavior:  behaviorPane
-        case .shortcuts: shortcutsPane
-        case .data:      dataPane
-        case .social:    socialPane
+        case .timer:         timerPane
+        case .behavior:      behaviorPane
+        case .notifications: notificationsPane
+        case .shortcuts:     shortcutsPane
+        case .data:          dataPane
+        case .social:        socialPane
         }
     }
 
@@ -157,7 +160,11 @@ struct SettingsView: View {
                     Stepper("\(vm.idlePauseThreshold) min", value: $vm.idlePauseThreshold, in: 2...30)
                 }
             }
-            Divider()
+        }
+    }
+
+    private var notificationsPane: some View {
+        card {
             settingRow("Notifications") {
                 Toggle("", isOn: $vm.notificationsEnabled)
                     .labelsHidden()
