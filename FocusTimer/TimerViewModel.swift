@@ -89,6 +89,12 @@ final class TimerViewModel: ObservableObject {
     private var idleMonitorCancellable: AnyCancellable?
     private var pausedDueToIdle = false
 
+    // Item 0: day-rollover tracking. Seeded at init; compared against
+    // StatsStore.todayKey on a 60-second poll so "today" counters re-sync
+    // when the calendar date changes while the app is open.
+    private var lastSyncedDayKey: String = StatsStore.todayKey
+    private var daySyncCancellable: AnyCancellable?
+
     init() {
         let ud = UserDefaults.standard
 
@@ -122,6 +128,12 @@ final class TimerViewModel: ObservableObject {
         timeRemaining = duration
         sessionStartDuration = duration
         completedPomodoros = StatsStore.shared.todaySessions
+
+        // Item 0: poll once a minute so the UI's "today" counters reset
+        // when the date rolls over without an app restart.
+        daySyncCancellable = Timer.publish(every: 60, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in self?.resyncIfDayChanged() }
     }
 
     func updateToggleHotkey(code: Int, mods: Int, label: String) {
@@ -246,8 +258,10 @@ final class TimerViewModel: ObservableObject {
         }
 
         if sessionType == .work {
-            completedPomodoros += 1
             StatsStore.shared.recordSession(durationMinutes: workDuration, taskLabel: taskLabel)
+            // Item 0: read the post-increment count from the store instead of
+            // `+= 1` on a possibly stale value.
+            completedPomodoros = StatsStore.shared.todaySessions
             syncStats()
         }
 
@@ -268,6 +282,17 @@ final class TimerViewModel: ObservableObject {
                 streak: streak
             )
         }
+    }
+
+    /// Item 0: re-syncs the "today" counters when the calendar day has
+    /// rolled over while the app was open. Cheap no-op when the day is
+    /// unchanged. Called from the 60-second poll and from
+    /// AppDelegate.applicationDidBecomeActive (fast recovery after sleep).
+    func resyncIfDayChanged() {
+        let today = StatsStore.todayKey
+        guard today != lastSyncedDayKey else { return }
+        lastSyncedDayKey = today
+        completedPomodoros = StatsStore.shared.todaySessions
     }
 
     private func advance() {
