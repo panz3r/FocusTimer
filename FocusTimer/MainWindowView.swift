@@ -31,6 +31,12 @@ struct MainWindowView: View {
         }
     }
 
+    /// Area 2: hide the Social entry while no backend is configured
+    /// (cross-cutting item L: deny-by-default).
+    private var socialAvailable: Bool {
+        SocialConfig.load().isExplicitlyEnabled
+    }
+
     var body: some View {
         VStack(spacing: 24) {
             headerRow
@@ -89,10 +95,12 @@ struct MainWindowView: View {
             Spacer()
 
             HStack(spacing: 12) {
-                Button { SocialWindowController.shared.open() } label: {
-                    Image(systemName: "person.2").foregroundColor(.secondary)
+                if socialAvailable {
+                    Button { SocialWindowController.shared.open() } label: {
+                        Image(systemName: "person.2").foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 Button { StatsWindowController.shared.open() } label: {
                     Image(systemName: "chart.bar").foregroundColor(.secondary)

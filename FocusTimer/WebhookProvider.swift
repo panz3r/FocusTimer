@@ -5,12 +5,15 @@ import Foundation
 ///
 /// Contract (documented in the plan and in the Settings UI):
 ///   POST {baseURL}/today    body: TodayStats (JSON, ISO-8601 dates)
-///   GET  {baseURL}/friends?usernames=a,b,c   → [FriendStats]
+///   POST {baseURL}/friends  body: {"usernames": ["a","b", …]}
+///                           → [FriendStats]
 ///   Auth: optional "Authorization: Bearer {token}"
 ///
-/// Identity is server-defined; TodayStats carries the locally-set username
-/// for reference, and registerUsername is a no-op because there is no
-/// Supabase-style profile table.
+/// Both endpoints are POST so usernames never appear in URL query strings
+/// (proxies and access logs record full URLs). Identity is server-defined;
+/// TodayStats carries the locally-set username for reference, and
+/// registerUsername is a no-op because there is no Supabase-style profile
+/// table.
 final class WebhookProvider: SocialProvider {
     private let config: SocialConfig
 
@@ -42,11 +45,11 @@ final class WebhookProvider: SocialProvider {
 
     func fetchFriendsStats(usernames: [String]) async throws -> [FriendStats] {
         guard let baseURL = config.baseURL else { throw SocialError.notConfigured }
-        var comps = URLComponents(url: baseURL.appendingPathComponent("friends"),
-                                  resolvingAgainstBaseURL: false)!
-        comps.queryItems = [URLQueryItem(name: "usernames", value: usernames.joined(separator: ","))]
-        var req = URLRequest(url: comps.url!)
+        var req = URLRequest(url: baseURL.appendingPathComponent("friends"))
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         for (key, value) in authHeaders() { req.setValue(value, forHTTPHeaderField: key) }
+        req.httpBody = try JSONEncoder().encode(["usernames": usernames])
         let (data, resp) = try await URLSession.shared.data(for: req)
         try Self.validate(resp)
         let decoder = JSONDecoder()

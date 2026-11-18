@@ -31,6 +31,13 @@ struct ContentView: View {
         }
     }
 
+    /// Area 2: the Social entry point only makes sense once a backend is
+    /// configured. Evaluated per render, so reopening the popover reflects
+    /// a Settings change immediately.
+    private var socialAvailable: Bool {
+        SocialConfig.load().isExplicitlyEnabled
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             // Header
@@ -50,13 +57,15 @@ struct ContentView: View {
 
                 Spacer()
 
-                Button {
-                    SocialWindowController.shared.open()
-                } label: {
-                    Image(systemName: "person.2")
-                        .foregroundColor(.secondary)
+                if socialAvailable {
+                    Button {
+                        SocialWindowController.shared.open()
+                    } label: {
+                        Image(systemName: "person.2")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 Button {
                     StatsWindowController.shared.open()

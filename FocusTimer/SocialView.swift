@@ -63,6 +63,12 @@ struct SocialView: View {
                 .autocorrectionDisabled()
                 .onSubmit { vm.createUsername() }
 
+            if vm.showTokenField {
+                SecureField("Token (optional)", text: $vm.tokenInput)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 220)
+            }
+
             if let err = vm.errorMessage {
                 Text(err).foregroundStyle(.red).font(.caption)
             }
@@ -183,9 +189,14 @@ final class SocialViewModel: ObservableObject {
     @Published var myUsername = ""
     @Published var friends: [FriendStats] = []
     @Published var usernameInput = ""
+    @Published var tokenInput = ""
     @Published var addInput = ""
     @Published var errorMessage: String?
     @Published var isLoading = false
+
+    /// Webhook bearer tokens can be entered during setup so the user
+    /// doesn't have to bounce through Settings (optional — empty = none).
+    var showTokenField: Bool { SocialConfig.load().provider == .webhook }
 
     var todaySessions: Int    { StatsStore.shared.todaySessions    }
     var todayMinutes: Int     { StatsStore.shared.todayFocusMinutes }
@@ -211,15 +222,20 @@ final class SocialViewModel: ObservableObject {
             errorMessage = nil
             defer { isLoading = false }
             do {
-                let config = SocialConfig.load()
+                var config = SocialConfig.load()
+                // Webhook setup can capture the optional bearer token here.
+                if config.provider == .webhook {
+                    let token = tokenInput.trimmingCharacters(in: .whitespaces)
+                    config.bearerToken = token.isEmpty ? nil : token
+                }
                 let provider = SocialProviderRegistry.activeProvider(using: config)
                 // Supabase registers a profile row; webhook/none store locally.
                 try await provider.registerUsername(name)
-                var updated = config
-                updated.username = name
-                updated.save()
+                config.username = name
+                config.save()
                 myUsername = name
                 state = .main
+                tokenInput = ""
                 await loadFriends()
             } catch let error as SocialError {
                 errorMessage = error.localizedDescription
