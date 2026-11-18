@@ -36,7 +36,6 @@ struct SettingsView: View {
 
     @State private var section: Section = .timer
     @State private var socialConfig = SocialConfig.load()
-    @State private var authorizationText: String?
 
     var body: some View {
         HStack(spacing: 0) {
@@ -173,58 +172,45 @@ struct SettingsView: View {
     }
 
     private var notificationsPane: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        card {
+            settingRow("Notifications") {
+                Toggle("", isOn: $vm.notificationsEnabled)
+                    .labelsHidden()
+                    .onChange(of: vm.notificationsEnabled) { enabled in
+                        if enabled { NotificationManager.shared.requestPermission() }
+                    }
+            }
+            if vm.notificationsEnabled {
+                Divider()
+                settingRow("Weekly digest") {
+                    Toggle("", isOn: $vm.weeklyDigestEnabled).labelsHidden()
+                }
+                Divider()
+                settingRow("Sound") {
+                    HStack(spacing: 6) {
+                        Button { vm.notificationSound.preview() } label: {
+                            Image(systemName: "speaker.wave.2")
+                                .foregroundStyle(vm.notificationSound.canPreview ? .secondary : .tertiary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!vm.notificationSound.canPreview)
 
-            card {
-                settingRow("Notifications") {
-                    Toggle("", isOn: $vm.notificationsEnabled)
+                        Picker("", selection: $vm.notificationSound) {
+                            ForEach(NotificationSound.allCases, id: \.self) {
+                                Text($0.rawValue).tag($0)
+                            }
+                        }
                         .labelsHidden()
-                        .onChange(of: vm.notificationsEnabled) { enabled in
-                            if enabled { NotificationManager.shared.requestPermission() }
-                        }
+                        .frame(width: 90)
+                    }
                 }
-                if vm.notificationsEnabled {
-                    Divider()
-                    settingRow("Weekly digest") {
-                        Toggle("", isOn: $vm.weeklyDigestEnabled).labelsHidden()
-                    }
-                    Divider()
-                    settingRow("Sound") {
-                        HStack(spacing: 6) {
-                            Button { vm.notificationSound.preview() } label: {
-                                Image(systemName: "speaker.wave.2")
-                                    .foregroundStyle(vm.notificationSound.canPreview ? .secondary : .tertiary)
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(!vm.notificationSound.canPreview)
-
-                            Picker("", selection: $vm.notificationSound) {
-                                ForEach(NotificationSound.allCases, id: \.self) {
-                                    Text($0.rawValue).tag($0)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(width: 90)
-                        }
-                    }
-                    Divider()
-                    settingRow("Test notification") {
-                        Button("Send…") {
-                            NotificationManager.shared.sendTestNotification()
-                            Task { authorizationText = await NotificationManager.shared.authorizationDescription() }
-                        }
+                Divider()
+                settingRow("Test notification") {
+                    Button("Send…") {
+                        Task { await NotificationManager.shared.sendTestNotificationWithPermissionFlow() }
                     }
                 }
             }
-
-            if let authorizationText {
-                Text("Authorization: \(authorizationText)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .task {
-            authorizationText = await NotificationManager.shared.authorizationDescription()
         }
     }
 

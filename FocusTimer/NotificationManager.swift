@@ -48,6 +48,52 @@ final class NotificationManager {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
+    /// "Send…" pipeline: sends a test notification when possible, and when
+    /// permissions aren't set correctly presents an information popup
+    /// instead (requesting the system prompt if never asked, or pointing at
+    /// System Settings if turned off).
+    @MainActor
+    func sendTestNotificationWithPermissionFlow() async {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
+            if granted {
+                sendTestNotification()
+            } else {
+                presentPermissionDeniedAlert()
+            }
+        case .denied:
+            presentNotificationsOffAlert()
+        default:
+            sendTestNotification()
+        }
+    }
+
+    @MainActor
+    private func presentNotificationsOffAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Notifications are turned off"
+        alert.informativeText = "Enable them in System Settings → Notifications → FocusTimer, then try again."
+        alert.addButton(withTitle: "Open System Settings")
+        alert.addButton(withTitle: "OK")
+        if alert.runModal() == .alertFirstButtonReturn,
+           let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @MainActor
+    private func presentPermissionDeniedAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Notifications were not allowed"
+        alert.informativeText = "FocusTimer can't show session alerts without notification permission. Enable it in System Settings → Notifications → FocusTimer."
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+
     /// Human-readable authorization state for the Settings pane.
     func authorizationDescription() async -> String {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
