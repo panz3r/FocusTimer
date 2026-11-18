@@ -48,6 +48,36 @@ final class NotificationManager {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
+    /// Human-readable authorization state for the Settings pane.
+    func authorizationDescription() async -> String {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return "Authorized"
+        case .denied:
+            return "Denied — enable in System Settings → Notifications → FocusTimer"
+        case .notDetermined:
+            return "Not requested yet — toggle Notifications to trigger the prompt"
+        @unknown default:
+            return "Unknown"
+        }
+    }
+
+    /// Posts an immediate notification so the pipeline can be verified
+    /// without waiting for a session to complete.
+    func sendTestNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Test notification"
+        content.body = "If you see this as a banner (or in Notification Center), notifications work."
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "test-\(UUID())",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
     func notify(sessionEnded type: SessionType, sound: UNNotificationSound?, taskLabel: String = "") {
         let content = UNMutableNotificationContent()
 
