@@ -47,7 +47,7 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .frame(width: 570, height: 620)
+        .frame(width: 580, height: 620)
     }
 
     // MARK: - Sidebar
@@ -65,7 +65,7 @@ struct SettingsView: View {
                 .padding(.horizontal, 12)
         }
         .padding(10)
-        .frame(width: 150)
+        .frame(width: 162)
     }
 
     private func sidebarItem(_ item: Section) -> some View {
