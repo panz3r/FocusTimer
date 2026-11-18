@@ -79,6 +79,17 @@ final class TimerViewModel: ObservableObject {
             if weeklyDigestEnabled { DigestChecker.shared.start() } else { DigestChecker.shared.stop() }
         }
     }
+    @Published var weeklyBackupEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(weeklyBackupEnabled, forKey: "weeklyBackupEnabled")
+            BackupScheduler.shared.restartIfNeeded()
+        }
+    }
+    @Published var weeklyBackupMarkdownEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: "weeklyBackupMarkdownEnabled")
+        }
+    }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
@@ -120,6 +131,8 @@ final class TimerViewModel: ObservableObject {
         let idleThresh = ud.integer(forKey: "idlePauseThreshold")
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
         weeklyDigestEnabled = ud.object(forKey: "weeklyDigestEnabled") as? Bool ?? true
+        weeklyBackupEnabled = ud.object(forKey: "weeklyBackupEnabled") as? Bool ?? false
+        weeklyBackupMarkdownEnabled = ud.object(forKey: "weeklyBackupMarkdownEnabled") as? Bool ?? false
         toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
         taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
@@ -292,6 +305,13 @@ final class TimerViewModel: ObservableObject {
         let today = StatsStore.todayKey
         guard today != lastSyncedDayKey else { return }
         lastSyncedDayKey = today
+        completedPomodoros = StatsStore.shared.todaySessions
+    }
+
+    /// Area 1: re-reads today's counters from the store after a backup
+    /// import merges data in. Setting the @Published property re-renders
+    /// every view bound to this view model.
+    func refreshFromStore() {
         completedPomodoros = StatsStore.shared.todaySessions
     }
 

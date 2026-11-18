@@ -121,6 +121,34 @@ struct SettingsView: View {
                 }
             }
 
+            sectionLabel("Data", icon: "externaldrive")
+
+            card {
+                settingRow("Export backup…") {
+                    Button("Export…") { SessionExport.runExportDialog() }
+                }
+                Divider()
+                settingRow("Import backup…") {
+                    Button("Import…") {
+                        SessionExport.runImportDialog { vm.refreshFromStore() }
+                    }
+                }
+                Divider()
+                settingRow("Weekly auto-backup") {
+                    Toggle("", isOn: $vm.weeklyBackupEnabled).labelsHidden()
+                }
+                if vm.weeklyBackupEnabled {
+                    Divider()
+                    settingRow("Include Markdown summary") {
+                        Toggle("", isOn: $vm.weeklyBackupMarkdownEnabled).labelsHidden()
+                    }
+                    Divider()
+                    settingRow("Backup folder") {
+                        Button("Choose…") { chooseBackupFolder() }
+                    }
+                }
+            }
+
             Divider()
 
             HStack {
@@ -162,6 +190,17 @@ struct SettingsView: View {
         }
         .padding(.horizontal, 14)
         .frame(height: 38)
+    }
+
+    private func chooseBackupFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.prompt = "Use Folder"
+        panel.message = "Weekly backups will be written to this folder."
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        BackupScheduler.setFolder(url)
     }
 }
 

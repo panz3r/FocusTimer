@@ -111,6 +111,21 @@ final class NotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
 
+    /// Area 1: the weekly auto-backup failed (usually a vanished folder).
+    /// Shown once before auto-backup turns itself off.
+    func sendBackupFailed(_ message: String) {
+        let content = UNMutableNotificationContent()
+        content.title = "Auto-backup failed"
+        content.body = "\(message) Auto-backup has been turned off — re-enable it in Settings."
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "backup-failed-\(UUID())",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
     func sendWeeklyDigest(sessions: Int, minutes: Int, streak: Int) {
         let content = UNMutableNotificationContent()
         content.title = "Weekly focus summary"

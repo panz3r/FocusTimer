@@ -29,6 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationManager.shared.requestPermission()
         UpdateChecker.shared.check()
         if viewModel.weeklyDigestEnabled { DigestChecker.shared.start() }
+        if viewModel.weeklyBackupEnabled { BackupScheduler.shared.start() }
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {

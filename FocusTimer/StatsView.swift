@@ -5,6 +5,7 @@ struct StatsView: View {
     @State private var tab: Tab = .overview
     @State private var metric: Metric = .sessions
     @State private var range: Int = 28
+    @State private var refreshToken = 0
 
     enum Tab: String, CaseIterable {
         case overview  = "Overview"
@@ -43,6 +44,7 @@ struct StatsView: View {
             }
         }
         .frame(width: 500)
+        .id(refreshToken)   // Area 1: full re-render after a backup import
     }
 
     // MARK: - Header
@@ -52,6 +54,22 @@ struct StatsView: View {
             Text("Stats History")
                 .font(.title2.weight(.semibold))
             Spacer()
+            Button {
+                SessionExport.runExportDialog()
+            } label: {
+                Image(systemName: "square.and.arrow.up")
+            }
+            .buttonStyle(.plain)
+            .help("Export backup…")
+
+            Button {
+                SessionExport.runImportDialog { refreshToken += 1 }
+            } label: {
+                Image(systemName: "square.and.arrow.down")
+            }
+            .buttonStyle(.plain)
+            .help("Import backup…")
+
             Picker("", selection: $range) {
                 Text("1 week").tag(7)
                 Text("2 weeks").tag(14)
