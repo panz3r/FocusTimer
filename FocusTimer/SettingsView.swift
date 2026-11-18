@@ -13,8 +13,8 @@ struct SettingsView: View {
         case timer     = "Timer"
         case behavior  = "Behavior"
         case shortcuts = "Shortcuts"
-        case data      = "Data"
         case social    = "Social"
+        case data      = "Data"
 
         var id: String { rawValue }
 
@@ -45,7 +45,7 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .frame(width: 560, height: 620)
+        .frame(width: 570, height: 620)
     }
 
     // MARK: - Sidebar
@@ -63,7 +63,7 @@ struct SettingsView: View {
                 .padding(.horizontal, 12)
         }
         .padding(10)
-        .frame(width: 132)
+        .frame(width: 150)
     }
 
     private func sidebarItem(_ item: Section) -> some View {
