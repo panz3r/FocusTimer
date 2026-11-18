@@ -29,11 +29,20 @@ final class SyncCoordinator: ObservableObject {
 
     @Published private(set) var state: State = .disabled
     @Published private(set) var lastSyncAt: Date?
+    /// A session currently running on ANOTHER Mac (own-host sessions are
+    /// filtered out — the local UI already shows them).
+    @Published private(set) var remoteActiveSession: ActiveSession?
 
     private var pollTimer: Timer?
     private var debounceWorkItem: DispatchWorkItem?
     private var lastPushedLogHash: Int?
     private var lastPushedStatsHash: Int?
+    private var lastPushedCurrentHash: Int?
+
+    /// Stable per-machine identity, so clients can tell their own writes
+    /// from other Macs' and clean up their own stale files after a crash.
+    private let deviceId: String
+    private let deviceName: String
 
     /// Injectable so the merge/flush logic can be verified headlessly
     /// against a temp directory; the app singleton uses the real iCloud
@@ -43,6 +52,15 @@ final class SyncCoordinator: ObservableObject {
     init(folderOverride: URL? = nil) {
         self.folderOverride = folderOverride
         lastSyncAt = UserDefaults.standard.object(forKey: "icloud.lastSyncAt") as? Date
+
+        if let saved = UserDefaults.standard.string(forKey: "sync.deviceId") {
+            deviceId = saved
+        } else {
+            let fresh = UUID().uuidString
+            UserDefaults.standard.set(fresh, forKey: "sync.deviceId")
+            deviceId = fresh
+        }
+        deviceName = Host.current().localizedName ?? "Mac"
     }
 
     // MARK: - Paths
@@ -62,6 +80,7 @@ final class SyncCoordinator: ObservableObject {
     private var syncFolder: URL { folderOverride ?? Self.syncFolder }
     private var sessionLogURL: URL { syncFolder.appendingPathComponent("session-log.json") }
     private var dailyStatsURL: URL { syncFolder.appendingPathComponent("daily-stats.json") }
+    private var currentSessionURL: URL { syncFolder.appendingPathComponent("current-session.json") }
 
     // MARK: - Enablement & lifecycle
 
@@ -193,6 +212,55 @@ final class SyncCoordinator: ObservableObject {
         return try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: StatsStore.shared.dailyStatsSnapshot))
     }
 
+    // MARK: - Current session (live state across Macs)
+
+    /// Mirrors a locally started/paused session to current-session.json, or
+    /// removes the file when the session ends (completed, skipped, reset).
+    /// Identity (host/deviceId) is owned by the coordinator.
+    func pushCurrentSession(id: UUID, type: String, label: String,
+                            startedAt: Date, durationSeconds: Int, paused: Bool) {
+        pushCurrentSession(ActiveSession(
+            id: id,
+            host: deviceName,
+            type: type,
+            label: label,
+            startedAt: startedAt,
+            durationSeconds: durationSeconds,
+            pausedAt: paused ? Date() : nil
+        ))
+    }
+
+    /// Mirrors a locally started/paused session to current-session.json, or
+    /// removes the file when the session ends (completed, skipped, reset).
+    func pushCurrentSession(_ session: ActiveSession?) {
+        guard isEnabled, Self.iCloudDriveAvailable else { return }
+        do {
+            if let session {
+                let encoder = JSONEncoder()
+                encoder.dateEncodingStrategy = .iso8601
+                encoder.outputFormatting = [.sortedKeys]
+                let data = try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: session))
+                try data.write(to: currentSessionURL, options: .atomic)
+                lastPushedCurrentHash = data.hashValue
+            } else {
+                try? FileManager.default.removeItem(at: currentSessionURL)
+                lastPushedCurrentHash = nil
+            }
+        } catch {
+            state = .error("Couldn't sync current session: \(error.localizedDescription)")
+        }
+    }
+
+    /// Removes our own stale current-session file after a crash (a file
+    /// written by another Mac is left alone — it expires on its own).
+    func clearOwnSessionIfAny() {
+        guard let data = readRemoteData(currentSessionURL),
+              let session = decode(ActiveSession.self, from: data),
+              session.host == deviceName || session.host == deviceId else { return }
+        try? FileManager.default.removeItem(at: currentSessionURL)
+        lastPushedCurrentHash = nil
+    }
+
     // MARK: - Read path
 
     private func pollRemote() {
@@ -228,6 +296,23 @@ final class SyncCoordinator: ObservableObject {
                 changed = changed || result.changedDays > 0
             }
         }
+
+        // Current session awareness: a session running on another Mac.
+        // Own-host sessions are ignored (the local UI shows them already);
+        // expired ones are ignored (the owner will delete the file).
+        if let data = readRemoteData(currentSessionURL) {
+            sawRemote = true
+            if let session = decode(ActiveSession.self, from: data),
+               !session.isExpired,
+               session.host != deviceName, session.host != deviceId {
+                remoteActiveSession = session
+            } else {
+                remoteActiveSession = nil
+            }
+        } else {
+            remoteActiveSession = nil
+        }
+
         guard sawRemote else { return false }
 
         if changed {
@@ -267,4 +352,36 @@ final class SyncCoordinator: ObservableObject {
 struct SyncEnvelope<T: Codable>: Codable {
     let schemaVersion: Int
     let payload: T
+}
+
+/// Snapshot of a session running on some Mac, mirrored to
+/// current-session.json. Created on start, rewritten on pause/resume,
+/// deleted when the session ends. Other clients derive the remaining time
+/// from startedAt — no per-second writes.
+struct ActiveSession: Codable {
+    let id: UUID
+    let host: String
+    let type: String              // SessionType raw value
+    let label: String
+    let startedAt: Date
+    let durationSeconds: Int
+    var pausedAt: Date?           // set while the session is paused
+
+    /// Seconds left, derived from the clock. Paused sessions freeze at the
+    /// moment they were paused.
+    var remainingSeconds: Int {
+        let reference = pausedAt ?? Date()
+        let elapsed = Int(reference.timeIntervalSince(startedAt))
+        return max(0, durationSeconds - elapsed)
+    }
+
+    /// A session nobody is running anymore: its time elapsed, or it has
+    /// been paused for over a day. Lets every client ignore stale files
+    /// (un-propagated deletions, crashed machines) without coordination.
+    var isExpired: Bool {
+        if let pausedAt {
+            return Date().timeIntervalSince(pausedAt) > 86_400
+        }
+        return Date().timeIntervalSince(startedAt) > Double(durationSeconds + 60)
+    }
 }
