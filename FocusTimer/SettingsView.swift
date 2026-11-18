@@ -5,7 +5,8 @@ struct SettingsView: View {
     @ObservedObject var vm: TimerViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
 
             sectionLabel("Durations", icon: "clock")
 
@@ -237,6 +238,13 @@ struct SettingsView: View {
         }
         .padding(16)
         .frame(width: 320)
+        }
+        // Area 2 crash fix: a fixed height pins the hosting view to the
+        // window, so SwiftUI content changes can't drive the window height
+        // back and forth (that layout feedback loop threw "more Update
+        // Constraints in Window passes than there are views" once the
+        // Social section made the content tall). Overflow scrolls.
+        .frame(height: 620)
     }
 
     // MARK: - Subviews

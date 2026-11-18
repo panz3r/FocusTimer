@@ -5,6 +5,35 @@ import Combine
 class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     let viewModel = TimerViewModel()
 
+    // Crash diagnostics: when AppKit raises during layout (e.g. the Area 2
+    // constraint-loop crash), the exception name/reason/stack land in
+    // ~/Library/Logs/FocusTimer-exception.log and on stderr, instead of a
+    // reason-less SIGTRAP report. Silent unless a crash happens.
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        NSSetUncaughtExceptionHandler { exception in
+            let report = """
+
+            ========== UNCAUGHT EXCEPTION ==========
+            time:   \(Date())
+            name:   \(exception.name.rawValue)
+            reason: \(exception.reason ?? "nil")
+            stack:
+            \(exception.callStackSymbols.joined(separator: "\n"))
+            ========================================
+            """
+            FileHandle.standardError.write(Data(report.utf8))
+            let logURL = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Logs/FocusTimer-exception.log")
+            if let handle = try? FileHandle(forWritingTo: logURL) {
+                handle.seekToEndOfFile()
+                handle.write(Data(report.utf8))
+                try? handle.close()
+            } else {
+                try? report.write(to: logURL, atomically: true, encoding: .utf8)
+            }
+        }
+    }
+
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var cancellable: AnyCancellable?
