@@ -52,6 +52,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // Item 0: fast recovery of "today" counters after sleep / long inactivity.
     func applicationDidBecomeActive(_ notification: Notification) {
         viewModel.resyncIfDayChanged()
+        SyncCoordinator.shared.appDidBecomeActive()
+    }
+
+    // Area 3: push any pending local change before the process dies.
+    func applicationWillTerminate(_ notification: Notification) {
+        SyncCoordinator.shared.flushNow()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -59,6 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         UpdateChecker.shared.check()
         if viewModel.weeklyDigestEnabled { DigestChecker.shared.start() }
         if viewModel.weeklyBackupEnabled { BackupScheduler.shared.start() }
+        SyncCoordinator.shared.restartIfNeeded()
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {

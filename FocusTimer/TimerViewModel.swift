@@ -90,6 +90,12 @@ final class TimerViewModel: ObservableObject {
             UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: "weeklyBackupMarkdownEnabled")
         }
     }
+    @Published var icloudSyncEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(icloudSyncEnabled, forKey: "icloudSyncEnabled")
+            SyncCoordinator.shared.restartIfNeeded()
+        }
+    }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
@@ -133,6 +139,7 @@ final class TimerViewModel: ObservableObject {
         weeklyDigestEnabled = ud.object(forKey: "weeklyDigestEnabled") as? Bool ?? true
         weeklyBackupEnabled = ud.object(forKey: "weeklyBackupEnabled") as? Bool ?? false
         weeklyBackupMarkdownEnabled = ud.object(forKey: "weeklyBackupMarkdownEnabled") as? Bool ?? false
+        icloudSyncEnabled = ud.object(forKey: "icloudSyncEnabled") as? Bool ?? SyncCoordinator.iCloudDriveAvailable
         toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
         taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
@@ -276,6 +283,7 @@ final class TimerViewModel: ObservableObject {
             // `+= 1` on a possibly stale value.
             completedPomodoros = StatsStore.shared.todaySessions
             syncStats()
+            SyncCoordinator.shared.queueWrite()
         }
 
         advance()
