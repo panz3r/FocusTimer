@@ -3,42 +3,26 @@ import Combine
 import CoreGraphics
 import ServiceManagement
 
-enum SessionType: String, CaseIterable {
-    case work = "Work"
-    case shortBreak = "Short Break"
-    case longBreak = "Long Break"
-
-    var sfSymbol: String {
-        switch self {
-        case .work: return "timer"
-        case .shortBreak: return "cup.and.saucer"
-        case .longBreak: return "leaf"
-        }
-    }
-}
-
 final class TimerViewModel: ObservableObject {
     @Published var timeRemaining: Int
     @Published var sessionStartDuration: Int
     @Published var isRunning = false
-    @Published var sessionType: SessionType = .work
+    @Published var currentSchedule: Schedule {
+        didSet { ScheduleStore.shared.save(currentSchedule) }
+    }
+    @Published var currentStep: Step
+    @Published private(set) var currentStepIndex = 0
+    @Published private(set) var cycleCount = 0
+    /// Completed work steps since the schedule started; drives the long-break
+    /// cadence (`completedWorkSteps % insertedLongBreakEvery == 0`).
+    @Published private(set) var completedWorkSteps = 0
+    /// Completed step minutes since the schedule started (`untilTotalMinutes`).
+    @Published private(set) var accumulatedMinutes = 0
+    /// Set when a `.count`/`.untilTotalMinutes` schedule runs to completion;
+    /// the timer holds at zero until reset.
+    @Published private(set) var isScheduleFinished = false
     @Published var completedPomodoros = 0
 
-    @Published var workDuration: Int {
-        didSet { UserDefaults.standard.set(workDuration, forKey: "workDuration") }
-    }
-    @Published var shortBreakDuration: Int {
-        didSet { UserDefaults.standard.set(shortBreakDuration, forKey: "shortBreakDuration") }
-    }
-    @Published var longBreakDuration: Int {
-        didSet { UserDefaults.standard.set(longBreakDuration, forKey: "longBreakDuration") }
-    }
-    @Published var sessionsBeforeLongBreak: Int {
-        didSet { UserDefaults.standard.set(sessionsBeforeLongBreak, forKey: "sessionsBeforeLongBreak") }
-    }
-    @Published var notificationsEnabled: Bool {
-        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled") }
-    }
     @Published var dailyGoal: Int {
         didSet { UserDefaults.standard.set(dailyGoal, forKey: "dailyGoal") }
     }
@@ -96,6 +80,9 @@ final class TimerViewModel: ObservableObject {
             SyncCoordinator.shared.restartIfNeeded()
         }
     }
+    @Published var notificationsEnabled: Bool {
+        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled") }
+    }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
@@ -122,15 +109,6 @@ final class TimerViewModel: ObservableObject {
     init() {
         let ud = UserDefaults.standard
 
-        let work = ud.integer(forKey: "workDuration")
-        let short = ud.integer(forKey: "shortBreakDuration")
-        let long = ud.integer(forKey: "longBreakDuration")
-        let sessions = ud.integer(forKey: "sessionsBeforeLongBreak")
-
-        workDuration = work > 0 ? work : 25
-        shortBreakDuration = short > 0 ? short : 5
-        longBreakDuration = long > 0 ? long : 15
-        sessionsBeforeLongBreak = sessions > 0 ? sessions : 4
         notificationsEnabled = ud.object(forKey: "notificationsEnabled") as? Bool ?? true
         let goal = ud.integer(forKey: "dailyGoal")
         dailyGoal = goal > 0 ? goal : 8
@@ -151,9 +129,19 @@ final class TimerViewModel: ObservableObject {
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
         taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
 
-        let duration = (work > 0 ? work : 25) * 60
-        timeRemaining = duration
-        sessionStartDuration = duration
+        // Area 4: the active schedule (ScheduleStore bootstraps the legacy
+        // Pomodoro migration on first launch).
+        let active = ScheduleStore.shared.active ?? Schedule.legacyPomodoro(
+            work: 25, shortBreak: 5, longBreakMinutes: 15, cadence: 4
+        )
+        let firstStep = active.steps.first ?? Step(
+            label: Step.Kind.work.defaultLabel, minutes: 25, kind: .work
+        )
+        currentSchedule = active
+        currentStep = firstStep
+        let firstDuration = firstStep.minutes * 60
+        sessionStartDuration = firstDuration
+        timeRemaining = firstDuration
         completedPomodoros = StatsStore.shared.todaySessions
 
         // Item 0: poll once a minute so the UI's "today" counters reset
@@ -200,6 +188,27 @@ final class TimerViewModel: ObservableObject {
 
     var formattedTime: String {
         String(format: "%02d:%02d", timeRemaining / 60, timeRemaining % 60)
+    }
+
+    /// Area 4: switches the active schedule. Locked decision: disallowed
+    /// while a session is running (reset first). Applies the schedule's
+    /// first step immediately.
+    func switchSchedule(to id: UUID) {
+        guard !isRunning else { return }
+        guard let schedule = ScheduleStore.shared.schedule(id: id) else { return }
+        currentSchedule = schedule
+        isScheduleFinished = false
+        currentStepIndex = 0
+        cycleCount = 0
+        completedWorkSteps = 0
+        accumulatedMinutes = 0
+        pausedAtLocally = nil
+        if let first = schedule.steps.first {
+            applyLabelRule(entering: first, schedule: schedule)
+            applyStep(first, at: 0)
+        }
+        clearSessionFromSync()
+        isRunning = false
     }
 
     func toggleTimer() {
@@ -272,9 +281,8 @@ final class TimerViewModel: ObservableObject {
     func reset() {
         pause()
         clearSessionFromSync()
-        let duration = durationFor(sessionType)
-        timeRemaining = duration
-        sessionStartDuration = duration
+        restartSchedulePositions()
+        isRunning = false
     }
 
     func skip() {
@@ -282,6 +290,20 @@ final class TimerViewModel: ObservableObject {
         clearSessionFromSync()
         advance()
         if autoAdvance { start() }
+    }
+
+    /// Restarts the schedule from its first step (Item 0-style hold state
+    /// after a `.count`/`.untilTotalMinutes` schedule finishes).
+    private func restartSchedulePositions() {
+        currentStepIndex = 0
+        cycleCount = 0
+        completedWorkSteps = 0
+        accumulatedMinutes = 0
+        isScheduleFinished = false
+        pausedAtLocally = nil
+        if let first = currentSchedule.steps.first {
+            applyStep(first, at: 0)
+        }
     }
 
     private func tick() {
@@ -296,13 +318,26 @@ final class TimerViewModel: ObservableObject {
         pause()
         clearSessionFromSync()
 
+        let completedMinutes = Int(Double(sessionStartDuration) / 60.0)
+        accumulatedMinutes += completedMinutes
+
         if notificationsEnabled {
             notificationSound.playAtSessionEnd()
-            NotificationManager.shared.notify(sessionEnded: sessionType, sound: notificationSound.unSound, taskLabel: taskLabel)
+            NotificationManager.shared.notify(
+                stepCompleted: currentStep.kind,
+                stepLabel: currentStep.label,
+                taskLabel: taskLabel,
+                sound: notificationSound.unSound
+            )
         }
 
-        if sessionType == .work {
-            StatsStore.shared.recordSession(durationMinutes: workDuration, taskLabel: taskLabel)
+        if currentStep.kind == .work {
+            completedWorkSteps += 1
+            StatsStore.shared.recordSession(
+                durationMinutes: completedMinutes,
+                taskLabel: taskLabel,
+                stepLabel: currentStep.label
+            )
             // Item 0: read the post-increment count from the store instead of
             // `+= 1` on a possibly stale value.
             completedPomodoros = StatsStore.shared.todaySessions
@@ -311,7 +346,7 @@ final class TimerViewModel: ObservableObject {
         }
 
         advance()
-        if autoAdvance { start() }
+        if autoAdvance && !isScheduleFinished { start() }
     }
 
     private func syncStats() {
@@ -359,8 +394,8 @@ final class TimerViewModel: ObservableObject {
     private func pushSessionToSync(paused: Bool) {
         SyncCoordinator.shared.pushCurrentSession(
             id: activeSessionId,
-            type: sessionType.rawValue,
-            label: taskLabel,
+            type: currentStep.kind.rawValue,
+            label: currentStep.label,
             startedAt: sessionStartedAt,
             durationSeconds: sessionStartDuration,
             paused: paused
@@ -371,24 +406,81 @@ final class TimerViewModel: ObservableObject {
         SyncCoordinator.shared.pushCurrentSession(nil)
     }
 
-    private func advance() {
-        switch sessionType {
-        case .work:
-            let isLongBreak = completedPomodoros > 0 && completedPomodoros % sessionsBeforeLongBreak == 0
-            sessionType = isLongBreak ? .longBreak : .shortBreak
-        case .shortBreak, .longBreak:
-            sessionType = .work
-        }
-        let duration = durationFor(sessionType)
-        timeRemaining = duration
-        sessionStartDuration = duration
+    // MARK: - Schedule editing (Area 4, Settings pane)
+
+    func addStepToCurrentSchedule() {
+        currentSchedule.steps.append(Step(
+            label: Step.Kind.work.defaultLabel,
+            minutes: 25,
+            kind: .work
+        ))
     }
 
-    private func durationFor(_ type: SessionType) -> Int {
-        switch type {
-        case .work: return workDuration * 60
-        case .shortBreak: return shortBreakDuration * 60
-        case .longBreak: return longBreakDuration * 60
+    func removeStepFromCurrentSchedule(_ id: UUID) {
+        guard currentSchedule.steps.count > 1 else { return }
+        currentSchedule.steps.removeAll { $0.id == id }
+    }
+
+    // MARK: - Schedule progression (Area 4)
+
+    /// Computes and applies the next step via the pure progression engine
+    /// (Schedule.nextStep). The just-completed step's kind drives the
+    /// long-break upgrade; finished `.count`/`.untilTotalMinutes` schedules
+    /// hold until reset.
+    private func advance() {
+        guard let next = Schedule.nextStep(
+            schedule: currentSchedule,
+            after: currentStep,
+            currentStepIndex: currentStepIndex,
+            completedWorkSteps: completedWorkSteps,
+            accumulatedMinutes: accumulatedMinutes,
+            cycleCount: cycleCount
+        ) else {
+            finishSchedule()
+            return
+        }
+
+        if next.wrapped { cycleCount += 1 }
+        applyLabelRule(entering: next.step, schedule: currentSchedule)
+        applyStep(next.step, at: next.index)
+    }
+
+    /// Locked label rule: non-work steps clear the label (remembered on the
+    /// schedule); the next work step restores it.
+    private func applyLabelRule(entering step: Step, schedule: Schedule) {
+        if step.kind == .work {
+            if taskLabel.trimmingCharacters(in: .whitespaces).isEmpty,
+               let last = schedule.lastUsedLabel, !last.isEmpty {
+                taskLabel = last
+            }
+        } else {
+            let trimmed = taskLabel.trimmingCharacters(in: .whitespaces)
+            guard !trimmed.isEmpty else { return }
+            var updated = schedule
+            updated.lastUsedLabel = trimmed
+            currentSchedule = updated   // persists through didSet
+        }
+    }
+
+    private func applyStep(_ step: Step, at index: Int) {
+        currentStepIndex = index
+        currentStep = step
+        pausedAtLocally = nil
+        sessionStartDuration = step.minutes * 60
+        timeRemaining = sessionStartDuration
+    }
+
+    private func finishSchedule() {
+        isScheduleFinished = true
+        isRunning = false
+        timerCancellable?.cancel()
+        timerCancellable = nil
+        stopIdleMonitor()
+        pausedAtLocally = nil
+        timeRemaining = 0
+        clearSessionFromSync()
+        if notificationsEnabled {
+            NotificationManager.shared.notify(scheduleCompleted: currentSchedule.name)
         }
     }
 }

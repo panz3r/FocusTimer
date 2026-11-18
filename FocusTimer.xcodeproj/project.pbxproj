@@ -32,6 +32,8 @@
 		8A3B5C7D9E1F2345600000B7 /* WebhookProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */; };
 		8A3B5C7D9E1F2345600000B9 /* NoopProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */; };
 		8A3B5C7D9E1F2345600000BB /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */; };
+		8A3B5C7D9E1F2345600000BD /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BC /* Schedule.swift */; };
+		8A3B5C7D9E1F2345600000BF /* ScheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +65,8 @@
 		8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookProvider.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoopProvider.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000BC /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +118,8 @@
 				8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */,
 				8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */,
 				8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */,
+				8A3B5C7D9E1F2345600000BC /* Schedule.swift */,
+				8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -219,6 +225,8 @@
 				8A3B5C7D9E1F2345600000B7 /* WebhookProvider.swift in Sources */,
 				8A3B5C7D9E1F2345600000B9 /* NoopProvider.swift in Sources */,
 				8A3B5C7D9E1F2345600000BB /* SyncCoordinator.swift in Sources */,
+				8A3B5C7D9E1F2345600000BD /* Schedule.swift in Sources */,
+				8A3B5C7D9E1F2345600000BF /* ScheduleStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

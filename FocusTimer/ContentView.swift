@@ -25,9 +25,9 @@ struct ContentView: View {
     ]
 
     private var sessionColor: Color {
-        switch vm.sessionType {
+        switch vm.currentStep.kind {
         case .work: return .red
-        case .shortBreak: return .green
+        case .break: return .green
         case .longBreak: return .teal
         }
     }
@@ -44,17 +44,17 @@ struct ContentView: View {
             // Header
             HStack {
                 HStack(spacing: 7) {
-                    Image(systemName: vm.sessionType.sfSymbol)
+                    Image(systemName: vm.currentStep.kind.sfSymbol)
                         .foregroundStyle(sessionColor)
-                        .id("icon-\(vm.sessionType)")
+                        .id("icon-\(vm.currentStep.id)")
                         .transition(.scale(scale: 0.6).combined(with: .opacity))
 
-                    Text(vm.sessionType.rawValue)
+                    Text(vm.currentStep.label)
                         .font(.headline)
-                        .id("label-\(vm.sessionType)")
+                        .id("label-\(vm.currentStep.id)")
                         .transition(.opacity)
                 }
-                .animation(.spring(response: 0.4, dampingFraction: 0.75), value: vm.sessionType)
+                .animation(.spring(response: 0.4, dampingFraction: 0.75), value: vm.currentStep)
 
                 Spacer()
 
@@ -173,20 +173,29 @@ struct ContentView: View {
                 }
             }
 
-            // Pomodoro dots
-            HStack(spacing: 10) {
-                ForEach(0..<vm.sessionsBeforeLongBreak, id: \.self) { i in
-                    let filled = i < (vm.completedPomodoros % vm.sessionsBeforeLongBreak)
-                    Circle()
-                        .fill(filled ? sessionColor : Color.secondary.opacity(0.25))
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(filled ? 1.25 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: filled)
+            // Step-progress dots: completed work steps toward the long break
+            // (hidden for schedules without a cadence, e.g. Deep Work).
+            if let cadence = vm.currentSchedule.insertedLongBreakEvery,
+               vm.currentSchedule.hasLongBreak {
+                HStack(spacing: 10) {
+                    ForEach(0..<cadence, id: \.self) { i in
+                        let filled = i < (vm.completedWorkSteps % cadence)
+                        Circle()
+                            .fill(filled ? sessionColor : Color.secondary.opacity(0.25))
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(filled ? 1.25 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: filled)
+                    }
                 }
             }
 
+            // Schedule caption
+            Text(vm.currentSchedule.caption(cycleCount: vm.cycleCount))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+
             // Break prompt
-            if vm.sessionType != .work, !breakPrompt.isEmpty {
+            if vm.currentStep.kind != .work, !breakPrompt.isEmpty {
                 Text(breakPrompt)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -242,14 +251,14 @@ struct ContentView: View {
         }
         .padding(24)
         .frame(width: 300)
-        .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+        .animation(.easeInOut(duration: 0.35), value: vm.currentStep)
         .onAppear {
-            if vm.sessionType != .work {
+            if vm.currentStep.kind != .work {
                 breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
             }
         }
-        .onChange(of: vm.sessionType) { type in
-            if type != .work {
+        .onChange(of: vm.currentStep) { step in
+            if step.kind != .work {
                 breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
             }
         }

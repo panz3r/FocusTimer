@@ -11,7 +11,7 @@ struct SettingsView: View {
     @ObservedObject private var syncCoordinator = SyncCoordinator.shared
 
     enum Section: String, CaseIterable, Identifiable {
-        case timer        = "Timer"
+        case schedules    = "Schedules"
         case behavior     = "Behavior"
         case notifications = "Notifications"
         case shortcuts    = "Shortcuts"
@@ -23,7 +23,7 @@ struct SettingsView: View {
 
         var icon: String {
             switch self {
-            case .timer:         return "clock"
+            case .schedules:     return "timer"
             case .behavior:      return "gearshape"
             case .notifications: return "bell"
             case .shortcuts:     return "keyboard"
@@ -34,7 +34,7 @@ struct SettingsView: View {
         }
     }
 
-    @State private var section: Section = .timer
+    @State private var section: Section = .schedules
     @State private var socialConfig = SocialConfig.load()
 
     var body: some View {
@@ -107,42 +107,216 @@ struct SettingsView: View {
     @ViewBuilder
     private var content: some View {
         switch section {
-        case .timer:         timerPane
+        case .schedules:     schedulesPane
         case .behavior:      behaviorPane
         case .notifications: notificationsPane
         case .shortcuts:     shortcutsPane
-        case .data:          dataPane
         case .social:        socialPane
         case .sync:          syncPane
+        case .data:          dataPane
         }
     }
 
-    private var timerPane: some View {
+    private var schedulesPane: some View {
         VStack(alignment: .leading, spacing: 12) {
             card {
-                settingRow("Work session") {
-                    Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+                settingRow("Schedule") {
+                    Picker("", selection: scheduleSelection) {
+                        ForEach(scheduleStore.schedules) { schedule in
+                            Text(schedule.name).tag(schedule.id)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 170)
+                    .disabled(vm.isRunning)
+                }
+            }
+
+            if vm.isRunning {
+                Text("Reset the timer to switch schedules.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            // Active schedule editor
+            card {
+                settingRow("Name") {
+                    TextField("Schedule name", text: scheduleName)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 170)
                 }
                 Divider()
-                settingRow("Short break") {
-                    Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
+
+                ForEach($vm.currentSchedule.steps) { $step in
+                    stepEditorRow($step)
                 }
                 Divider()
-                settingRow("Long break") {
-                    Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+                settingRow("Add step") {
+                    Button("Add…") { vm.addStepToCurrentSchedule() }
+                }
+
+                if vm.currentSchedule.hasLongBreak {
+                    Divider()
+                    settingRow("Auto long break") {
+                        Toggle("", isOn: autoLongBreak).labelsHidden()
+                    }
+                    if autoLongBreak.wrappedValue {
+                        Divider()
+                        settingRow("Every N work steps") {
+                            Stepper(value: longBreakCadence, in: 2...8) {
+                                Text(verbatim: "\(longBreakCadence.wrappedValue) work steps")
+                            }
+                            .font(.callout)
+                        }
+                        Divider()
+                        settingRow("Long break") {
+                            Stepper(value: longBreakMinutes, in: 1...60) {
+                                Text(verbatim: "\(longBreakMinutes.wrappedValue) min")
+                            }
+                            .font(.callout)
+                        }
+                    }
+                }
+
+                Divider()
+                settingRow("Repeats") {
+                    Picker("", selection: repeatKind) {
+                        Text("Always").tag(RepeatKind.infinite)
+                        Text("N cycles").tag(RepeatKind.count)
+                        Text("N minutes").tag(RepeatKind.total)
+                    }
+                    .labelsHidden()
+                    .frame(width: 130)
+                }
+                if repeatKind.wrappedValue == .count {
+                    Divider()
+                    settingRow("Cycles") {
+                        Stepper(value: repeatCount, in: 1...20) {
+                            Text(verbatim: "\(repeatCount.wrappedValue)")
+                        }
+                        .font(.callout)
+                    }
+                }
+                if repeatKind.wrappedValue == .total {
+                    Divider()
+                    settingRow("Total minutes") {
+                        Stepper(value: repeatTotalMinutes, in: 5...480, step: 5) {
+                            Text(verbatim: "\(repeatTotalMinutes.wrappedValue)")
+                        }
+                        .font(.callout)
+                    }
                 }
             }
 
             card {
-                settingRow("Sessions before long break") {
-                    Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
-                }
-                Divider()
                 settingRow("Daily goal") {
                     Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
                 }
             }
+
+            if vm.isRunning {
+                Text("Schedule edits apply from the next step.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
+    }
+
+    private enum RepeatKind {
+        case infinite, count, total
+    }
+
+    private var repeatKind: Binding<RepeatKind> {
+        Binding(
+            get: {
+                switch vm.currentSchedule.repeatMode {
+                case .infinite:               return .infinite
+                case .count:                  return .count
+                case .untilTotalMinutes:      return .total
+                }
+            },
+            set: { kind in
+                switch kind {
+                case .infinite: vm.currentSchedule.repeatMode = .infinite
+                case .count:    vm.currentSchedule.repeatMode = .count(2)
+                case .total:    vm.currentSchedule.repeatMode = .untilTotalMinutes(120)
+                }
+            }
+        )
+    }
+
+    private var repeatCount: Binding<Int> {
+        Binding(
+            get: {
+                if case .count(let n) = vm.currentSchedule.repeatMode { return n }
+                return 2
+            },
+            set: { vm.currentSchedule.repeatMode = .count($0) }
+        )
+    }
+
+    private var repeatTotalMinutes: Binding<Int> {
+        Binding(
+            get: {
+                if case .untilTotalMinutes(let m) = vm.currentSchedule.repeatMode { return m }
+                return 120
+            },
+            set: { vm.currentSchedule.repeatMode = .untilTotalMinutes($0) }
+        )
+    }
+
+    private var autoLongBreak: Binding<Bool> {
+        Binding(
+            get: { vm.currentSchedule.insertedLongBreakEvery != nil },
+            set: { enabled in
+                vm.currentSchedule.insertedLongBreakEvery = enabled ? 4 : nil
+                if enabled, vm.currentSchedule.longBreak == nil {
+                    vm.currentSchedule.longBreak = Step(
+                        label: Step.Kind.longBreak.defaultLabel,
+                        minutes: 15,
+                        kind: .longBreak
+                    )
+                }
+            }
+        )
+    }
+
+    private var longBreakCadence: Binding<Int> {
+        Binding(
+            get: { vm.currentSchedule.insertedLongBreakEvery ?? 4 },
+            set: { vm.currentSchedule.insertedLongBreakEvery = $0 }
+        )
+    }
+
+    private var longBreakMinutes: Binding<Int> {
+        Binding(
+            get: { vm.currentSchedule.longBreak?.minutes ?? 15 },
+            set: { vm.currentSchedule.longBreak?.minutes = $0 }
+        )
+    }
+
+    private func stepEditorRow(_ step: Binding<Step>) -> some View {
+        HStack(spacing: 8) {
+            TextField("Label", text: step.label)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 88)
+            Stepper(value: step.minutes, in: 1...240) {
+                Text(verbatim: "\(step.wrappedValue.minutes) min")
+            }
+            .font(.callout)
+            Picker("", selection: step.kind) {
+                Text("Work").tag(Step.Kind.work)
+                Text("Break").tag(Step.Kind.break)
+            }
+            .labelsHidden()
+            .frame(width: 86)
+            Button("✕") { vm.removeStepFromCurrentSchedule(step.id) }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help("Remove step")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 6)
     }
 
     private var behaviorPane: some View {
@@ -431,6 +605,24 @@ struct SettingsView: View {
         panel.message = "Weekly backups will be written to this folder."
         guard panel.runModal() == .OK, let url = panel.url else { return }
         BackupScheduler.setFolder(url)
+    }
+
+    // MARK: Schedules (Area 4)
+
+    @ObservedObject private var scheduleStore = ScheduleStore.shared
+
+    private var scheduleSelection: Binding<UUID> {
+        Binding(
+            get: { vm.currentSchedule.id },
+            set: { vm.switchSchedule(to: $0) }
+        )
+    }
+
+    private var scheduleName: Binding<String> {
+        Binding(
+            get: { vm.currentSchedule.name },
+            set: { vm.currentSchedule.name = $0.isEmpty ? "Untitled" : $0 }
+        )
     }
 
     // MARK: Social (Area 2)

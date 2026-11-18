@@ -129,9 +129,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func sessionNSColor(opacity: Double) -> NSColor {
-        let base: NSColor = switch viewModel.sessionType {
+        let base: NSColor = switch viewModel.currentStep.kind {
         case .work:       .systemRed
-        case .shortBreak: .systemGreen
+        case .break:      .systemGreen
         case .longBreak:  .systemTeal
         }
         return base.withAlphaComponent(opacity)
