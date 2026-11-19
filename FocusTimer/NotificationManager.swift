@@ -124,12 +124,15 @@ final class NotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
 
-    func notify(sessionEnded type: SessionType, sound: UNNotificationSound?, taskLabel: String = "") {
+    /// Area 4: per-step completion notice. The legacy per-kind copy
+    /// (including the task-label easter eggs) is preserved.
+    func notify(stepCompleted kind: Step.Kind, stepLabel: String,
+                taskLabel: String, sound: UNNotificationSound?) {
         let content = UNMutableNotificationContent()
 
-        switch type {
+        switch kind {
         case .work:
-            content.title = "Work session complete!"
+            content.title = "Focus session complete!"
             switch taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
             case "🍅":
                 content.body = "Pomodoro complete! 🍅 Take a well-earned break."
@@ -144,11 +147,11 @@ final class NotificationManager {
                     ? "Time to take a break. Great focus session."
                     : "\(taskLabel) — take a well-earned break."
             }
-        case .shortBreak:
-            content.title = "Break over!"
+        case .break:
+            content.title = "\(stepLabel) over!"
             content.body = "Ready to get back to it?"
         case .longBreak:
-            content.title = "Long break over!"
+            content.title = "\(stepLabel) over!"
             content.body = "Fully recharged? Let\u{2019}s go."
         }
 
@@ -200,6 +203,27 @@ final class NotificationManager {
             trigger: nil
         )
         UNUserNotificationCenter.current().add(request)
+    }
+
+    /// Area 4: fired once when a `.count`/`.untilTotalMinutes` schedule
+    /// runs to completion.
+    func notify(scheduleCompleted name: String) {
+        guard notificationsGate() else { return }
+        let content = UNMutableNotificationContent()
+        content.title = "Schedule complete"
+        content.body = "“\(name)” finished — nicely done."
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "schedule-complete-\(UUID())",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    /// Session/schedule notifications are gated on the Notifications toggle.
+    private func notificationsGate() -> Bool {
+        UserDefaults.standard.object(forKey: "notificationsEnabled") as? Bool ?? true
     }
 
     func sendWeeklyDigest(sessions: Int, minutes: Int, streak: Int) {

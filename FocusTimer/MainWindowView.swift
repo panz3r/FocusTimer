@@ -25,9 +25,9 @@ struct MainWindowView: View {
     ]
 
     private var sessionColor: Color {
-        switch vm.sessionType {
+        switch vm.currentStep.kind {
         case .work:       return .red
-        case .shortBreak: return .green
+        case .break:      return .green
         case .longBreak:  return .teal
         }
     }
@@ -44,8 +44,9 @@ struct MainWindowView: View {
             remoteSessionCaption
             taskRow
             ringView
+            scheduleCaption
             dotsRow
-            if vm.sessionType != .work, !breakPrompt.isEmpty {
+            if vm.currentStep.kind != .work, !breakPrompt.isEmpty {
                 Text(breakPrompt)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -65,14 +66,14 @@ struct MainWindowView: View {
         .overlay(alignment: .top) {
             if case .failed(let msg) = updaterW.phase { errorBanner(msg) }
         }
-        .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+        .animation(.easeInOut(duration: 0.35), value: vm.currentStep)
         .onAppear {
-            if vm.sessionType != .work {
+            if vm.currentStep.kind != .work {
                 breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
             }
         }
-        .onChange(of: vm.sessionType) { type in
-            if type != .work {
+        .onChange(of: vm.currentStep) { step in
+            if step.kind != .work {
                 breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
             }
         }
@@ -80,19 +81,25 @@ struct MainWindowView: View {
 
     // MARK: - Header
 
+    private var scheduleCaption: some View {
+        Text(vm.currentSchedule.caption(cycleCount: vm.cycleCount))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+    }
+
     private var headerRow: some View {
         HStack {
             HStack(spacing: 8) {
-                Image(systemName: vm.sessionType.sfSymbol)
+                Image(systemName: vm.currentStep.kind.sfSymbol)
                     .foregroundStyle(sessionColor)
-                    .id("icon-\(vm.sessionType)")
+                    .id("icon-\(vm.currentStep.id)")
                     .transition(.scale(scale: 0.6).combined(with: .opacity))
-                Text(vm.sessionType.rawValue)
+                Text(vm.currentStep.label)
                     .font(.title3.weight(.semibold))
-                    .id("label-\(vm.sessionType)")
+                    .id("label-\(vm.currentStep.id)")
                     .transition(.opacity)
             }
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: vm.sessionType)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: vm.currentStep)
 
             Spacer()
 
@@ -247,14 +254,19 @@ struct MainWindowView: View {
     // MARK: - Dots
 
     private var dotsRow: some View {
-        HStack(spacing: 12) {
-            ForEach(0..<vm.sessionsBeforeLongBreak, id: \.self) { i in
-                let filled = i < (vm.completedPomodoros % vm.sessionsBeforeLongBreak)
-                Circle()
-                    .fill(filled ? sessionColor : Color.secondary.opacity(0.25))
-                    .frame(width: 10, height: 10)
-                    .scaleEffect(filled ? 1.25 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: filled)
+        Group {
+            if let cadence = vm.currentSchedule.insertedLongBreakEvery,
+               vm.currentSchedule.hasLongBreak {
+                HStack(spacing: 12) {
+                    ForEach(0..<cadence, id: \.self) { i in
+                        let filled = i < (vm.completedWorkSteps % cadence)
+                        Circle()
+                            .fill(filled ? sessionColor : Color.secondary.opacity(0.25))
+                            .frame(width: 10, height: 10)
+                            .scaleEffect(filled ? 1.25 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: filled)
+                    }
+                }
             }
         }
     }

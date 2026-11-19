@@ -117,13 +117,13 @@ final class StatsStore {
     var allTimeSessions:    Int { records.values.reduce(0) { $0 + $1.sessions } }
     var allTimeFocusMinutes: Int { records.values.reduce(0) { $0 + $1.focusMinutes } }
 
-    func recordSession(durationMinutes: Int, taskLabel: String = "") {
+    func recordSession(durationMinutes: Int, taskLabel: String = "", stepLabel: String? = nil) {
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
         record.focusMinutes += durationMinutes
         records[todayKey] = record
 
-        let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel)
+        let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel, stepLabel: stepLabel)
         sessionLog.append(entry)
         // Area 1: no in-memory cap — the store is the source of truth.
         persistLog()
