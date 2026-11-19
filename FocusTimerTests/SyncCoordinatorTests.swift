@@ -5,6 +5,7 @@ import Foundation
 /// Area 3: SyncCoordinator convergence + current-session lifecycle,
 /// verified against an injected temp folder and isolated store/defaults.
 @Suite("Sync Coordinator")
+@MainActor
 struct SyncCoordinatorTests {
 
     private func makeEnvironment() -> (SyncCoordinator, StatsStore, URL) {

@@ -5,7 +5,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     static let shared = SettingsWindowController()
     private var window: NSWindow?
 
-    func open(viewModel: TimerViewModel) {
+    func open(engine: SessionEngine, settings: AppSettings) {
         if let existing = window, existing.isVisible {
             existing.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -22,7 +22,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         win.isReleasedWhenClosed = false
         win.delegate = self
         win.center()
-        win.contentView = NSHostingView(rootView: SettingsView(vm: viewModel))
+        win.contentView = NSHostingView(rootView: SettingsView(engine: engine, settings: settings))
         window = win
 
         NSApp.activate(ignoringOtherApps: true)

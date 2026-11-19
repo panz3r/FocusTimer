@@ -2,33 +2,33 @@ import SwiftUI
 
 /// Shortcuts pane: global hotkey enable + the two key recorders.
 struct ShortcutsPane: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var hotkeys: HotkeyManager
 
     var body: some View {
         VStack(spacing: 0) {
             SettingsRow("Global shortcuts") {
-                Toggle("", isOn: $vm.hotkeysEnabled).labelsHidden()
+                Toggle("", isOn: $hotkeys.hotkeysEnabled).labelsHidden()
             }
-            if vm.hotkeysEnabled {
+            if hotkeys.hotkeysEnabled {
                 Divider()
                 SettingsRow("Start / Pause") {
                     KeyRecorder(
-                        label: vm.toggleHotkeyLabel,
+                        label: hotkeys.toggleHotkeyLabel,
                         onStartRecording: { HotkeyManager.shared.unregister() },
-                        onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
+                        onCancel: { if hotkeys.hotkeysEnabled { HotkeyManager.shared.register() } },
                         onRecord: { code, mods, label in
-                            vm.updateToggleHotkey(code: code, mods: mods, label: label)
+                            hotkeys.updateToggleHotkey(code: code, mods: mods, label: label)
                         }
                     )
                 }
                 Divider()
                 SettingsRow("Skip") {
                     KeyRecorder(
-                        label: vm.skipHotkeyLabel,
+                        label: hotkeys.skipHotkeyLabel,
                         onStartRecording: { HotkeyManager.shared.unregister() },
-                        onCancel: { if vm.hotkeysEnabled { HotkeyManager.shared.register() } },
+                        onCancel: { if hotkeys.hotkeysEnabled { HotkeyManager.shared.register() } },
                         onRecord: { code, mods, label in
-                            vm.updateSkipHotkey(code: code, mods: mods, label: label)
+                            hotkeys.updateSkipHotkey(code: code, mods: mods, label: label)
                         }
                     )
                 }

@@ -4,7 +4,7 @@ import SwiftUI
 /// steps, long-break cadence, daily goal, repeat mode), all locked while
 /// a session runs (locked decision: no mid-session schedule changes).
 struct SchedulesPane: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     @ObservedObject private var scheduleStore = ScheduleStore.shared
 
     var body: some View {
@@ -12,7 +12,7 @@ struct SchedulesPane: View {
             pickerCard
             runStateCaption
             editorCard
-                .disabled(vm.isRunning)
+                .disabled(engine.isRunning)
         }
     }
 
@@ -26,11 +26,11 @@ struct SchedulesPane: View {
                 }
                 .labelsHidden()
                 .frame(width: 170)
-                .disabled(vm.isRunning)
+                .disabled(engine.isRunning)
             }
             .settingsCard()
 
-            if vm.isRunning {
+            if engine.isRunning {
                 Text("Reset the timer to edit or switch schedules.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -50,15 +50,15 @@ struct SchedulesPane: View {
                 }
                 Divider()
 
-                ForEach($vm.currentSchedule.steps) { $step in
+                ForEach($engine.currentSchedule.steps) { $step in
                     stepEditorRow($step)
                 }
                 Divider()
                 SettingsRow("Add step") {
-                    Button("Add…") { vm.addStepToCurrentSchedule() }
+                    Button("Add…") { engine.addStepToCurrentSchedule() }
                 }
 
-                if vm.currentSchedule.hasLongBreak {
+                if engine.currentSchedule.hasLongBreak {
                     Divider()
                     SettingsRow("Auto long break") {
                         Toggle("", isOn: autoLongBreak).labelsHidden()
@@ -83,7 +83,7 @@ struct SchedulesPane: View {
 
                 Divider()
                 SettingsRow("Daily goal") {
-                    Stepper("\(vm.currentSchedule.dailyGoal) sessions", value: $vm.currentSchedule.dailyGoal, in: 1...20)
+                    Stepper("\(engine.currentSchedule.dailyGoal) sessions", value: $engine.currentSchedule.dailyGoal, in: 1...20)
                 }
 
                 Divider()
@@ -128,7 +128,7 @@ struct SchedulesPane: View {
     private var repeatKind: Binding<RepeatKind> {
         Binding(
             get: {
-                switch vm.currentSchedule.repeatMode {
+                switch engine.currentSchedule.repeatMode {
                 case .infinite:               return .infinite
                 case .count:                  return .count
                 case .untilTotalMinutes:      return .total
@@ -136,9 +136,9 @@ struct SchedulesPane: View {
             },
             set: { kind in
                 switch kind {
-                case .infinite: vm.currentSchedule.repeatMode = .infinite
-                case .count:    vm.currentSchedule.repeatMode = .count(2)
-                case .total:    vm.currentSchedule.repeatMode = .untilTotalMinutes(120)
+                case .infinite: engine.currentSchedule.repeatMode = .infinite
+                case .count:    engine.currentSchedule.repeatMode = .count(2)
+                case .total:    engine.currentSchedule.repeatMode = .untilTotalMinutes(120)
                 }
             }
         )
@@ -147,30 +147,30 @@ struct SchedulesPane: View {
     private var repeatCount: Binding<Int> {
         Binding(
             get: {
-                if case .count(let n) = vm.currentSchedule.repeatMode { return n }
+                if case .count(let n) = engine.currentSchedule.repeatMode { return n }
                 return 2
             },
-            set: { vm.currentSchedule.repeatMode = .count($0) }
+            set: { engine.currentSchedule.repeatMode = .count($0) }
         )
     }
 
     private var repeatTotalMinutes: Binding<Int> {
         Binding(
             get: {
-                if case .untilTotalMinutes(let m) = vm.currentSchedule.repeatMode { return m }
+                if case .untilTotalMinutes(let m) = engine.currentSchedule.repeatMode { return m }
                 return 120
             },
-            set: { vm.currentSchedule.repeatMode = .untilTotalMinutes($0) }
+            set: { engine.currentSchedule.repeatMode = .untilTotalMinutes($0) }
         )
     }
 
     private var autoLongBreak: Binding<Bool> {
         Binding(
-            get: { vm.currentSchedule.insertedLongBreakEvery != nil },
+            get: { engine.currentSchedule.insertedLongBreakEvery != nil },
             set: { enabled in
-                vm.currentSchedule.insertedLongBreakEvery = enabled ? 4 : nil
-                if enabled, vm.currentSchedule.longBreak == nil {
-                    vm.currentSchedule.longBreak = Step(
+                engine.currentSchedule.insertedLongBreakEvery = enabled ? 4 : nil
+                if enabled, engine.currentSchedule.longBreak == nil {
+                    engine.currentSchedule.longBreak = Step(
                         label: Step.Kind.longBreak.defaultLabel,
                         minutes: 15,
                         kind: .longBreak
@@ -182,29 +182,29 @@ struct SchedulesPane: View {
 
     private var longBreakCadence: Binding<Int> {
         Binding(
-            get: { vm.currentSchedule.insertedLongBreakEvery ?? 4 },
-            set: { vm.currentSchedule.insertedLongBreakEvery = $0 }
+            get: { engine.currentSchedule.insertedLongBreakEvery ?? 4 },
+            set: { engine.currentSchedule.insertedLongBreakEvery = $0 }
         )
     }
 
     private var longBreakMinutes: Binding<Int> {
         Binding(
-            get: { vm.currentSchedule.longBreak?.minutes ?? 15 },
-            set: { vm.currentSchedule.longBreak?.minutes = $0 }
+            get: { engine.currentSchedule.longBreak?.minutes ?? 15 },
+            set: { engine.currentSchedule.longBreak?.minutes = $0 }
         )
     }
 
     private var scheduleSelection: Binding<UUID> {
         Binding(
-            get: { vm.currentSchedule.id },
-            set: { vm.switchSchedule(to: $0) }
+            get: { engine.currentSchedule.id },
+            set: { engine.switchSchedule(to: $0) }
         )
     }
 
     private var scheduleName: Binding<String> {
         Binding(
-            get: { vm.currentSchedule.name },
-            set: { vm.currentSchedule.name = $0.isEmpty ? "Untitled" : $0 }
+            get: { engine.currentSchedule.name },
+            set: { engine.currentSchedule.name = $0.isEmpty ? "Untitled" : $0 }
         )
     }
 
@@ -223,7 +223,7 @@ struct SchedulesPane: View {
             }
             .labelsHidden()
             .frame(width: 86)
-            Button("✕") { vm.removeStepFromCurrentSchedule(step.id) }
+            Button("✕") { engine.removeStepFromCurrentSchedule(step.id) }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .help("Remove step")

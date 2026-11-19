@@ -8,8 +8,11 @@ import SwiftUI
 ///
 /// Phase 2: each pane lives in its own file (SettingsXPane.swift); this
 /// file is only the shell — sidebar, pane routing, and the section enum.
+/// Phase 4: panes bind the SessionEngine and AppSettings directly instead
+/// of the former god ViewModel.
 struct SettingsView: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
+    @ObservedObject var settings: AppSettings
 
     enum Section: String, CaseIterable, Identifiable {
         case schedules    = "Schedules"
@@ -107,13 +110,13 @@ struct SettingsView: View {
     @ViewBuilder
     private var content: some View {
         switch section {
-        case .schedules:     SchedulesPane(vm: vm)
-        case .behavior:      BehaviorPane(vm: vm)
-        case .notifications: NotificationsPane(vm: vm)
-        case .shortcuts:     ShortcutsPane(vm: vm)
+        case .schedules:     SchedulesPane(engine: engine)
+        case .behavior:      BehaviorPane(engine: engine, settings: settings)
+        case .notifications: NotificationsPane(settings: settings)
+        case .shortcuts:     ShortcutsPane(hotkeys: HotkeyManager.shared)
         case .social:        SocialPane()
-        case .sync:          SyncPane(vm: vm)
-        case .data:          DataPane(vm: vm)
+        case .sync:          SyncPane(settings: settings)
+        case .data:          DataPane(engine: engine, settings: settings)
         }
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainWindowView: View {
-    @EnvironmentObject var vm: TimerViewModel
+    @EnvironmentObject var engine: SessionEngine
     @ObservedObject private var statsStore = StatsStore.shared
     @ObservedObject private var syncCoordinator = SyncCoordinator.shared
     @ObservedObject private var updater  = UpdateChecker.shared
@@ -11,14 +11,14 @@ struct MainWindowView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            TimerHeaderBar(vm: vm, labelFont: .title3.weight(.semibold), spacing: 8)
+            TimerHeaderBar(engine: engine, labelFont: .title3.weight(.semibold), spacing: 8)
 
-            RemoteSessionCaptionView(coordinator: syncCoordinator, vm: vm)
+            RemoteSessionCaptionView(coordinator: syncCoordinator, engine: engine)
 
-            TaskLabelField(vm: vm, font: .callout, focus: $isTaskFieldFocused)
+            TaskLabelField(engine: engine, font: .callout, focus: $isTaskFieldFocused)
 
             TimerRingView(
-                vm: vm,
+                engine: engine,
                 size: 240,
                 trackWidth: 12,
                 glowWidth: 24,
@@ -27,16 +27,16 @@ struct MainWindowView: View {
                 statusFont: .caption
             )
 
-            ScheduleCaptionView(schedule: vm.currentSchedule, cycleCount: vm.cycleCount)
+            ScheduleCaptionView(schedule: engine.currentSchedule, cycleCount: engine.cycleCount)
 
             StepDotsRow(
-                schedule: vm.currentSchedule,
-                completedWorkSteps: vm.completedWorkSteps,
+                schedule: engine.currentSchedule,
+                completedWorkSteps: engine.completedWorkSteps,
                 dotSize: 10,
                 spacing: 12
             )
 
-            if vm.currentStep.kind != .work, !breakPrompt.isEmpty {
+            if engine.currentStep.kind != .work, !breakPrompt.isEmpty {
                 Text(breakPrompt)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -44,25 +44,25 @@ struct MainWindowView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
-            TimerControlsRow(vm: vm, spacing: 16, controlSize: .large, minWidth: 80)
+            TimerControlsRow(engine: engine, spacing: 16, controlSize: .large, minWidth: 80)
 
             Divider()
 
             statsRow
-            GoalFooterView(vm: vm)
+            GoalFooterView(engine: engine)
         }
         .padding(32)
         .frame(width: 360)
         .overlay(alignment: .top) {
             UpdateBannersView(updater: updater, autoUpdater: updaterW)
         }
-        .animation(.easeInOut(duration: 0.35), value: vm.currentStep)
+        .animation(.easeInOut(duration: 0.35), value: engine.currentStep)
         .onAppear {
-            if vm.currentStep.kind != .work {
+            if engine.currentStep.kind != .work {
                 breakPrompt = BreakPrompts.roll()
             }
         }
-        .onChange(of: vm.currentStep) { _, step in
+        .onChange(of: engine.currentStep) { _, step in
             if step.kind != .work {
                 breakPrompt = BreakPrompts.roll()
             }
@@ -73,7 +73,7 @@ struct MainWindowView: View {
 
     private var statsRow: some View {
         HStack {
-            statItem("\(vm.completedPomodoros)", "sessions")
+            statItem("\(engine.completedPomodoros)", "sessions")
             Divider().frame(height: 32)
             statItem("\(StatsStore.shared.todayFocusMinutes)", "min focus")
             Divider().frame(height: 32)

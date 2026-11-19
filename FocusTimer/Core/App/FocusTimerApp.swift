@@ -7,7 +7,8 @@ struct FocusTimerApp: App {
     var body: some Scene {
         Window("FocusTimer", id: "main") {
             MainWindowView()
-                .environmentObject(appDelegate.viewModel)
+                .environmentObject(SessionEngine.shared)
+                .environmentObject(AppSettings.shared)
         }
         .windowResizability(.contentSize)
     }

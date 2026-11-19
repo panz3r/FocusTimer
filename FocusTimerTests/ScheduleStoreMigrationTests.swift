@@ -5,6 +5,7 @@ import Foundation
 /// Area 4: ScheduleStore bootstrap/migration + Schedule's tolerant decoding.
 /// Each test uses a fresh isolated defaults suite.
 @Suite("Schedule Store & Migration")
+@MainActor
 struct ScheduleStoreMigrationTests {
 
     private func makeDefaults() -> UserDefaults {

@@ -2,8 +2,10 @@ import AppKit
 import SwiftUI
 import Combine
 
-class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
-    let viewModel = TimerViewModel()
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+    let engine = SessionEngine.shared
+    private let settings = AppSettings.shared
 
     // Crash diagnostics: when AppKit raises during layout (e.g. the Area 2
     // constraint-loop crash), the exception name/reason/stack land in
@@ -37,6 +39,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var cancellable: AnyCancellable?
+    private var engineCancellable: AnyCancellable?
+
+    /// Area 4 Phase 4: the session engine's events drive the live-session
+    /// mirror (SyncCoordinator) and the social stats push — the engine no
+    /// longer calls into them directly.
+    private func wireEngineEvents() {
+        // Events are sent from the engine on the main actor; the sink runs
+        // synchronously on the sending thread, so assume-isolated is sound.
+        engineCancellable = SessionEngine.shared.events
+            .sink { event in
+                MainActor.assumeIsolated {
+                switch event {
+                case .mirrorChanged(let mirror):
+                    SyncCoordinator.shared.updateSessionMirror(mirror)
+                case .workSessionRecorded:
+                    SyncCoordinator.shared.queueWrite()
+                    Task { await SocialSyncService.pushTodayStats() }
+                }
+                }
+            }
+    }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return false
@@ -51,7 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // Item 0: fast recovery of "today" counters after sleep / long inactivity.
     func applicationDidBecomeActive(_ notification: Notification) {
-        viewModel.resyncIfDayChanged()
+        SessionEngine.shared.resyncIfDayChanged()
         SyncCoordinator.shared.appDidBecomeActive()
     }
 
@@ -63,9 +86,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NotificationManager.shared.requestPermission()
         UpdateChecker.shared.check()
-        if viewModel.weeklyDigestEnabled { DigestChecker.shared.start() }
-        if viewModel.weeklyBackupEnabled { BackupScheduler.shared.start() }
+        let settings = AppSettings.shared
+        if settings.weeklyDigestEnabled { DigestChecker.shared.start() }
+        if settings.weeklyBackupEnabled { BackupScheduler.shared.start() }
         SyncCoordinator.shared.restartIfNeeded()
+        wireEngineEvents()
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
@@ -77,14 +102,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         popover = NSPopover()
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
-            rootView: ContentView().environmentObject(viewModel)
+            rootView: ContentView()
+                .environmentObject(SessionEngine.shared)
+                .environmentObject(AppSettings.shared)
         )
 
-        HotkeyManager.shared.onToggle = { [weak self] in self?.viewModel.toggleTimer() }
-        HotkeyManager.shared.onSkip   = { [weak self] in self?.viewModel.skip() }
-        if viewModel.hotkeysEnabled { HotkeyManager.shared.register() }
+        HotkeyManager.shared.onToggle = { SessionEngine.shared.toggleTimer() }
+        HotkeyManager.shared.onSkip   = { SessionEngine.shared.skip() }
+        if HotkeyManager.shared.hotkeysEnabled { HotkeyManager.shared.register() }
 
-        cancellable = viewModel.objectWillChange
+        cancellable = SessionEngine.shared.objectWillChange
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 DispatchQueue.main.async { self?.updateButton() }
@@ -99,8 +126,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let result = NSMutableAttributedString()
 
         // Colored dot — only shown when session is active
-        if viewModel.isRunning || viewModel.progress > 0 {
-            let dotColor = sessionNSColor(opacity: viewModel.isRunning ? 1.0 : 0.45)
+        if engine.isRunning || engine.progress > 0 {
+            let dotColor = sessionNSColor(opacity: engine.isRunning ? 1.0 : 0.45)
             result.append(NSAttributedString(string: "● ", attributes: [
                 .foregroundColor: dotColor,
                 .font: NSFont.systemFont(ofSize: 9, weight: .bold),
@@ -109,14 +136,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         // Time
-        result.append(NSAttributedString(string: viewModel.formattedTime, attributes: [
+        result.append(NSAttributedString(string: engine.formattedTime, attributes: [
             .foregroundColor: NSColor.labelColor,
             .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .regular)
         ]))
 
         // Optional task label
-        if viewModel.showTaskLabelInMenuBar, !viewModel.taskLabel.isEmpty {
-            let raw = viewModel.taskLabel
+        if settings.showTaskLabelInMenuBar, !engine.taskLabel.isEmpty {
+            let raw = engine.taskLabel
             let truncated = raw.count > 20 ? String(raw.prefix(19)) + "…" : raw
             result.append(NSAttributedString(string: "  " + truncated, attributes: [
                 .foregroundColor: NSColor.secondaryLabelColor,
@@ -129,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func sessionNSColor(opacity: Double) -> NSColor {
-        let base: NSColor = switch viewModel.currentStep.kind {
+        let base: NSColor = switch engine.currentStep.kind {
         case .work:       .systemRed
         case .break:      .systemGreen
         case .longBreak:  .systemTeal
@@ -166,7 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let menu = NSMenu()
 
         let toggleItem = NSMenuItem(
-            title: viewModel.isRunning ? "Pause" : "Start",
+            title: engine.isRunning ? "Pause" : "Start",
             action: #selector(menuToggle),
             keyEquivalent: ""
         )
@@ -201,8 +228,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem.menu = nil
     }
 
-    @objc private func menuToggle()   { viewModel.toggleTimer() }
-    @objc private func menuSkip()     { viewModel.skip() }
-    @objc private func menuReset()    { viewModel.reset() }
-    @objc private func menuSettings() { SettingsWindowController.shared.open(viewModel: viewModel) }
+    @objc private func menuToggle()   { engine.toggleTimer() }
+    @objc private func menuSkip()     { engine.skip() }
+    @objc private func menuReset()    { engine.reset() }
+    @objc private func menuSettings() { SettingsWindowController.shared.open(engine: engine, settings: settings) }
 }
