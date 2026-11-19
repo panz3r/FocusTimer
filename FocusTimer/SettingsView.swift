@@ -8,6 +8,7 @@ import SwiftUI
 /// structurally impossible. Overflow inside a pane scrolls.
 struct SettingsView: View {
     @ObservedObject var vm: TimerViewModel
+    @ObservedObject private var syncCoordinator = SyncCoordinator.shared
 
     enum Section: String, CaseIterable, Identifiable {
         case timer        = "Timer"
@@ -15,6 +16,7 @@ struct SettingsView: View {
         case notifications = "Notifications"
         case shortcuts    = "Shortcuts"
         case social       = "Social"
+        case sync         = "Sync"
         case data         = "Data"
 
         var id: String { rawValue }
@@ -25,8 +27,9 @@ struct SettingsView: View {
             case .behavior:      return "gearshape"
             case .notifications: return "bell"
             case .shortcuts:     return "keyboard"
-            case .data:          return "externaldrive"
             case .social:        return "person.2"
+            case .sync:          return "icloud"
+            case .data:          return "externaldrive"
             }
         }
     }
@@ -110,6 +113,7 @@ struct SettingsView: View {
         case .shortcuts:     shortcutsPane
         case .data:          dataPane
         case .social:        socialPane
+        case .sync:          syncPane
         }
     }
 
@@ -200,6 +204,12 @@ struct SettingsView: View {
                         .frame(width: 90)
                     }
                 }
+                Divider()
+                settingRow("Test notification") {
+                    Button("Send…") {
+                        Task { await NotificationManager.shared.sendTestNotificationWithPermissionFlow() }
+                    }
+                }
             }
         }
     }
@@ -244,7 +254,10 @@ struct SettingsView: View {
             Divider()
             settingRow("Import backup…") {
                 Button("Import…") {
-                    SessionExport.runImportDialog { vm.refreshFromStore() }
+                    SessionExport.runImportDialog {
+                        vm.refreshFromStore()
+                        SyncCoordinator.shared.queueWrite()
+                    }
                 }
             }
             Divider()
@@ -262,6 +275,58 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    private var syncPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            card {
+                settingRow("Sync via iCloud Drive") {
+                    Toggle("", isOn: $vm.icloudSyncEnabled).labelsHidden()
+                }
+                if vm.icloudSyncEnabled {
+                    Divider()
+                    settingRow("Last sync") {
+                        Text(lastSyncText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Divider()
+                    settingRow("Sync now") {
+                        Button("Sync") { syncCoordinator.syncNow() }
+                    }
+                    Divider()
+                    settingRow("iCloud folder") {
+                        Button("Open in Finder") {
+                            NSWorkspace.shared.open(SyncCoordinator.syncFolder)
+                        }
+                    }
+                }
+            }
+
+            Text("Task labels are written to your iCloud Drive.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+
+            switch syncCoordinator.state {
+            case .unconfigured:
+                Text("iCloud Drive isn't available on this Mac — sign in to iCloud, enable iCloud Drive, then reopen Settings.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            case .error(let message):
+                Text(message)
+                    .font(.caption2)
+                    .foregroundStyle(.red)
+            default:
+                EmptyView()
+            }
+        }
+    }
+
+    private var lastSyncText: String {
+        guard let date = syncCoordinator.lastSyncAt else { return "never" }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 
     private var socialPane: some View {

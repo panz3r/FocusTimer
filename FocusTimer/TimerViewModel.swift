@@ -90,6 +90,12 @@ final class TimerViewModel: ObservableObject {
             UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: "weeklyBackupMarkdownEnabled")
         }
     }
+    @Published var icloudSyncEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(icloudSyncEnabled, forKey: "icloudSyncEnabled")
+            SyncCoordinator.shared.restartIfNeeded()
+        }
+    }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
@@ -105,6 +111,13 @@ final class TimerViewModel: ObservableObject {
     // when the calendar date changes while the app is open.
     private var lastSyncedDayKey: String = StatsStore.todayKey
     private var daySyncCancellable: AnyCancellable?
+
+    // Area 3: identity of the live session, mirrored to iCloud Drive so
+    // other Macs can show what's running. sessionStartedAt shifts forward
+    // by the paused gap on resume, keeping derived remaining time truthful.
+    private var activeSessionId = UUID()
+    private var sessionStartedAt = Date()
+    private var pausedAtLocally: Date?
 
     init() {
         let ud = UserDefaults.standard
@@ -133,6 +146,7 @@ final class TimerViewModel: ObservableObject {
         weeklyDigestEnabled = ud.object(forKey: "weeklyDigestEnabled") as? Bool ?? true
         weeklyBackupEnabled = ud.object(forKey: "weeklyBackupEnabled") as? Bool ?? false
         weeklyBackupMarkdownEnabled = ud.object(forKey: "weeklyBackupMarkdownEnabled") as? Bool ?? false
+        icloudSyncEnabled = ud.object(forKey: "icloudSyncEnabled") as? Bool ?? SyncCoordinator.iCloudDriveAvailable
         toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
         taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
@@ -194,11 +208,21 @@ final class TimerViewModel: ObservableObject {
 
     func start() {
         pausedDueToIdle = false
+        if let pausedAt = pausedAtLocally {
+            // Resuming: shift the start time past the paused gap so derived
+            // remaining time on other Macs stays truthful.
+            sessionStartedAt = sessionStartedAt.addingTimeInterval(Date().timeIntervalSince(pausedAt))
+        } else {
+            sessionStartedAt = Date()
+            activeSessionId = UUID()
+        }
+        pausedAtLocally = nil
         isRunning = true
         timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.tick() }
         if idleDetectionEnabled { startIdleMonitor() }
+        pushSessionToSync(paused: false)
     }
 
     func pause() {
@@ -206,6 +230,8 @@ final class TimerViewModel: ObservableObject {
         timerCancellable?.cancel()
         timerCancellable = nil
         stopIdleMonitor()
+        pausedAtLocally = Date()
+        pushSessionToSync(paused: true)
     }
 
     private func pauseForIdle() {
@@ -213,6 +239,8 @@ final class TimerViewModel: ObservableObject {
         timerCancellable?.cancel()
         timerCancellable = nil
         // Idle monitor stays running to detect when user returns
+        pausedAtLocally = Date()
+        pushSessionToSync(paused: true)
     }
 
     private func startIdleMonitor() {
@@ -243,6 +271,7 @@ final class TimerViewModel: ObservableObject {
 
     func reset() {
         pause()
+        clearSessionFromSync()
         let duration = durationFor(sessionType)
         timeRemaining = duration
         sessionStartDuration = duration
@@ -250,6 +279,7 @@ final class TimerViewModel: ObservableObject {
 
     func skip() {
         pause()
+        clearSessionFromSync()
         advance()
         if autoAdvance { start() }
     }
@@ -264,6 +294,7 @@ final class TimerViewModel: ObservableObject {
 
     private func sessionComplete() {
         pause()
+        clearSessionFromSync()
 
         if notificationsEnabled {
             notificationSound.playAtSessionEnd()
@@ -276,6 +307,7 @@ final class TimerViewModel: ObservableObject {
             // `+= 1` on a possibly stale value.
             completedPomodoros = StatsStore.shared.todaySessions
             syncStats()
+            SyncCoordinator.shared.queueWrite()
         }
 
         advance()
@@ -320,6 +352,23 @@ final class TimerViewModel: ObservableObject {
     /// every view bound to this view model.
     func refreshFromStore() {
         completedPomodoros = StatsStore.shared.todaySessions
+    }
+
+    // MARK: - Current-session mirror (Area 3)
+
+    private func pushSessionToSync(paused: Bool) {
+        SyncCoordinator.shared.pushCurrentSession(
+            id: activeSessionId,
+            type: sessionType.rawValue,
+            label: taskLabel,
+            startedAt: sessionStartedAt,
+            durationSeconds: sessionStartDuration,
+            paused: paused
+        )
+    }
+
+    private func clearSessionFromSync() {
+        SyncCoordinator.shared.pushCurrentSession(nil)
     }
 
     private func advance() {

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainWindowView: View {
     @EnvironmentObject var vm: TimerViewModel
+    @ObservedObject private var syncCoordinator = SyncCoordinator.shared
     @ObservedObject private var updater  = UpdateChecker.shared
     @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.0
@@ -40,6 +41,7 @@ struct MainWindowView: View {
     var body: some View {
         VStack(spacing: 24) {
             headerRow
+            remoteSessionCaption
             taskRow
             ringView
             dotsRow
@@ -130,6 +132,18 @@ struct MainWindowView: View {
 
             if isTaskFieldFocused && !filteredSuggestions.isEmpty {
                 taskSuggestionsView
+            }
+        }
+    }
+
+    // Area 3: session running on another Mac (when this one is idle)
+    private var remoteSessionCaption: some View {
+        Group {
+            if let remote = syncCoordinator.remoteActiveSession, !vm.isRunning {
+                Text("\(remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .transition(.opacity)
             }
         }
     }
