@@ -31,7 +31,7 @@ enum BreakPrompts {
 /// Icon + step label on the left; Social (gated), Stats and Settings
 /// buttons on the right.
 struct TimerHeaderBar: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     var labelFont: Font = .headline
     var spacing: CGFloat = 7
 
@@ -42,17 +42,17 @@ struct TimerHeaderBar: View {
     var body: some View {
         HStack {
             HStack(spacing: spacing) {
-                Image(systemName: vm.currentStep.kind.sfSymbol)
-                    .foregroundStyle(vm.currentStep.kind.defaultColor)
-                    .id("icon-\(vm.currentStep.id)")
+                Image(systemName: engine.currentStep.kind.sfSymbol)
+                    .foregroundStyle(engine.currentStep.kind.defaultColor)
+                    .id("icon-\(engine.currentStep.id)")
                     .transition(.scale(scale: 0.6).combined(with: .opacity))
 
-                Text(vm.currentStep.label)
+                Text(engine.currentStep.label)
                     .font(labelFont)
-                    .id("label-\(vm.currentStep.id)")
+                    .id("label-\(engine.currentStep.id)")
                     .transition(.opacity)
             }
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: vm.currentStep)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: engine.currentStep)
 
             Spacer()
 
@@ -69,7 +69,14 @@ struct TimerHeaderBar: View {
                 }
                 .buttonStyle(.plain)
 
-                Button { SettingsWindowController.shared.open(viewModel: vm) } label: {
+                Button {
+                    // The header bar only carries the engine; fetch the
+                    // settings singleton for the settings window.
+                    SettingsWindowController.shared.open(
+                        engine: SessionEngine.shared,
+                        settings: AppSettings.shared
+                    )
+                } label: {
                     Image(systemName: "gearshape").foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
@@ -81,20 +88,20 @@ struct TimerHeaderBar: View {
 // MARK: - Task label (+ autocomplete)
 
 struct TaskLabelField: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     var font: Font = .caption
     var focus: FocusState<Bool>.Binding
 
     private var filteredSuggestions: [String] {
         let all = StatsStore.shared.recentLabels(limit: 8)
-        let query = vm.taskLabel.trimmingCharacters(in: .whitespaces)
+        let query = engine.taskLabel.trimmingCharacters(in: .whitespaces)
         if query.isEmpty { return all }
         return all.filter { $0.localizedCaseInsensitiveContains(query) && $0.lowercased() != query.lowercased() }
     }
 
     var body: some View {
         VStack(spacing: 4) {
-            TextField("What are you working on?", text: $vm.taskLabel)
+            TextField("What are you working on?", text: $engine.taskLabel)
                 .font(font)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -114,7 +121,7 @@ struct TaskLabelField: View {
             ForEach(Array(filteredSuggestions.prefix(5).enumerated()), id: \.element) { _, label in
                 if label != filteredSuggestions.first { Divider() }
                 Button {
-                    vm.taskLabel = label
+                    engine.taskLabel = label
                     focus.wrappedValue = false
                 } label: {
                     HStack(spacing: 6) {
@@ -144,7 +151,7 @@ struct TaskLabelField: View {
 // MARK: - Progress ring (includes the glow pulse + ring-tap easter egg)
 
 struct TimerRingView: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     var size: CGFloat
     var trackWidth: CGFloat
     var glowWidth: CGFloat
@@ -157,10 +164,10 @@ struct TimerRingView: View {
     @State private var ringTapCount = 0
     @State private var secretActive = false
 
-    init(vm: TimerViewModel, size: CGFloat, trackWidth: CGFloat, glowWidth: CGFloat,
+    init(engine: SessionEngine, size: CGFloat, trackWidth: CGFloat, glowWidth: CGFloat,
          blurRadius: CGFloat, timeFontSize: CGFloat, statusFont: Font,
          initialGlowOpacity: Double = 0.2) {
-        self.vm = vm
+        self.engine = engine
         self.size = size
         self.trackWidth = trackWidth
         self.glowWidth = glowWidth
@@ -171,7 +178,7 @@ struct TimerRingView: View {
         _glowOpacity = State(initialValue: initialGlowOpacity)
     }
 
-    private var color: Color { vm.currentStep.kind.defaultColor }
+    private var color: Color { engine.currentStep.kind.defaultColor }
 
     var body: some View {
         ZStack {
@@ -180,26 +187,26 @@ struct TimerRingView: View {
                 .frame(width: size, height: size)
 
             Circle()
-                .trim(from: 0, to: vm.progress)
+                .trim(from: 0, to: engine.progress)
                 .stroke(color.opacity(glowOpacity),
                         style: StrokeStyle(lineWidth: glowWidth, lineCap: .round))
                 .frame(width: size, height: size)
                 .rotationEffect(.degrees(-90))
                 .blur(radius: blurRadius)
-                .animation(.linear(duration: 0.9), value: vm.progress)
+                .animation(.linear(duration: 0.9), value: engine.progress)
 
             Circle()
-                .trim(from: 0, to: vm.progress)
+                .trim(from: 0, to: engine.progress)
                 .stroke(color, style: StrokeStyle(lineWidth: trackWidth, lineCap: .round))
                 .frame(width: size, height: size)
                 .rotationEffect(.degrees(-90))
-                .animation(.linear(duration: 0.9), value: vm.progress)
+                .animation(.linear(duration: 0.9), value: engine.progress)
 
             VStack(spacing: 6) {
-                Text(vm.formattedTime)
+                Text(engine.formattedTime)
                     .font(.system(size: timeFontSize, weight: .thin, design: .monospaced))
                     .contentTransition(.numericText(countsDown: true))
-                    .animation(.spring(response: 0.25, dampingFraction: 0.9), value: vm.formattedTime)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.9), value: engine.formattedTime)
 
                 Text(statusLabel)
                     .font(statusFont)
@@ -210,7 +217,7 @@ struct TimerRingView: View {
             }
         }
         // Pulse the glow while running
-        .onChange(of: vm.isRunning) { _, running in
+        .onChange(of: engine.isRunning) { _, running in
             if running {
                 withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                     glowOpacity = 0.45
@@ -233,8 +240,8 @@ struct TimerRingView: View {
 
     private var statusLabel: String {
         if secretActive { return "🎉 you found it!" }
-        if vm.isRunning {
-            switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
+        if engine.isRunning {
+            switch engine.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
             case "🍅":                  return "🍅 in progress"
             case "coffee", "☕":        return "☕ brewing"
             case "42":                  return "the answer 🌌"
@@ -242,7 +249,7 @@ struct TimerRingView: View {
             default:                    return "in progress"
             }
         }
-        if vm.progress > 0 { return "paused" }
+        if engine.progress > 0 { return "paused" }
         return "ready"
     }
 }
@@ -291,11 +298,11 @@ struct ScheduleCaptionView: View {
 /// Area 3: a session running on another Mac (shown while this one is idle).
 struct RemoteSessionCaptionView: View {
     @ObservedObject var coordinator: SyncCoordinator
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
 
     var body: some View {
         Group {
-            if let remote = coordinator.remoteActiveSession, !vm.isRunning {
+            if let remote = coordinator.remoteActiveSession, !engine.isRunning {
                 Text("\(remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -308,23 +315,23 @@ struct RemoteSessionCaptionView: View {
 // MARK: - Controls row
 
 struct TimerControlsRow: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     var spacing: CGFloat = 14
     var controlSize: ControlSize = .regular
     var minWidth: CGFloat = 56
 
-    private var color: Color { vm.currentStep.kind.defaultColor }
+    private var color: Color { engine.currentStep.kind.defaultColor }
 
     var body: some View {
         HStack(spacing: spacing) {
-            Button("Reset") { vm.reset() }
+            Button("Reset") { engine.reset() }
                 .buttonStyle(.bordered)
                 .controlSize(controlSize)
 
             Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { vm.toggleTimer() }
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { engine.toggleTimer() }
             } label: {
-                Text(vm.isRunning ? "Pause" : "Start")
+                Text(engine.isRunning ? "Pause" : "Start")
                     .frame(minWidth: minWidth)
                     .contentTransition(.interpolate)
             }
@@ -333,7 +340,7 @@ struct TimerControlsRow: View {
             .controlSize(controlSize)
             .animation(.easeInOut(duration: 0.2), value: color)
 
-            Button("Skip") { vm.skip() }
+            Button("Skip") { engine.skip() }
                 .buttonStyle(.bordered)
                 .controlSize(controlSize)
         }
@@ -343,14 +350,14 @@ struct TimerControlsRow: View {
 // MARK: - Goal footer
 
 struct GoalFooterView: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
     var showsQuitButton = false
 
-    private var color: Color { vm.currentStep.kind.defaultColor }
+    private var color: Color { engine.currentStep.kind.defaultColor }
 
     var body: some View {
-        let done    = vm.completedPomodoros
-        let goal    = vm.dailyGoal
+        let done    = engine.completedPomodoros
+        let goal    = engine.dailyGoal
         let reached = done >= goal
 
         return VStack(spacing: 6) {

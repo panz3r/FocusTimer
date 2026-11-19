@@ -1,9 +1,43 @@
 import Foundation
 import Combine
 import CoreGraphics
-import ServiceManagement
+import SwiftUI
 
-final class TimerViewModel: ObservableObject {
+/// The live state a session mirrors to other Macs (Area 3). Built by the
+/// engine on session events; SyncCoordinator attaches its own identity.
+struct SessionMirror {
+    let id: UUID
+    let kind: Step.Kind
+    let label: String
+    let startedAt: Date
+    let durationSeconds: Int
+    let paused: Bool
+}
+
+/// Events the engine publishes; SyncCoordinator (and the social push)
+/// react instead of the engine calling into them directly.
+enum SessionEngineEvent {
+    /// The live-session mirror changed; nil clears it.
+    case mirrorChanged(SessionMirror?)
+    /// A work step was completed and recorded — stats changed.
+    case workSessionRecorded
+}
+
+/// Area 4 Phase 4: the session machinery, extracted from the former
+/// TimerViewModel god object. Owns the schedule progression, pause/resume
+/// math (including idle pausing), the Item 0 day-rollover poll, the task
+/// label rule, and the live-session mirror publication via `events`.
+///
+/// Session-behavior knobs (autoAdvance, idle detection) live here because
+/// the machinery consumes them directly; display/integration settings
+/// live in AppSettings.
+@MainActor
+final class SessionEngine: ObservableObject {
+    static let shared = SessionEngine()
+
+    /// Session lifecycle + mirror + stats events.
+    let events = PassthroughSubject<SessionEngineEvent, Never>()
+
     @Published var timeRemaining: Int
     @Published var sessionStartDuration: Int
     @Published var isRunning = false
@@ -23,29 +57,9 @@ final class TimerViewModel: ObservableObject {
     @Published private(set) var isScheduleFinished = false
     @Published var completedPomodoros = 0
 
-    /// Area 4 follow-up: the daily goal is per-schedule now; the global
-    /// setting was migrated into each stored schedule.
-    var dailyGoal: Int { currentSchedule.dailyGoal }
+    // Session-behavior knobs (persisted; consumed by the machinery below).
     @Published var autoAdvance: Bool {
         didSet { UserDefaults.standard.set(autoAdvance, forKey: UserDefaultsKeys.autoAdvance) }
-    }
-    @Published var showTaskLabelInMenuBar: Bool {
-        didSet { UserDefaults.standard.set(showTaskLabelInMenuBar, forKey: UserDefaultsKeys.showTaskLabelInMenuBar) }
-    }
-    @Published var hotkeysEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(hotkeysEnabled, forKey: UserDefaultsKeys.hotkeysEnabled)
-            if hotkeysEnabled { HotkeyManager.shared.register() } else { HotkeyManager.shared.unregister() }
-        }
-    }
-    @Published var notificationSound: NotificationSound {
-        didSet { UserDefaults.standard.set(notificationSound.rawValue, forKey: UserDefaultsKeys.notificationSound) }
-    }
-    @Published var launchAtLogin: Bool {
-        didSet {
-            if launchAtLogin { try? SMAppService.mainApp.register() }
-            else             { try? SMAppService.mainApp.unregister() }
-        }
     }
     @Published var idleDetectionEnabled: Bool {
         didSet {
@@ -57,34 +71,6 @@ final class TimerViewModel: ObservableObject {
     @Published var idlePauseThreshold: Int {
         didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: UserDefaultsKeys.idlePauseThreshold) }
     }
-    @Published var weeklyDigestEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(weeklyDigestEnabled, forKey: UserDefaultsKeys.weeklyDigestEnabled)
-            if weeklyDigestEnabled { DigestChecker.shared.start() } else { DigestChecker.shared.stop() }
-        }
-    }
-    @Published var weeklyBackupEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(weeklyBackupEnabled, forKey: UserDefaultsKeys.weeklyBackupEnabled)
-            BackupScheduler.shared.restartIfNeeded()
-        }
-    }
-    @Published var weeklyBackupMarkdownEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled)
-        }
-    }
-    @Published var icloudSyncEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(icloudSyncEnabled, forKey: UserDefaultsKeys.icloudSyncEnabled)
-            SyncCoordinator.shared.restartIfNeeded()
-        }
-    }
-    @Published var notificationsEnabled: Bool {
-        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: UserDefaultsKeys.notificationsEnabled) }
-    }
-    @Published var toggleHotkeyLabel: String
-    @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
         didSet { UserDefaults.standard.set(taskLabel, forKey: UserDefaultsKeys.taskLabel) }
     }
@@ -109,23 +95,11 @@ final class TimerViewModel: ObservableObject {
     init() {
         let ud = UserDefaults.standard
 
-        notificationsEnabled = ud.object(forKey: UserDefaultsKeys.notificationsEnabled) as? Bool ?? true
         autoAdvance = ud.object(forKey: UserDefaultsKeys.autoAdvance) as? Bool ?? true
-        showTaskLabelInMenuBar = ud.object(forKey: UserDefaultsKeys.showTaskLabelInMenuBar) as? Bool ?? false
-        hotkeysEnabled = ud.object(forKey: UserDefaultsKeys.hotkeysEnabled) as? Bool ?? true
-        let soundRaw = ud.string(forKey: UserDefaultsKeys.notificationSound) ?? NotificationSound.systemDefault.rawValue
-        notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault
-        launchAtLogin = SMAppService.mainApp.status == .enabled
         idleDetectionEnabled = ud.object(forKey: UserDefaultsKeys.idleDetectionEnabled) as? Bool ?? true
         let idleThresh = ud.integer(forKey: UserDefaultsKeys.idlePauseThreshold)
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
-        weeklyDigestEnabled = ud.object(forKey: UserDefaultsKeys.weeklyDigestEnabled) as? Bool ?? true
-        weeklyBackupEnabled = ud.object(forKey: UserDefaultsKeys.weeklyBackupEnabled) as? Bool ?? false
-        weeklyBackupMarkdownEnabled = ud.object(forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled) as? Bool ?? false
-        icloudSyncEnabled = ud.object(forKey: UserDefaultsKeys.icloudSyncEnabled) as? Bool ?? SyncCoordinator.iCloudDriveAvailable
-        toggleHotkeyLabel = ud.string(forKey: UserDefaultsKeys.toggleHotkeyLabel) ?? "⌃⌥Space"
-        skipHotkeyLabel   = ud.string(forKey: UserDefaultsKeys.skipHotkeyLabel)   ?? "⌃⌥S"
-        taskLabel         = ud.string(forKey: UserDefaultsKeys.taskLabel)         ?? ""
+        taskLabel = ud.string(forKey: UserDefaultsKeys.taskLabel) ?? ""
 
         // Area 4: the active schedule (ScheduleStore bootstraps the legacy
         // Pomodoro migration on first launch).
@@ -149,65 +123,7 @@ final class TimerViewModel: ObservableObject {
             .sink { [weak self] _ in self?.resyncIfDayChanged() }
     }
 
-    func updateToggleHotkey(code: Int, mods: Int, label: String) {
-        let ud = UserDefaults.standard
-        let skipCode = ud.object(forKey: UserDefaultsKeys.skipHotkeyCode) as? Int ?? 1
-        let skipMods = ud.object(forKey: UserDefaultsKeys.skipHotkeyMods) as? Int ?? 6144
-        guard code != skipCode || mods != skipMods else {
-            if hotkeysEnabled { HotkeyManager.shared.register() }
-            return
-        }
-        ud.set(code, forKey: UserDefaultsKeys.toggleHotkeyCode)
-        ud.set(mods, forKey: UserDefaultsKeys.toggleHotkeyMods)
-        ud.set(label, forKey: UserDefaultsKeys.toggleHotkeyLabel)
-        toggleHotkeyLabel = label
-        if hotkeysEnabled { HotkeyManager.shared.register() }
-    }
-
-    func updateSkipHotkey(code: Int, mods: Int, label: String) {
-        let ud = UserDefaults.standard
-        let toggleCode = ud.object(forKey: UserDefaultsKeys.toggleHotkeyCode) as? Int ?? 49
-        let toggleMods = ud.object(forKey: UserDefaultsKeys.toggleHotkeyMods) as? Int ?? 6144
-        guard code != toggleCode || mods != toggleMods else {
-            if hotkeysEnabled { HotkeyManager.shared.register() }
-            return
-        }
-        ud.set(code, forKey: UserDefaultsKeys.skipHotkeyCode)
-        ud.set(mods, forKey: UserDefaultsKeys.skipHotkeyMods)
-        ud.set(label, forKey: UserDefaultsKeys.skipHotkeyLabel)
-        skipHotkeyLabel = label
-        if hotkeysEnabled { HotkeyManager.shared.register() }
-    }
-
-    var progress: Double {
-        guard sessionStartDuration > 0 else { return 0 }
-        return Double(sessionStartDuration - timeRemaining) / Double(sessionStartDuration)
-    }
-
-    var formattedTime: String {
-        String(format: "%02d:%02d", timeRemaining / 60, timeRemaining % 60)
-    }
-
-    /// Area 4: switches the active schedule. Locked decision: disallowed
-    /// while a session is running (reset first). Applies the schedule's
-    /// first step immediately.
-    func switchSchedule(to id: UUID) {
-        guard !isRunning else { return }
-        guard let schedule = ScheduleStore.shared.schedule(id: id) else { return }
-        currentSchedule = schedule
-        isScheduleFinished = false
-        currentStepIndex = 0
-        cycleCount = 0
-        completedWorkSteps = 0
-        accumulatedMinutes = 0
-        pausedAtLocally = nil
-        if let first = schedule.steps.first {
-            applyLabelRule(entering: first, schedule: schedule)
-            applyStep(first, at: 0)
-        }
-        clearSessionFromSync()
-        isRunning = false
-    }
+    // MARK: - Controls
 
     func toggleTimer() {
         isRunning ? pause() : start()
@@ -229,7 +145,7 @@ final class TimerViewModel: ObservableObject {
             .autoconnect()
             .sink { [weak self] _ in self?.tick() }
         if idleDetectionEnabled { startIdleMonitor() }
-        pushSessionToSync(paused: false)
+        pushMirror(paused: false)
     }
 
     func pause() {
@@ -238,7 +154,7 @@ final class TimerViewModel: ObservableObject {
         timerCancellable = nil
         stopIdleMonitor()
         pausedAtLocally = Date()
-        pushSessionToSync(paused: true)
+        pushMirror(paused: true)
     }
 
     private func pauseForIdle() {
@@ -247,7 +163,7 @@ final class TimerViewModel: ObservableObject {
         timerCancellable = nil
         // Idle monitor stays running to detect when user returns
         pausedAtLocally = Date()
-        pushSessionToSync(paused: true)
+        pushMirror(paused: true)
     }
 
     private func startIdleMonitor() {
@@ -278,20 +194,20 @@ final class TimerViewModel: ObservableObject {
 
     func reset() {
         pause()
-        clearSessionFromSync()
+        clearMirror()
         restartSchedulePositions()
         isRunning = false
     }
 
     func skip() {
         pause()
-        clearSessionFromSync()
+        clearMirror()
         advance()
         if autoAdvance { start() }
     }
 
-    /// Restarts the schedule from its first step (Item 0-style hold state
-    /// after a `.count`/`.untilTotalMinutes` schedule finishes).
+    /// Restarts the schedule from its first step (hold state after a
+    /// `.count`/`.untilTotalMinutes` schedule finishes).
     private func restartSchedulePositions() {
         currentStepIndex = 0
         cycleCount = 0
@@ -314,18 +230,19 @@ final class TimerViewModel: ObservableObject {
 
     private func sessionComplete() {
         pause()
-        clearSessionFromSync()
+        clearMirror()
 
         let completedMinutes = Int(Double(sessionStartDuration) / 60.0)
         accumulatedMinutes += completedMinutes
 
-        if notificationsEnabled {
-            notificationSound.playAtSessionEnd()
+        let settings = AppSettings.shared
+        if settings.notificationsEnabled {
+            settings.notificationSound.playAtSessionEnd()
             NotificationManager.shared.notify(
                 stepCompleted: currentStep.kind,
                 stepLabel: currentStep.label,
                 taskLabel: taskLabel,
-                sound: notificationSound.unSound
+                sound: settings.notificationSound.unSound
             )
         }
 
@@ -339,34 +256,18 @@ final class TimerViewModel: ObservableObject {
             // Item 0: read the post-increment count from the store instead of
             // `+= 1` on a possibly stale value.
             completedPomodoros = StatsStore.shared.todaySessions
-            syncStats()
-            SyncCoordinator.shared.queueWrite()
+            events.send(.workSessionRecorded)
         }
 
         advance()
         if autoAdvance && !isScheduleFinished { start() }
     }
 
-    private func syncStats() {
-        let sessions = StatsStore.shared.todaySessions
-        let minutes  = StatsStore.shared.todayFocusMinutes
-        let streak   = StatsStore.shared.currentStreak
-        Task {
-            // Area 2: registry-based, deny-by-default. No config → NoopProvider,
-            // no network call.
-            let config = SocialConfig.load()
-            let provider = SocialProviderRegistry.activeProvider(using: config)
-            guard provider.isConfigured, config.isExplicitlyEnabled else { return }
-            let stats = TodayStats(
-                username: config.username ?? "",
-                date: StatsStore.todayKey,
-                sessions: sessions,
-                focusMinutes: minutes,
-                streak: streak,
-                exportedAt: Date()
-            )
-            try? await provider.postTodayStats(stats)
-        }
+    /// Area 1: re-reads today's counters from the store after a backup
+    /// import merges data in. Setting the @Published property re-renders
+    /// every view bound to the engine.
+    func refreshFromStore() {
+        completedPomodoros = StatsStore.shared.todaySessions
     }
 
     /// Item 0: re-syncs the "today" counters when the calendar day has
@@ -380,43 +281,18 @@ final class TimerViewModel: ObservableObject {
         completedPomodoros = StatsStore.shared.todaySessions
     }
 
-    /// Area 1: re-reads today's counters from the store after a backup
-    /// import merges data in. Setting the @Published property re-renders
-    /// every view bound to this view model.
-    func refreshFromStore() {
-        completedPomodoros = StatsStore.shared.todaySessions
+    // MARK: - Derived display state
+
+    var progress: Double {
+        guard sessionStartDuration > 0 else { return 0 }
+        return Double(sessionStartDuration - timeRemaining) / Double(sessionStartDuration)
     }
 
-    // MARK: - Current-session mirror (Area 3)
+    /// Per-schedule daily goal (Area 4 follow-up).
+    var dailyGoal: Int { currentSchedule.dailyGoal }
 
-    private func pushSessionToSync(paused: Bool) {
-        SyncCoordinator.shared.pushCurrentSession(
-            id: activeSessionId,
-            type: currentStep.kind.rawValue,
-            label: currentStep.label,
-            startedAt: sessionStartedAt,
-            durationSeconds: sessionStartDuration,
-            paused: paused
-        )
-    }
-
-    private func clearSessionFromSync() {
-        SyncCoordinator.shared.pushCurrentSession(nil)
-    }
-
-    // MARK: - Schedule editing (Area 4, Settings pane)
-
-    func addStepToCurrentSchedule() {
-        currentSchedule.steps.append(Step(
-            label: Step.Kind.work.defaultLabel,
-            minutes: 25,
-            kind: .work
-        ))
-    }
-
-    func removeStepFromCurrentSchedule(_ id: UUID) {
-        guard currentSchedule.steps.count > 1 else { return }
-        currentSchedule.steps.removeAll { $0.id == id }
+    var formattedTime: String {
+        String(format: "%02d:%02d", timeRemaining / 60, timeRemaining % 60)
     }
 
     // MARK: - Schedule progression (Area 4)
@@ -476,9 +352,63 @@ final class TimerViewModel: ObservableObject {
         stopIdleMonitor()
         pausedAtLocally = nil
         timeRemaining = 0
-        clearSessionFromSync()
-        if notificationsEnabled {
+        clearMirror()
+        let settings = AppSettings.shared
+        if settings.notificationsEnabled {
             NotificationManager.shared.notify(scheduleCompleted: currentSchedule.name)
         }
+    }
+
+    // MARK: - Schedule editing (Settings pane)
+
+    /// Area 4: switches the active schedule. Locked decision: disallowed
+    /// while a session is running (reset first). Applies the schedule's
+    /// first step immediately.
+    func switchSchedule(to id: UUID) {
+        guard !isRunning else { return }
+        guard let schedule = ScheduleStore.shared.schedule(id: id) else { return }
+        currentSchedule = schedule
+        isScheduleFinished = false
+        currentStepIndex = 0
+        cycleCount = 0
+        completedWorkSteps = 0
+        accumulatedMinutes = 0
+        pausedAtLocally = nil
+        if let first = schedule.steps.first {
+            applyLabelRule(entering: first, schedule: schedule)
+            applyStep(first, at: 0)
+        }
+        clearMirror()
+        isRunning = false
+    }
+
+    func addStepToCurrentSchedule() {
+        currentSchedule.steps.append(Step(
+            label: Step.Kind.work.defaultLabel,
+            minutes: 25,
+            kind: .work
+        ))
+    }
+
+    func removeStepFromCurrentSchedule(_ id: UUID) {
+        guard currentSchedule.steps.count > 1 else { return }
+        currentSchedule.steps.removeAll { $0.id == id }
+    }
+
+    // MARK: - Live-session mirror (Area 3, via events)
+
+    private func pushMirror(paused: Bool) {
+        events.send(.mirrorChanged(SessionMirror(
+            id: activeSessionId,
+            kind: currentStep.kind,
+            label: currentStep.label,
+            startedAt: sessionStartedAt,
+            durationSeconds: sessionStartDuration,
+            paused: paused
+        )))
+    }
+
+    private func clearMirror() {
+        events.send(.mirrorChanged(nil))
     }
 }

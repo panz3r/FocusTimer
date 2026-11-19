@@ -3,29 +3,30 @@ import SwiftUI
 /// Behavior pane: app-level toggles (launch/login, auto-advance, menu-bar
 /// label, idle pausing).
 struct BehaviorPane: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
+    @ObservedObject var settings: AppSettings
 
     var body: some View {
         VStack(spacing: 0) {
             SettingsRow("Launch at Login") {
-                Toggle("", isOn: $vm.launchAtLogin).labelsHidden()
+                Toggle("", isOn: $settings.launchAtLogin).labelsHidden()
             }
             Divider()
             SettingsRow("Auto-advance sessions") {
-                Toggle("", isOn: $vm.autoAdvance).labelsHidden()
+                Toggle("", isOn: $engine.autoAdvance).labelsHidden()
             }
             Divider()
             SettingsRow("Show label in menu bar") {
-                Toggle("", isOn: $vm.showTaskLabelInMenuBar).labelsHidden()
+                Toggle("", isOn: $settings.showTaskLabelInMenuBar).labelsHidden()
             }
             Divider()
             SettingsRow("Pause when idle") {
-                Toggle("", isOn: $vm.idleDetectionEnabled).labelsHidden()
+                Toggle("", isOn: $engine.idleDetectionEnabled).labelsHidden()
             }
-            if vm.idleDetectionEnabled {
+            if engine.idleDetectionEnabled {
                 Divider()
                 SettingsRow("Idle threshold") {
-                    Stepper("\(vm.idlePauseThreshold) min", value: $vm.idlePauseThreshold, in: 2...30)
+                    Stepper("\(engine.idlePauseThreshold) min", value: $engine.idlePauseThreshold, in: 2...30)
                 }
             }
         }

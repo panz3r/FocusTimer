@@ -16,6 +16,7 @@ import Foundation
 ///   DigestChecker/BackupScheduler pattern already in the codebase.
 /// - No manifest.json: our own writes are recognized by content hash, which
 ///   is strictly more reliable than timestamp bookkeeping.
+@MainActor
 final class SyncCoordinator: ObservableObject {
     static let shared = SyncCoordinator()
 
@@ -216,6 +217,23 @@ final class SyncCoordinator: ObservableObject {
     }
 
     // MARK: - Current session (live state across Macs)
+
+    /// Area 4: entry point for engine events — updates the live-session
+    /// mirror from the engine's published state (nil clears it).
+    func updateSessionMirror(_ mirror: SessionMirror?) {
+        guard let mirror else {
+            pushCurrentSession(nil)
+            return
+        }
+        pushCurrentSession(
+            id: mirror.id,
+            type: mirror.kind.rawValue,
+            label: mirror.label,
+            startedAt: mirror.startedAt,
+            durationSeconds: mirror.durationSeconds,
+            paused: mirror.paused
+        )
+    }
 
     /// Mirrors a locally started/paused session to current-session.json, or
     /// removes the file when the session ends (completed, skipped, reset).

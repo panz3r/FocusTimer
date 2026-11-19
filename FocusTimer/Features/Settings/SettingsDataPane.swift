@@ -3,7 +3,8 @@ import SwiftUI
 /// Data pane: JSON backup export/import (restore), and the weekly
 /// auto-backup options.
 struct DataPane: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var engine: SessionEngine
+    @ObservedObject var settings: AppSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -14,19 +15,19 @@ struct DataPane: View {
             SettingsRow("Import backup…") {
                 Button("Import…") {
                     SessionExport.runImportDialog {
-                        vm.refreshFromStore()
+                        engine.refreshFromStore()
                         SyncCoordinator.shared.queueWrite()
                     }
                 }
             }
             Divider()
             SettingsRow("Weekly auto-backup") {
-                Toggle("", isOn: $vm.weeklyBackupEnabled).labelsHidden()
+                Toggle("", isOn: $settings.weeklyBackupEnabled).labelsHidden()
             }
-            if vm.weeklyBackupEnabled {
+            if settings.weeklyBackupEnabled {
                 Divider()
                 SettingsRow("Include Markdown summary") {
-                    Toggle("", isOn: $vm.weeklyBackupMarkdownEnabled).labelsHidden()
+                    Toggle("", isOn: $settings.weeklyBackupMarkdownEnabled).labelsHidden()
                 }
                 Divider()
                 SettingsRow("Backup folder") {

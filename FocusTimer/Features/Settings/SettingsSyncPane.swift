@@ -3,16 +3,16 @@ import SwiftUI
 /// Sync pane: iCloud Drive toggle, last-sync state, manual sync, folder
 /// access, and the privacy/unconfigured/error messaging.
 struct SyncPane: View {
-    @ObservedObject var vm: TimerViewModel
+    @ObservedObject var settings: AppSettings
     @ObservedObject private var coordinator = SyncCoordinator.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(spacing: 0) {
                 SettingsRow("Sync via iCloud Drive") {
-                    Toggle("", isOn: $vm.icloudSyncEnabled).labelsHidden()
+                    Toggle("", isOn: $settings.icloudSyncEnabled).labelsHidden()
                 }
-                if vm.icloudSyncEnabled {
+                if settings.icloudSyncEnabled {
                     Divider()
                     SettingsRow("Last sync") {
                         Text(lastSyncText)
