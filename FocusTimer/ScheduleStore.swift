@@ -18,6 +18,7 @@ final class ScheduleStore: ObservableObject {
     private static let activeKey = "schedules.active"
     private static let migratedKey = "schedules.migrated_v1"
     private static let workLabelMigrationKey = "schedules.workLabelFocus_v2"
+    private static let pomodoroWorkLabelKey = "schedules.pomodoroWorkLabel_v3"
 
     private init() {
         bootstrap()
@@ -80,6 +81,7 @@ final class ScheduleStore: ObservableObject {
                 activeScheduleId = schedules.first?.id
             }
             applyWorkLabelMigrationIfNeeded()
+            applyPomodoroWorkLabelRevertIfNeeded()
             return
         }
 
@@ -101,6 +103,28 @@ final class ScheduleStore: ObservableObject {
         persist()
         ud.set(true, forKey: Self.migratedKey)
         ud.set(true, forKey: Self.workLabelMigrationKey)
+        ud.set(true, forKey: Self.pomodoroWorkLabelKey)
+    }
+
+    /// Follow-up (Area 4): step labels named "Work" make sense in the
+    /// Pomodoro schedule (traditional terminology) — revert the v2 type
+    /// rename there. Other schedules keep "Focus".
+    private func applyPomodoroWorkLabelRevertIfNeeded() {
+        let ud = UserDefaults.standard
+        guard ud.object(forKey: Self.pomodoroWorkLabelKey) == nil else { return }
+        var changed = false
+        schedules = schedules.map { schedule in
+            guard schedule.name == "Pomodoro" else { return schedule }
+            var updated = schedule
+            for index in updated.steps.indices
+            where updated.steps[index].kind == .work && updated.steps[index].label == Step.Kind.work.defaultLabel {
+                updated.steps[index].label = "Work"
+                changed = true
+            }
+            return updated
+        }
+        if changed { persist() }
+        ud.set(true, forKey: Self.pomodoroWorkLabelKey)
     }
 
     /// Follow-up (Area 4): the work type is displayed as "Focus". One-shot

@@ -94,7 +94,9 @@ struct Schedule: Codable, Identifiable, Equatable {
         Schedule(
             name: "Pomodoro",
             steps: [
-                Step(label: Step.Kind.work.defaultLabel, minutes: work, kind: .work),
+                // "Work" is the traditional Pomodoro term — the schedule
+                // keeps it even though the generic type is named "Focus".
+                Step(label: "Work", minutes: work, kind: .work),
                 Step(label: Step.Kind.break.defaultLabel, minutes: shortBreak, kind: .break)
             ],
             longBreak: Step(label: Step.Kind.longBreak.defaultLabel, minutes: longBreakMinutes, kind: .longBreak),
