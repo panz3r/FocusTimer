@@ -3,38 +3,8 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 71;
 	objects = {
-
-/* Begin PBXBuildFile section */
-		8A3B5C7D9E1F234560000020 /* FocusTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000010 /* FocusTimerApp.swift */; };
-		8A3B5C7D9E1F234560000021 /* TimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000011 /* TimerViewModel.swift */; };
-		8A3B5C7D9E1F234560000022 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000012 /* ContentView.swift */; };
-		8A3B5C7D9E1F234560000023 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000013 /* SettingsView.swift */; };
-		8A3B5C7D9E1F234560000024 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000014 /* NotificationManager.swift */; };
-		8A3B5C7D9E1F234560000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000015 /* Assets.xcassets */; };
-		8A3B5C7D9E1F234560000026 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */; };
-		8A3B5C7D9E1F234560000093 /* StatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000083 /* StatsStore.swift */; };
-		8A3B5C7D9E1F234560000094 /* SupabaseProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000084 /* SupabaseProvider.swift */; };
-		8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000085 /* SocialView.swift */; };
-		8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */; };
-		8A3B5C7D9E1F234560000097 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */; };
-		8A3B5C7D9E1F234560000098 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000088 /* MainWindowView.swift */; };
-		8A3B5C7D9E1F234560000099 /* AutoUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */; };
-		8A3B5C7D9E1F23456000009A /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008A /* StatsView.swift */; };
-		8A3B5C7D9E1F23456000009B /* StatsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */; };
-		8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008C /* AppDelegate.swift */; };
-		8A3B5C7D9E1F23456000009E /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */; };
-		8A3B5C7D9E1F2345600000A0 /* DigestChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */; };
-		8A3B5C7D9E1F2345600000B1 /* SessionExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */; };
-		8A3B5C7D9E1F2345600000B3 /* BackupScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */; };
-		8A3B5C7D9E1F2345600000B5 /* SocialProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B4 /* SocialProvider.swift */; };
-		8A3B5C7D9E1F2345600000B7 /* WebhookProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */; };
-		8A3B5C7D9E1F2345600000B9 /* NoopProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */; };
-		8A3B5C7D9E1F2345600000BB /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */; };
-		8A3B5C7D9E1F2345600000BD /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BC /* Schedule.swift */; };
-		8A3B5C7D9E1F2345600000BF /* ScheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */; };
-/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		F6791DB330AF1AC70045477D /* PBXContainerItemProxy */ = {
@@ -48,41 +18,23 @@
 
 /* Begin PBXFileReference section */
 		8A3B5C7D9E1F234560000001 /* FocusTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8A3B5C7D9E1F234560000010 /* FocusTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerApp.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000011 /* TimerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewModel.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000013 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000014 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000017 /* FocusTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusTimer.entitlements; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000083 /* StatsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsStore.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000084 /* SupabaseProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseProvider.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000085 /* SocialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialView.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialWindowController.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000088 /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUpdater.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F23456000008A /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsWindowController.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F23456000008C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigestChecker.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExport.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupScheduler.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000B4 /* SocialProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialProvider.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookProvider.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoopProvider.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000BC /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleStore.swift; sourceTree = "<group>"; };
-		8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		F6791DAF30AF1AC60045477D /* FocusTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F6791E8930AF3EC20045477D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Local.xcconfig,
+			);
+			target = 8A3B5C7D9E1F234560000060 /* FocusTimer */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F6791DB030AF1AC70045477D /* FocusTimerTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusTimerTests; sourceTree = "<group>"; };
+		F6791E6A30AF3EC10045477D /* FocusTimer */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (F6791E8930AF3EC20045477D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusTimer; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,47 +58,10 @@
 		8A3B5C7D9E1F234560000002 = {
 			isa = PBXGroup;
 			children = (
-				8A3B5C7D9E1F234560000003 /* FocusTimer */,
+				F6791E6A30AF3EC10045477D /* FocusTimer */,
 				F6791DB030AF1AC70045477D /* FocusTimerTests */,
 				8A3B5C7D9E1F234560000004 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		8A3B5C7D9E1F234560000003 /* FocusTimer */ = {
-			isa = PBXGroup;
-			children = (
-				8A3B5C7D9E1F234560000010 /* FocusTimerApp.swift */,
-				8A3B5C7D9E1F234560000011 /* TimerViewModel.swift */,
-				8A3B5C7D9E1F234560000012 /* ContentView.swift */,
-				8A3B5C7D9E1F234560000013 /* SettingsView.swift */,
-				8A3B5C7D9E1F234560000014 /* NotificationManager.swift */,
-				8A3B5C7D9E1F234560000015 /* Assets.xcassets */,
-				8A3B5C7D9E1F234560000016 /* Info.plist */,
-				8A3B5C7D9E1F234560000017 /* FocusTimer.entitlements */,
-				8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */,
-				8A3B5C7D9E1F234560000083 /* StatsStore.swift */,
-				8A3B5C7D9E1F234560000084 /* SupabaseProvider.swift */,
-				8A3B5C7D9E1F234560000085 /* SocialView.swift */,
-				8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */,
-				8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */,
-				8A3B5C7D9E1F234560000088 /* MainWindowView.swift */,
-				8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */,
-				8A3B5C7D9E1F23456000008A /* StatsView.swift */,
-				8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */,
-				8A3B5C7D9E1F23456000008C /* AppDelegate.swift */,
-				8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */,
-				8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */,
-				8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */,
-				8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */,
-				8A3B5C7D9E1F2345600000B4 /* SocialProvider.swift */,
-				8A3B5C7D9E1F2345600000B6 /* WebhookProvider.swift */,
-				8A3B5C7D9E1F2345600000B8 /* NoopProvider.swift */,
-				8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */,
-				8A3B5C7D9E1F2345600000BC /* Schedule.swift */,
-				8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */,
-				8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */,
-			);
-			path = FocusTimer;
 			sourceTree = "<group>";
 		};
 		8A3B5C7D9E1F234560000004 /* Products */ = {
@@ -172,6 +87,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F6791E6A30AF3EC10045477D /* FocusTimer */,
 			);
 			name = FocusTimer;
 			productName = FocusTimer;
@@ -244,7 +162,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A3B5C7D9E1F234560000025 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,32 +179,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A3B5C7D9E1F234560000020 /* FocusTimerApp.swift in Sources */,
-				8A3B5C7D9E1F234560000021 /* TimerViewModel.swift in Sources */,
-				8A3B5C7D9E1F234560000022 /* ContentView.swift in Sources */,
-				8A3B5C7D9E1F234560000023 /* SettingsView.swift in Sources */,
-				8A3B5C7D9E1F234560000024 /* NotificationManager.swift in Sources */,
-				8A3B5C7D9E1F234560000026 /* SettingsWindowController.swift in Sources */,
-				8A3B5C7D9E1F234560000093 /* StatsStore.swift in Sources */,
-				8A3B5C7D9E1F234560000094 /* SupabaseProvider.swift in Sources */,
-				8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */,
-				8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */,
-				8A3B5C7D9E1F234560000097 /* UpdateChecker.swift in Sources */,
-				8A3B5C7D9E1F234560000098 /* MainWindowView.swift in Sources */,
-				8A3B5C7D9E1F234560000099 /* AutoUpdater.swift in Sources */,
-				8A3B5C7D9E1F23456000009A /* StatsView.swift in Sources */,
-				8A3B5C7D9E1F23456000009B /* StatsWindowController.swift in Sources */,
-				8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */,
-				8A3B5C7D9E1F23456000009E /* HotkeyManager.swift in Sources */,
-				8A3B5C7D9E1F2345600000A0 /* DigestChecker.swift in Sources */,
-				8A3B5C7D9E1F2345600000B1 /* SessionExport.swift in Sources */,
-				8A3B5C7D9E1F2345600000B3 /* BackupScheduler.swift in Sources */,
-				8A3B5C7D9E1F2345600000B5 /* SocialProvider.swift in Sources */,
-				8A3B5C7D9E1F2345600000B7 /* WebhookProvider.swift in Sources */,
-				8A3B5C7D9E1F2345600000B9 /* NoopProvider.swift in Sources */,
-				8A3B5C7D9E1F2345600000BB /* SyncCoordinator.swift in Sources */,
-				8A3B5C7D9E1F2345600000BD /* Schedule.swift in Sources */,
-				8A3B5C7D9E1F2345600000BF /* ScheduleStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,7 +202,8 @@
 /* Begin XCBuildConfiguration section */
 		8A3B5C7D9E1F234560000040 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
+			baseConfigurationReferenceAnchor = F6791E6A30AF3EC10045477D /* FocusTimer */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FocusTimer/FocusTimer.entitlements;
@@ -333,7 +225,8 @@
 		};
 		8A3B5C7D9E1F234560000041 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
+			baseConfigurationReferenceAnchor = F6791E6A30AF3EC10045477D /* FocusTimer */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FocusTimer/FocusTimer.entitlements;
