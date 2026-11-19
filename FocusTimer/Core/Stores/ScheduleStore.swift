@@ -14,12 +14,17 @@ final class ScheduleStore: ObservableObject {
     @Published private(set) var schedules: [Schedule] = []
     @Published private(set) var activeScheduleId: UUID?
 
-    private static let storeKey = "schedules.v1"
-    private static let activeKey = "schedules.active"
+    private static let storeKey = UserDefaultsKeys.schedulesStore
+    private static let activeKey = UserDefaultsKeys.schedulesActive
     private static let migratedKey = "schedules.migrated_v1"
     private static let goalMigrationKey = "schedules.goalPerSchedule_v4"
 
-    private init() {
+    private let defaults: UserDefaults
+
+    /// Injectable defaults so tests run in an isolated domain; the app
+    /// singleton uses `.standard` (behavior unchanged).
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         bootstrap()
     }
 
@@ -45,7 +50,7 @@ final class ScheduleStore: ObservableObject {
     func setActive(id: UUID) {
         guard schedules.contains(where: { $0.id == id }) else { return }
         activeScheduleId = id
-        UserDefaults.standard.set(id.uuidString, forKey: Self.activeKey)
+        defaults.set(id.uuidString, forKey: Self.activeKey)
     }
 
     func delete(id: UUID) {
@@ -58,15 +63,15 @@ final class ScheduleStore: ObservableObject {
 
     private func persist() {
         if let data = try? JSONEncoder().encode(schedules) {
-            UserDefaults.standard.set(data, forKey: Self.storeKey)
+            defaults.set(data, forKey: Self.storeKey)
         }
         if let id = activeScheduleId {
-            UserDefaults.standard.set(id.uuidString, forKey: Self.activeKey)
+            defaults.set(id.uuidString, forKey: Self.activeKey)
         }
     }
 
     private func bootstrap() {
-        let ud = UserDefaults.standard
+        let ud = defaults
 
         if let data = ud.data(forKey: Self.storeKey),
            let decoded = try? JSONDecoder().decode([Schedule].self, from: data),
@@ -85,11 +90,11 @@ final class ScheduleStore: ObservableObject {
 
         // First launch after Area 4: migrate the legacy Pomodoro settings
         // into a schedule, then seed the built-in presets.
-        let work   = ud.integer(forKey: "workDuration")
-        let short  = ud.integer(forKey: "shortBreakDuration")
-        let long   = ud.integer(forKey: "longBreakDuration")
-        let cadence = ud.integer(forKey: "sessionsBeforeLongBreak")
-        let legacyGoal = ud.object(forKey: "dailyGoal") as? Int ?? 8
+        let work   = ud.integer(forKey: UserDefaultsKeys.workDuration)
+        let short  = ud.integer(forKey: UserDefaultsKeys.shortBreakDuration)
+        let long   = ud.integer(forKey: UserDefaultsKeys.longBreakDuration)
+        let cadence = ud.integer(forKey: UserDefaultsKeys.sessionsBeforeLongBreak)
+        let legacyGoal = ud.object(forKey: UserDefaultsKeys.dailyGoal) as? Int ?? 8
 
         var seeded = Schedule.seedPresets
         seeded[0] = Schedule.legacyPomodoro(
@@ -116,7 +121,7 @@ final class ScheduleStore: ObservableObject {
     private func applyPerScheduleGoalMigrationIfNeeded() {
         let ud = UserDefaults.standard
         guard ud.object(forKey: Self.goalMigrationKey) == nil else { return }
-        let legacyGoal = ud.object(forKey: "dailyGoal") as? Int ?? 8
+        let legacyGoal = ud.object(forKey: UserDefaultsKeys.dailyGoal) as? Int ?? 8
         schedules = schedules.map { schedule in
             var updated = schedule
             updated.dailyGoal = legacyGoal

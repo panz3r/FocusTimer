@@ -27,7 +27,7 @@ final class DigestChecker {
 
         // Send at most once per calendar week
         let thisWeek = cal.component(.weekOfYear, from: now)
-        let lastWeek = UserDefaults.standard.integer(forKey: "lastDigestWeek")
+        let lastWeek = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDigestWeek)
         guard thisWeek != lastWeek else { return }
 
         let data     = StatsStore.shared.history(days: 7)
@@ -36,6 +36,6 @@ final class DigestChecker {
         let streak   = StatsStore.shared.currentStreak
 
         NotificationManager.shared.sendWeeklyDigest(sessions: sessions, minutes: minutes, streak: streak)
-        UserDefaults.standard.set(thisWeek, forKey: "lastDigestWeek")
+        UserDefaults.standard.set(thisWeek, forKey: UserDefaultsKeys.lastDigestWeek)
     }
 }

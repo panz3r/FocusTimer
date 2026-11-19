@@ -65,8 +65,13 @@ final class AutoUpdater: ObservableObject {
             phase = .failed("Could not mount update"); return
         }
 
+        // Identity-aware: install next to the RUNNING app, so a fork under a
+        // personal bundle id (or a non-/Applications install) updates itself
+        // instead of clobbering whatever FocusTimer.app sits in /Applications.
         let src = mountPoint.appendingPathComponent("FocusTimer.app")
-        let dst = URL(fileURLWithPath: "/Applications/FocusTimer.app")
+        let runningApp = Bundle.main.bundleURL                     // …/<dir>/FocusTimer.app
+        let installDir = runningApp.deletingLastPathComponent()    // …/<dir>/
+        let dst = installDir.appendingPathComponent("FocusTimer.app")
         let fm  = FileManager.default
 
         do {
@@ -84,7 +89,7 @@ final class AutoUpdater: ObservableObject {
         // Relaunch updated app then quit this instance
         let relaunch = Process()
         relaunch.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-        relaunch.arguments = ["-n", "/Applications/FocusTimer.app"]
+        relaunch.arguments = ["-n", dst.path]
         try? relaunch.run()
         NSApplication.shared.terminate(nil)
     }

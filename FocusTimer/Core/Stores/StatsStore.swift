@@ -5,20 +5,24 @@ private struct DayRecord: Codable {
     var focusMinutes: Int = 0
 }
 
-final class StatsStore {
+final class StatsStore: ObservableObject {
     static let shared = StatsStore()
 
-    private let udKey = "v1_daily_stats"
+    private let udKey = UserDefaultsKeys.dailyStatsStore
+    private let defaults: UserDefaults
     private var records: [String: DayRecord]
 
-    private init() {
-        if let data = UserDefaults.standard.data(forKey: udKey),
+    /// Injectable defaults so tests run in an isolated domain; the app
+    /// singleton uses `.standard` (behavior unchanged).
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        if let data = defaults.data(forKey: udKey),
            let decoded = try? JSONDecoder().decode([String: DayRecord].self, from: data) {
             records = decoded
         } else {
             records = [:]
         }
-        let logData = UserDefaults.standard.data(forKey: "v1_session_log")
+        let logData = defaults.data(forKey: UserDefaultsKeys.sessionLogStore)
         if let data = logData,
            let decoded = try? JSONDecoder().decode([SessionEntry].self, from: data) {
             sessionLog = decoded
@@ -91,7 +95,7 @@ final class StatsStore {
         var stepLabel: String? = nil
     }
 
-    private let logKey = "v1_session_log"
+    private let logKey = UserDefaultsKeys.sessionLogStore
     private(set) var sessionLog: [SessionEntry]
 
     func recentEntries(days: Int) -> [SessionEntry] {
@@ -118,6 +122,7 @@ final class StatsStore {
     var allTimeFocusMinutes: Int { records.values.reduce(0) { $0 + $1.focusMinutes } }
 
     func recordSession(durationMinutes: Int, taskLabel: String = "", stepLabel: String? = nil) {
+        objectWillChange.send()
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
         record.focusMinutes += durationMinutes
@@ -135,14 +140,14 @@ final class StatsStore {
     // MARK: - Milestones
 
     private static let milestones = [10, 50, 100, 500, 1000]
-    private static let milestoneKey = "v1_milestones_reached"
+    private static let milestoneKey = UserDefaultsKeys.milestonesReached
 
     private func checkMilestone(totalSessions: Int) {
-        var reached = Set(UserDefaults.standard.array(forKey: Self.milestoneKey) as? [Int] ?? [])
+        var reached = Set(defaults.array(forKey: Self.milestoneKey) as? [Int] ?? [])
         let unfired = Self.milestones.filter { totalSessions >= $0 && !reached.contains($0) }
         guard let highest = unfired.max() else { return }
         unfired.forEach { reached.insert($0) }
-        UserDefaults.standard.set(Array(reached), forKey: Self.milestoneKey)
+        defaults.set(Array(reached), forKey: Self.milestoneKey)
         NotificationManager.shared.sendMilestone(sessions: highest, focusMinutes: allTimeFocusMinutes)
     }
 
@@ -177,6 +182,7 @@ final class StatsStore {
     /// sessions only.
     @discardableResult
     func mergeImport(dailyStats: [String: DaySnapshot], sessionLog incoming: [SessionEntry]) -> (newSessions: Int, changedDays: Int) {
+        objectWillChange.send()
         var changedDays = 0
         for (day, inc) in dailyStats {
             let existing = records[day] ?? DayRecord()
@@ -215,13 +221,13 @@ final class StatsStore {
 
     private func persist() {
         if let data = try? JSONEncoder().encode(records) {
-            UserDefaults.standard.set(data, forKey: udKey)
+            defaults.set(data, forKey: udKey)
         }
     }
 
     private func persistLog() {
         if let data = try? JSONEncoder().encode(sessionLog) {
-            UserDefaults.standard.set(data, forKey: logKey)
+            defaults.set(data, forKey: logKey)
         }
     }
 }

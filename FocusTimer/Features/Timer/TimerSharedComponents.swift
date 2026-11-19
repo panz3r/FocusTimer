@@ -1,17 +1,16 @@
 import SwiftUI
 
-struct MainWindowView: View {
-    @EnvironmentObject var vm: TimerViewModel
-    @ObservedObject private var syncCoordinator = SyncCoordinator.shared
-    @ObservedObject private var updater  = UpdateChecker.shared
-    @ObservedObject private var updaterW = AutoUpdater.shared
-    @State private var glowOpacity: Double = 0.0
-    @State private var breakPrompt: String = ""
-    @State private var ringTapCount = 0
-    @State private var secretActive = false
-    @FocusState private var isTaskFieldFocused: Bool
+/// Phase 2: components shared by the popover (ContentView) and the main
+/// window (MainWindowView). Both compose these; the two bodies only differ
+/// in sizing/layout, not in the pieces.
+///
+/// Easter-egg state (ring taps, secret status) is ring-local and lives
+/// inside TimerRingView.
 
-    private static let breakPrompts = [
+// MARK: - Break prompts
+
+enum BreakPrompts {
+    static let all = [
         "Stand up and stretch for a minute.",
         "Get some water.",
         "Look out a window — give your eyes a rest.",
@@ -24,78 +23,32 @@ struct MainWindowView: View {
         "Refill your coffee or tea.",
     ]
 
-    private var sessionColor: Color {
-        switch vm.currentStep.kind {
-        case .work:       return .red
-        case .break:      return .green
-        case .longBreak:  return .teal
-        }
-    }
+    static func roll() -> String { all.randomElement() ?? "" }
+}
 
-    /// Area 2: hide the Social entry while no backend is configured
-    /// (cross-cutting item L: deny-by-default).
+// MARK: - Header bar
+
+/// Icon + step label on the left; Social (gated), Stats and Settings
+/// buttons on the right.
+struct TimerHeaderBar: View {
+    @ObservedObject var vm: TimerViewModel
+    var labelFont: Font = .headline
+    var spacing: CGFloat = 7
+
     private var socialAvailable: Bool {
         SocialConfig.load().isExplicitlyEnabled
     }
 
     var body: some View {
-        VStack(spacing: 24) {
-            headerRow
-            remoteSessionCaption
-            taskRow
-            ringView
-            scheduleCaption
-            dotsRow
-            if vm.currentStep.kind != .work, !breakPrompt.isEmpty {
-                Text(breakPrompt)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-            controlsRow
-            Divider()
-            statsRow
-            goalRow
-        }
-        .padding(32)
-        .frame(width: 360)
-        .overlay(alignment: .top) {
-            if let ver = updater.availableVersion { updateBanner(ver) }
-        }
-        .overlay(alignment: .top) {
-            if case .failed(let msg) = updaterW.phase { errorBanner(msg) }
-        }
-        .animation(.easeInOut(duration: 0.35), value: vm.currentStep)
-        .onAppear {
-            if vm.currentStep.kind != .work {
-                breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
-            }
-        }
-        .onChange(of: vm.currentStep) { step in
-            if step.kind != .work {
-                breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
-            }
-        }
-    }
-
-    // MARK: - Header
-
-    private var scheduleCaption: some View {
-        Text(vm.currentSchedule.caption(cycleCount: vm.cycleCount))
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-    }
-
-    private var headerRow: some View {
         HStack {
-            HStack(spacing: 8) {
+            HStack(spacing: spacing) {
                 Image(systemName: vm.currentStep.kind.sfSymbol)
-                    .foregroundStyle(sessionColor)
+                    .foregroundStyle(vm.currentStep.kind.defaultColor)
                     .id("icon-\(vm.currentStep.id)")
                     .transition(.scale(scale: 0.6).combined(with: .opacity))
+
                 Text(vm.currentStep.label)
-                    .font(.title3.weight(.semibold))
+                    .font(labelFont)
                     .id("label-\(vm.currentStep.id)")
                     .transition(.opacity)
             }
@@ -123,52 +76,46 @@ struct MainWindowView: View {
             }
         }
     }
+}
 
-    // MARK: - Task label
+// MARK: - Task label (+ autocomplete)
 
-    private var taskRow: some View {
+struct TaskLabelField: View {
+    @ObservedObject var vm: TimerViewModel
+    var font: Font = .caption
+    var focus: FocusState<Bool>.Binding
+
+    private var filteredSuggestions: [String] {
+        let all = StatsStore.shared.recentLabels(limit: 8)
+        let query = vm.taskLabel.trimmingCharacters(in: .whitespaces)
+        if query.isEmpty { return all }
+        return all.filter { $0.localizedCaseInsensitiveContains(query) && $0.lowercased() != query.lowercased() }
+    }
+
+    var body: some View {
         VStack(spacing: 4) {
             TextField("What are you working on?", text: $vm.taskLabel)
-                .font(.callout)
+                .font(font)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .textFieldStyle(.plain)
                 .lineLimit(1)
                 .truncationMode(.tail)
-                .focused($isTaskFieldFocused)
+                .focused(focus)
 
-            if isTaskFieldFocused && !filteredSuggestions.isEmpty {
-                taskSuggestionsView
+            if focus.wrappedValue && !filteredSuggestions.isEmpty {
+                suggestionsView
             }
         }
     }
 
-    // Area 3: session running on another Mac (when this one is idle)
-    private var remoteSessionCaption: some View {
-        Group {
-            if let remote = syncCoordinator.remoteActiveSession, !vm.isRunning {
-                Text("\(remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .transition(.opacity)
-            }
-        }
-    }
-
-    private var filteredSuggestions: [String] {
-        let all = StatsStore.shared.recentLabels(limit: 8)
-        let q = vm.taskLabel.trimmingCharacters(in: .whitespaces)
-        if q.isEmpty { return all }
-        return all.filter { $0.localizedCaseInsensitiveContains(q) && $0.lowercased() != q.lowercased() }
-    }
-
-    private var taskSuggestionsView: some View {
+    private var suggestionsView: some View {
         VStack(spacing: 0) {
-            ForEach(Array(filteredSuggestions.prefix(5).enumerated()), id: \.element) { idx, label in
-                if idx > 0 { Divider() }
+            ForEach(Array(filteredSuggestions.prefix(5).enumerated()), id: \.element) { _, label in
+                if label != filteredSuggestions.first { Divider() }
                 Button {
                     vm.taskLabel = label
-                    isTaskFieldFocused = false
+                    focus.wrappedValue = false
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "clock.arrow.circlepath")
@@ -192,46 +139,78 @@ struct MainWindowView: View {
         .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.white.opacity(0.08), lineWidth: 1))
         .shadow(color: .black.opacity(0.12), radius: 3, y: 2)
     }
+}
 
-    // MARK: - Ring
+// MARK: - Progress ring (includes the glow pulse + ring-tap easter egg)
 
-    private var ringView: some View {
+struct TimerRingView: View {
+    @ObservedObject var vm: TimerViewModel
+    var size: CGFloat
+    var trackWidth: CGFloat
+    var glowWidth: CGFloat
+    var blurRadius: CGFloat
+    var timeFontSize: CGFloat
+    var statusFont: Font
+    var initialGlowOpacity: Double = 0.2
+
+    @State private var glowOpacity: Double
+    @State private var ringTapCount = 0
+    @State private var secretActive = false
+
+    init(vm: TimerViewModel, size: CGFloat, trackWidth: CGFloat, glowWidth: CGFloat,
+         blurRadius: CGFloat, timeFontSize: CGFloat, statusFont: Font,
+         initialGlowOpacity: Double = 0.2) {
+        self.vm = vm
+        self.size = size
+        self.trackWidth = trackWidth
+        self.glowWidth = glowWidth
+        self.blurRadius = blurRadius
+        self.timeFontSize = timeFontSize
+        self.statusFont = statusFont
+        self.initialGlowOpacity = initialGlowOpacity
+        _glowOpacity = State(initialValue: initialGlowOpacity)
+    }
+
+    private var color: Color { vm.currentStep.kind.defaultColor }
+
+    var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.secondary.opacity(0.15), lineWidth: 12)
-                .frame(width: 240, height: 240)
+                .stroke(Color.secondary.opacity(0.15), lineWidth: trackWidth)
+                .frame(width: size, height: size)
 
             Circle()
                 .trim(from: 0, to: vm.progress)
-                .stroke(sessionColor.opacity(glowOpacity),
-                        style: StrokeStyle(lineWidth: 24, lineCap: .round))
-                .frame(width: 240, height: 240)
+                .stroke(color.opacity(glowOpacity),
+                        style: StrokeStyle(lineWidth: glowWidth, lineCap: .round))
+                .frame(width: size, height: size)
                 .rotationEffect(.degrees(-90))
-                .blur(radius: 8)
+                .blur(radius: blurRadius)
                 .animation(.linear(duration: 0.9), value: vm.progress)
 
             Circle()
                 .trim(from: 0, to: vm.progress)
-                .stroke(sessionColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
-                .frame(width: 240, height: 240)
+                .stroke(color, style: StrokeStyle(lineWidth: trackWidth, lineCap: .round))
+                .frame(width: size, height: size)
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 0.9), value: vm.progress)
 
             VStack(spacing: 6) {
                 Text(vm.formattedTime)
-                    .font(.system(size: 56, weight: .thin, design: .monospaced))
+                    .font(.system(size: timeFontSize, weight: .thin, design: .monospaced))
                     .contentTransition(.numericText(countsDown: true))
                     .animation(.spring(response: 0.25, dampingFraction: 0.9), value: vm.formattedTime)
 
                 Text(statusLabel)
-                    .font(.caption)
+                    .font(statusFont)
                     .foregroundStyle(.secondary)
                     .id("status-\(statusLabel)")
                     .transition(.opacity)
                     .animation(.easeInOut(duration: 0.25), value: statusLabel)
             }
         }
-        .onChange(of: vm.isRunning) { running in
+        // Pulse the glow while running
+        .onChange(of: vm.isRunning) { _, running in
             if running {
                 withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                     glowOpacity = 0.45
@@ -240,6 +219,7 @@ struct MainWindowView: View {
                 withAnimation(.easeOut(duration: 0.4)) { glowOpacity = 0.0 }
             }
         }
+        // Five ring taps reveal the easter egg
         .onTapGesture {
             ringTapCount += 1
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { ringTapCount = 0 }
@@ -251,18 +231,41 @@ struct MainWindowView: View {
         }
     }
 
-    // MARK: - Dots
+    private var statusLabel: String {
+        if secretActive { return "🎉 you found it!" }
+        if vm.isRunning {
+            switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
+            case "🍅":                  return "🍅 in progress"
+            case "coffee", "☕":        return "☕ brewing"
+            case "42":                  return "the answer 🌌"
+            case "debug", "debugging":  return "🐛 squashing bugs"
+            default:                    return "in progress"
+            }
+        }
+        if vm.progress > 0 { return "paused" }
+        return "ready"
+    }
+}
 
-    private var dotsRow: some View {
+// MARK: - Step dots (completed work steps toward the long break)
+
+struct StepDotsRow: View {
+    let schedule: Schedule
+    let completedWorkSteps: Int
+    var dotSize: CGFloat = 8
+    var spacing: CGFloat = 10
+
+    private var color: Color { schedule.steps.first?.kind.defaultColor ?? .red }
+
+    var body: some View {
         Group {
-            if let cadence = vm.currentSchedule.insertedLongBreakEvery,
-               vm.currentSchedule.hasLongBreak {
-                HStack(spacing: 12) {
+            if let cadence = schedule.insertedLongBreakEvery, schedule.hasLongBreak {
+                HStack(spacing: spacing) {
                     ForEach(0..<cadence, id: \.self) { i in
-                        let filled = i < (vm.completedWorkSteps % cadence)
+                        let filled = i < (completedWorkSteps % cadence)
                         Circle()
-                            .fill(filled ? sessionColor : Color.secondary.opacity(0.25))
-                            .frame(width: 10, height: 10)
+                            .fill(filled ? color : Color.secondary.opacity(0.25))
+                            .frame(width: dotSize, height: dotSize)
                             .scaleEffect(filled ? 1.25 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.5), value: filled)
                     }
@@ -270,62 +273,82 @@ struct MainWindowView: View {
             }
         }
     }
+}
 
-    // MARK: - Controls
+// MARK: - Captions
 
-    private var controlsRow: some View {
-        HStack(spacing: 16) {
+struct ScheduleCaptionView: View {
+    let schedule: Schedule
+    let cycleCount: Int
+
+    var body: some View {
+        Text(schedule.caption(cycleCount: cycleCount))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+    }
+}
+
+/// Area 3: a session running on another Mac (shown while this one is idle).
+struct RemoteSessionCaptionView: View {
+    @ObservedObject var coordinator: SyncCoordinator
+    @ObservedObject var vm: TimerViewModel
+
+    var body: some View {
+        Group {
+            if let remote = coordinator.remoteActiveSession, !vm.isRunning {
+                Text("\(remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .transition(.opacity)
+            }
+        }
+    }
+}
+
+// MARK: - Controls row
+
+struct TimerControlsRow: View {
+    @ObservedObject var vm: TimerViewModel
+    var spacing: CGFloat = 14
+    var controlSize: ControlSize = .regular
+    var minWidth: CGFloat = 56
+
+    private var color: Color { vm.currentStep.kind.defaultColor }
+
+    var body: some View {
+        HStack(spacing: spacing) {
             Button("Reset") { vm.reset() }
                 .buttonStyle(.bordered)
-                .controlSize(.large)
+                .controlSize(controlSize)
 
             Button {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { vm.toggleTimer() }
             } label: {
                 Text(vm.isRunning ? "Pause" : "Start")
-                    .frame(minWidth: 80)
+                    .frame(minWidth: minWidth)
                     .contentTransition(.interpolate)
             }
             .buttonStyle(.borderedProminent)
-            .tint(sessionColor)
-            .controlSize(.large)
-            .animation(.easeInOut(duration: 0.2), value: sessionColor)
+            .tint(color)
+            .controlSize(controlSize)
+            .animation(.easeInOut(duration: 0.2), value: color)
 
             Button("Skip") { vm.skip() }
                 .buttonStyle(.bordered)
-                .controlSize(.large)
+                .controlSize(controlSize)
         }
     }
+}
 
-    // MARK: - Stats
+// MARK: - Goal footer
 
-    private var statsRow: some View {
-        HStack {
-            statItem("\(vm.completedPomodoros)", "sessions")
-            Divider().frame(height: 32)
-            statItem("\(StatsStore.shared.todayFocusMinutes)", "min focus")
-            Divider().frame(height: 32)
-            statItem("\(StatsStore.shared.currentStreak)", "day streak")
-        }
-        .frame(maxWidth: .infinity)
-    }
+struct GoalFooterView: View {
+    @ObservedObject var vm: TimerViewModel
+    var showsQuitButton = false
 
-    private func statItem(_ value: String, _ label: String) -> some View {
-        VStack(spacing: 3) {
-            Text(value)
-                .font(.title2.weight(.semibold))
-                .contentTransition(.numericText())
-                .animation(.spring(response: 0.4), value: value)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
+    private var color: Color { vm.currentStep.kind.defaultColor }
 
-    // MARK: - Goal
-
-    private var goalRow: some View {
+    var body: some View {
         let done    = vm.completedPomodoros
         let goal    = vm.dailyGoal
         let reached = done >= goal
@@ -333,20 +356,32 @@ struct MainWindowView: View {
         return VStack(spacing: 6) {
             HStack {
                 Image(systemName: reached ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(reached ? .green : sessionColor)
+                    .foregroundStyle(reached ? .green : color)
                     .font(.caption)
+
                 Text(reached ? "Goal reached · \(done) sessions" : "\(done) of \(goal) sessions today")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText())
                     .animation(.spring(response: 0.4), value: done)
+
                 Spacer()
+
+                if showsQuitButton {
+                    Button("Quit") { NSApplication.shared.terminate(nil) }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
+
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Color.secondary.opacity(0.12)).frame(height: 3)
                     Capsule()
-                        .fill(reached ? Color.green : sessionColor)
+                        .fill(Color.secondary.opacity(0.12))
+                        .frame(height: 3)
+                    Capsule()
+                        .fill(reached ? Color.green : color)
                         .frame(
                             width: min(geo.size.width * CGFloat(done) / CGFloat(max(goal, 1)), geo.size.width),
                             height: 3
@@ -357,12 +392,24 @@ struct MainWindowView: View {
             .frame(height: 3)
         }
     }
+}
 
-    // MARK: - Banners
+// MARK: - Update / error banners
+
+struct UpdateBannersView: View {
+    @ObservedObject var updater: UpdateChecker
+    @ObservedObject var autoUpdater: AutoUpdater
+
+    var body: some View {
+        VStack(spacing: 6) {
+            if let ver = updater.availableVersion { updateBanner(ver) }
+            if case .failed(let msg) = autoUpdater.phase { errorBanner(msg) }
+        }
+    }
 
     private func updateBanner(_ ver: String) -> some View {
         Group {
-            switch updaterW.phase {
+            switch autoUpdater.phase {
             case .idle:
                 Button {
                     if let url = updater.downloadURL {
@@ -380,25 +427,25 @@ struct MainWindowView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
                     .background(Color.blue.opacity(0.75))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
                 }
                 .buttonStyle(.plain)
 
             case .downloading(let p):
-                VStack(spacing: 0) {
-                    Text("Downloading update… \(Int(p * 100))%")
+                VStack(spacing: 3) {
+                    Text("Downloading… \(Int(p * 100))%")
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.85))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
                     GeometryReader { geo in
                         Capsule().fill(Color.white.opacity(0.35)).frame(height: 3)
                         Capsule().fill(Color.white).frame(width: geo.size.width * p, height: 3)
                     }
                     .frame(height: 3)
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 4)
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
                 .background(Color.blue.opacity(0.75))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
 
             case .installing:
                 HStack(spacing: 5) {
@@ -410,6 +457,7 @@ struct MainWindowView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
                 .background(Color.blue.opacity(0.75))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
 
             case .failed:
                 EmptyView()
@@ -418,34 +466,17 @@ struct MainWindowView: View {
     }
 
     private func errorBanner(_ msg: String) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 4) {
             Image(systemName: "exclamationmark.triangle")
             Text(msg)
             Spacer()
-            Button("Dismiss") { AutoUpdater.shared.phase = .idle }
-                .font(.caption2.weight(.semibold))
+            Button("✕") { AutoUpdater.shared.phase = .idle }.font(.caption2.weight(.bold))
         }
         .font(.caption2)
         .foregroundStyle(.white.opacity(0.9))
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
         .background(Color.red.opacity(0.75))
-    }
-
-    // MARK: - Helpers
-
-    private var statusLabel: String {
-        if secretActive { return "🎉 you found it!" }
-        if vm.isRunning {
-            switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
-            case "🍅":                  return "🍅 in progress"
-            case "coffee", "☕":        return "☕ brewing"
-            case "42":                  return "the answer 🌌"
-            case "debug", "debugging": return "🐛 squashing bugs"
-            default:                    return "in progress"
-            }
-        }
-        if vm.progress > 0 { return "paused" }
-        return "ready"
+        .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 }
