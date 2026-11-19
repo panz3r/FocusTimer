@@ -5,7 +5,7 @@ private struct DayRecord: Codable {
     var focusMinutes: Int = 0
 }
 
-final class StatsStore {
+final class StatsStore: ObservableObject {
     static let shared = StatsStore()
 
     private let udKey = UserDefaultsKeys.dailyStatsStore
@@ -122,6 +122,7 @@ final class StatsStore {
     var allTimeFocusMinutes: Int { records.values.reduce(0) { $0 + $1.focusMinutes } }
 
     func recordSession(durationMinutes: Int, taskLabel: String = "", stepLabel: String? = nil) {
+        objectWillChange.send()
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
         record.focusMinutes += durationMinutes
@@ -181,6 +182,7 @@ final class StatsStore {
     /// sessions only.
     @discardableResult
     func mergeImport(dailyStats: [String: DaySnapshot], sessionLog incoming: [SessionEntry]) -> (newSessions: Int, changedDays: Int) {
+        objectWillChange.send()
         var changedDays = 0
         for (day, inc) in dailyStats {
             let existing = records[day] ?? DayRecord()

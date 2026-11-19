@@ -2,6 +2,7 @@ import SwiftUI
 import Charts
 
 struct StatsView: View {
+    @ObservedObject private var statsStore = StatsStore.shared
     @State private var tab: Tab = .overview
     @State private var metric: Metric = .sessions
     @State private var range: Int = 28

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainWindowView: View {
     @EnvironmentObject var vm: TimerViewModel
+    @ObservedObject private var statsStore = StatsStore.shared
     @ObservedObject private var syncCoordinator = SyncCoordinator.shared
     @ObservedObject private var updater  = UpdateChecker.shared
     @ObservedObject private var updaterW = AutoUpdater.shared
