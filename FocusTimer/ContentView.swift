@@ -152,7 +152,7 @@ struct ContentView: View {
                 }
             }
             // Pulse the glow while running
-            .onChange(of: vm.isRunning) { running in
+            .onChange(of: vm.isRunning) { _, running in
                 if running {
                     withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                         glowOpacity = 0.45
@@ -257,7 +257,7 @@ struct ContentView: View {
                 breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
             }
         }
-        .onChange(of: vm.currentStep) { step in
+        .onChange(of: vm.currentStep) { _, step in
             if step.kind != .work {
                 breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
             }

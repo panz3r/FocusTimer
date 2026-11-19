@@ -72,7 +72,7 @@ struct MainWindowView: View {
                 breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
             }
         }
-        .onChange(of: vm.currentStep) { step in
+        .onChange(of: vm.currentStep) { _, step in
             if step.kind != .work {
                 breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
             }
@@ -231,7 +231,7 @@ struct MainWindowView: View {
                     .animation(.easeInOut(duration: 0.25), value: statusLabel)
             }
         }
-        .onChange(of: vm.isRunning) { running in
+        .onChange(of: vm.isRunning) { _, running in
             if running {
                 withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                     glowOpacity = 0.45

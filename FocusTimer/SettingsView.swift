@@ -345,7 +345,7 @@ struct SettingsView: View {
             settingRow("Notifications") {
                 Toggle("", isOn: $vm.notificationsEnabled)
                     .labelsHidden()
-                    .onChange(of: vm.notificationsEnabled) { enabled in
+                    .onChange(of: vm.notificationsEnabled) { _, enabled in
                         if enabled { NotificationManager.shared.requestPermission() }
                     }
             }

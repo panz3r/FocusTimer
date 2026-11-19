@@ -2,7 +2,7 @@
 
 **A beautiful, minimal Pomodoro timer that lives in your macOS menu bar.**
 
-[![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue?logo=apple)](https://github.com/lumenworksco/FocusTimer/releases)
+[![macOS](https://img.shields.io/badge/macOS-14.0%2B-blue?logo=apple)](https://github.com/lumenworksco/FocusTimer/releases)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange?logo=swift)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/lumenworksco/FocusTimer?color=red)](https://github.com/lumenworksco/FocusTimer/releases/latest)
@@ -22,7 +22,7 @@
 </a>
 
 <br/>
-<sub>macOS 13.0 Ventura or later &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp; Free &amp; open source</sub>
+<sub>macOS 14.0 Sonoma or later &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp; Free &amp; open source</sub>
 
 </div>
 
@@ -136,7 +136,7 @@ The classic Pomodoro cycle:
 
 ## Building from Source
 
-**Requirements:** Xcode 15+, macOS 13.0+
+**Requirements:** Xcode 15+, macOS 14.0+
 
 ```bash
 git clone https://github.com/lumenworksco/FocusTimer.git
