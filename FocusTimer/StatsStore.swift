@@ -143,9 +143,18 @@ final class StatsStore {
         NotificationManager.shared.sendMilestone(sessions: highest, focusMinutes: allTimeFocusMinutes)
     }
 
-    private var todayKey: String { key(for: Date()) }
+    private var todayKey: String { Self.todayKey }
+
+    /// Day key for "now" in the store's canonical format. Exposed so
+    /// TimerViewModel can detect day rollover (Item 0) without reaching
+    /// into private store state.
+    static var todayKey: String { key(for: Date()) }
 
     private func key(for date: Date) -> String {
+        Self.key(for: date)
+    }
+
+    private static func key(for date: Date) -> String {
         DateFormatter.yyyyMMdd.string(from: date)
     }
 

@@ -20,6 +20,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return true
     }
 
+    // Item 0: fast recovery of "today" counters after sleep / long inactivity.
+    func applicationDidBecomeActive(_ notification: Notification) {
+        viewModel.resyncIfDayChanged()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NotificationManager.shared.requestPermission()
         UpdateChecker.shared.check()
