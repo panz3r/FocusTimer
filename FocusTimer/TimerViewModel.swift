@@ -287,13 +287,20 @@ final class TimerViewModel: ObservableObject {
         let minutes  = StatsStore.shared.todayFocusMinutes
         let streak   = StatsStore.shared.currentStreak
         Task {
-            guard SupabaseConfig.isConfigured else { return }
-            try? await SupabaseManager.shared.ensureAuthenticated()
-            try? await SupabaseManager.shared.upsertTodayStats(
+            // Area 2: registry-based, deny-by-default. No config → NoopProvider,
+            // no network call.
+            let config = SocialConfig.load()
+            let provider = SocialProviderRegistry.activeProvider(using: config)
+            guard provider.isConfigured, config.isExplicitlyEnabled else { return }
+            let stats = TodayStats(
+                username: config.username ?? "",
+                date: StatsStore.todayKey,
                 sessions: sessions,
                 focusMinutes: minutes,
-                streak: streak
+                streak: streak,
+                exportedAt: Date()
             )
+            try? await provider.postTodayStats(stats)
         }
     }
 

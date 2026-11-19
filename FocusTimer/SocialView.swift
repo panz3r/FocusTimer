@@ -23,9 +23,9 @@ struct SocialView: View {
             Image(systemName: "network.slash")
                 .font(.system(size: 36))
                 .foregroundStyle(.secondary)
-            Text("Supabase not configured")
+            Text("Social is off")
                 .font(.headline)
-            Text("Fill in your project URL and anon key\nin SupabaseConfig.swift, then rebuild.")
+            Text("Connect a backend in Settings → Social,\nthen reopen this window.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -61,13 +61,19 @@ struct SocialView: View {
                 .textFieldStyle(.roundedBorder)
                 .frame(maxWidth: 220)
                 .autocorrectionDisabled()
-                .onSubmit { vm.createProfile() }
+                .onSubmit { vm.createUsername() }
+
+            if vm.showTokenField {
+                SecureField("Token (optional)", text: $vm.tokenInput)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 220)
+            }
 
             if let err = vm.errorMessage {
                 Text(err).foregroundStyle(.red).font(.caption)
             }
 
-            Button("Get Started") { vm.createProfile() }
+            Button("Get Started") { vm.createUsername() }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
                 .disabled(vm.isLoading || vm.usernameInput.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -92,7 +98,7 @@ struct SocialView: View {
     private var myHeader: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("@\(vm.myProfile?.username ?? "–")")
+                Text("@\(vm.myUsername)")
                     .font(.headline)
                 HStack(spacing: 16) {
                     statPill("\(vm.todaySessions)", "sessions")
@@ -127,12 +133,12 @@ struct SocialView: View {
             ForEach(vm.friends) { friend in
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("@\(friend.profile.username)")
+                        Text("@\(friend.username)")
                             .font(.subheadline.weight(.medium))
                         HStack(spacing: 12) {
-                            Text("\(friend.todaySessions) sessions today")
-                            Text("\(friend.todayMinutes) min")
-                            Text("\(friend.weekSessions) this week")
+                            Text("\(friend.sessions) sessions today")
+                            Text("\(friend.focusMinutes) min")
+                            Text("\(friend.streak)-day streak")
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -157,13 +163,13 @@ struct SocialView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             HStack(spacing: 8) {
-                TextField("Find by username", text: $vm.addInput)
+                TextField("Add by username", text: $vm.addInput)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     .onSubmit { vm.addFriend() }
                 Button("Add") { vm.addFriend() }
                     .buttonStyle(.bordered)
-                    .disabled(vm.addInput.trimmingCharacters(in: .whitespaces).isEmpty || vm.isLoading)
+                    .disabled(vm.addInput.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(12)
         }
@@ -172,44 +178,43 @@ struct SocialView: View {
 
 // MARK: - ViewModel
 
+/// Friends are a local, username-based list stored in SocialConfig (max 25).
+/// The configured SocialProvider resolves those usernames to current numbers.
+/// Adding/removing friends never touches the network — only re-fetching does.
 @MainActor
 final class SocialViewModel: ObservableObject {
     enum State { case notConfigured, loading, setup, main }
 
     @Published var state: State = .loading
-    @Published var myProfile: Profile?
-    @Published var friends: [FriendWithStats] = []
+    @Published var myUsername = ""
+    @Published var friends: [FriendStats] = []
     @Published var usernameInput = ""
+    @Published var tokenInput = ""
     @Published var addInput = ""
     @Published var errorMessage: String?
     @Published var isLoading = false
+
+    /// Webhook bearer tokens can be entered during setup so the user
+    /// doesn't have to bounce through Settings (optional — empty = none).
+    var showTokenField: Bool { SocialConfig.load().provider == .webhook }
 
     var todaySessions: Int    { StatsStore.shared.todaySessions    }
     var todayMinutes: Int     { StatsStore.shared.todayFocusMinutes }
     var streak: Int           { StatsStore.shared.currentStreak    }
 
     func load() {
-        guard SupabaseConfig.isConfigured else { state = .notConfigured; return }
-        Task {
-            isLoading = true
-            defer { isLoading = false }
-            do {
-                try await SupabaseManager.shared.ensureAuthenticated()
-                if let p = try await SupabaseManager.shared.getMyProfile() {
-                    myProfile = p
-                    state = .main
-                    await loadFriends()
-                } else {
-                    state = .setup
-                }
-            } catch {
-                errorMessage = error.localizedDescription
-                state = .setup
-            }
+        let config = SocialConfig.load()
+        guard config.isExplicitlyEnabled else { state = .notConfigured; return }
+        if let name = config.username?.trimmingCharacters(in: .whitespaces), !name.isEmpty {
+            myUsername = name
+            state = .main
+            Task { await loadFriends() }
+        } else {
+            state = .setup
         }
     }
 
-    func createProfile() {
+    func createUsername() {
         let name = usernameInput.trimmingCharacters(in: .whitespaces).lowercased()
         guard !name.isEmpty else { return }
         Task {
@@ -217,12 +222,23 @@ final class SocialViewModel: ObservableObject {
             errorMessage = nil
             defer { isLoading = false }
             do {
-                try await SupabaseManager.shared.createProfile(username: name)
-                myProfile = try await SupabaseManager.shared.getMyProfile()
+                var config = SocialConfig.load()
+                // Webhook setup can capture the optional bearer token here.
+                if config.provider == .webhook {
+                    let token = tokenInput.trimmingCharacters(in: .whitespaces)
+                    config.bearerToken = token.isEmpty ? nil : token
+                }
+                let provider = SocialProviderRegistry.activeProvider(using: config)
+                // Supabase registers a profile row; webhook/none store locally.
+                try await provider.registerUsername(name)
+                config.username = name
+                config.save()
+                myUsername = name
                 state = .main
+                tokenInput = ""
                 await loadFriends()
-            } catch SupabaseError.conflict {
-                errorMessage = "Username already taken."
+            } catch let error as SocialError {
+                errorMessage = error.localizedDescription
             } catch {
                 errorMessage = error.localizedDescription
             }
@@ -232,62 +248,46 @@ final class SocialViewModel: ObservableObject {
     func addFriend() {
         let name = addInput.trimmingCharacters(in: .whitespaces).lowercased()
         guard !name.isEmpty else { return }
-        Task {
-            isLoading = true
-            errorMessage = nil
-            defer { isLoading = false }
-            do {
-                guard let found = try await SupabaseManager.shared.searchProfile(username: name) else {
-                    errorMessage = "User '\(name)' not found."
-                    return
-                }
-                let myId = await SupabaseManager.shared.currentUserId
-                if found.id == myId {
-                    errorMessage = "That's you!"
-                    return
-                }
-                if friends.contains(where: { $0.id == found.id }) {
-                    errorMessage = "Already friends."
-                    return
-                }
-                try await SupabaseManager.shared.addFriend(friendId: found.id)
-                addInput = ""
-                await loadFriends()
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+        var config = SocialConfig.load()
+        if name == config.username {
+            errorMessage = "That's you!"
+            return
         }
+        if config.usernames.contains(name) {
+            errorMessage = "Already in your list."
+            return
+        }
+        guard config.usernames.count < 25 else {
+            errorMessage = "Friend list is full (25 max)."
+            return
+        }
+        config.usernames.append(name)
+        config.save()
+        addInput = ""
+        errorMessage = nil
+        Task { await loadFriends() }
     }
 
     func removeFriends(at offsets: IndexSet) {
-        let removed = offsets.map { friends[$0] }
-        friends.remove(atOffsets: offsets)
-        Task {
-            for f in removed {
-                try? await SupabaseManager.shared.removeFriend(friendId: f.id)
-            }
+        var config = SocialConfig.load()
+        for index in offsets.sorted(by: >) where index < config.usernames.count {
+            config.usernames.remove(at: index)
         }
+        config.save()
+        friends.remove(atOffsets: offsets)
     }
 
     func loadFriends() async {
+        let config = SocialConfig.load()
+        let provider = SocialProviderRegistry.activeProvider(using: config)
+        guard provider.isConfigured, !config.usernames.isEmpty else {
+            friends = []
+            return
+        }
         do {
-            let ids = try await SupabaseManager.shared.getFriendIds()
-            guard !ids.isEmpty else { friends = []; return }
-            let profiles = try await SupabaseManager.shared.getProfiles(ids: ids)
-            let since = DateFormatter.yyyyMMdd.string(
-                from: Calendar.current.date(byAdding: .day, value: -6, to: Date()) ?? Date()
-            )
-            let stats = try await SupabaseManager.shared.getStatsForUsers(ids: ids, since: since)
-            let today = DateFormatter.yyyyMMdd.string(from: Date())
-            friends = profiles.map { p in
-                let ps = stats.filter { $0.userId == p.id }
-                return FriendWithStats(
-                    profile: p,
-                    todaySessions: ps.first(where: { $0.date == today })?.sessions    ?? 0,
-                    todayMinutes:  ps.first(where: { $0.date == today })?.focusMinutes ?? 0,
-                    weekSessions:  ps.reduce(0) { $0 + $1.sessions }
-                )
-            }
+            isLoading = true
+            defer { isLoading = false }
+            friends = try await provider.fetchFriendsStats(usernames: config.usernames)
         } catch {
             // Keep existing friend data on network failure
         }
