@@ -44,20 +44,23 @@ final class SyncCoordinator: ObservableObject {
     private let deviceId: String
     private let deviceName: String
 
-    /// Injectable so the merge/flush logic can be verified headlessly
-    /// against a temp directory; the app singleton uses the real iCloud
-    /// Drive folder.
+    /// Injectable folder + defaults + store so tests run fully isolated;
+    /// the app singleton uses the real iCloud folder and `.standard`.
     private let folderOverride: URL?
+    private let defaults: UserDefaults
+    private let store: StatsStore
 
-    init(folderOverride: URL? = nil) {
+    init(folderOverride: URL? = nil, defaults: UserDefaults = .standard, store: StatsStore = .shared) {
         self.folderOverride = folderOverride
-        lastSyncAt = UserDefaults.standard.object(forKey: "icloud.lastSyncAt") as? Date
+        self.defaults = defaults
+        self.store = store
+        lastSyncAt = defaults.object(forKey: "icloud.lastSyncAt") as? Date
 
-        if let saved = UserDefaults.standard.string(forKey: "sync.deviceId") {
+        if let saved = defaults.string(forKey: "sync.deviceId") {
             deviceId = saved
         } else {
             let fresh = UUID().uuidString
-            UserDefaults.standard.set(fresh, forKey: "sync.deviceId")
+            defaults.set(fresh, forKey: "sync.deviceId")
             deviceId = fresh
         }
         deviceName = Host.current().localizedName ?? "Mac"
@@ -87,7 +90,7 @@ final class SyncCoordinator: ObservableObject {
     /// First-use default follows plan: on when iCloud Drive is detected,
     /// off otherwise; an explicit toggle always wins afterwards.
     var isEnabled: Bool {
-        UserDefaults.standard.object(forKey: "icloudSyncEnabled") as? Bool
+        defaults.object(forKey: "icloudSyncEnabled") as? Bool
             ?? Self.iCloudDriveAvailable
     }
 
@@ -202,14 +205,14 @@ final class SyncCoordinator: ObservableObject {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.sortedKeys]
-        return try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: StatsStore.shared.sessionLog))
+        return try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: store.sessionLog))
     }
 
     private func makeDailyStatsData() throws -> Data {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.sortedKeys]
-        return try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: StatsStore.shared.dailyStatsSnapshot))
+        return try encoder.encode(SyncEnvelope(schemaVersion: 1, payload: store.dailyStatsSnapshot))
     }
 
     // MARK: - Current session (live state across Macs)
@@ -284,7 +287,7 @@ final class SyncCoordinator: ObservableObject {
             sawRemote = true
             if data.hashValue != lastPushedLogHash,
                let entries = decode([StatsStore.SessionEntry].self, from: data) {
-                let result = StatsStore.shared.mergeImport(dailyStats: [:], sessionLog: entries)
+                let result = store.mergeImport(dailyStats: [:], sessionLog: entries)
                 changed = changed || result.newSessions > 0
             }
         }
@@ -292,7 +295,7 @@ final class SyncCoordinator: ObservableObject {
             sawRemote = true
             if data.hashValue != lastPushedStatsHash,
                let days = decode([String: StatsStore.DaySnapshot].self, from: data) {
-                let result = StatsStore.shared.mergeImport(dailyStats: days, sessionLog: [])
+                let result = store.mergeImport(dailyStats: days, sessionLog: [])
                 changed = changed || result.changedDays > 0
             }
         }
@@ -344,7 +347,7 @@ final class SyncCoordinator: ObservableObject {
     private func markSynced() {
         if case .syncing = state { state = .ready } else { state = .ready }
         lastSyncAt = Date()
-        UserDefaults.standard.set(lastSyncAt, forKey: "icloud.lastSyncAt")
+        defaults.set(lastSyncAt, forKey: "icloud.lastSyncAt")
     }
 }
 

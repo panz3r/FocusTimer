@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -35,6 +35,16 @@
 		8A3B5C7D9E1F2345600000BD /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BC /* Schedule.swift */; };
 		8A3B5C7D9E1F2345600000BF /* ScheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F6791DB330AF1AC70045477D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8A3B5C7D9E1F234560000070 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8A3B5C7D9E1F234560000060;
+			remoteInfo = FocusTimer;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		8A3B5C7D9E1F234560000001 /* FocusTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,10 +78,22 @@
 		8A3B5C7D9E1F2345600000BC /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleStore.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		F6791DAF30AF1AC60045477D /* FocusTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F6791DB030AF1AC70045477D /* FocusTimerTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FocusTimerTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8A3B5C7D9E1F234560000032 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6791DAC30AF1AC60045477D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -85,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				8A3B5C7D9E1F234560000003 /* FocusTimer */,
+				F6791DB030AF1AC70045477D /* FocusTimerTests */,
 				8A3B5C7D9E1F234560000004 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,6 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				8A3B5C7D9E1F234560000001 /* FocusTimer.app */,
+				F6791DAF30AF1AC60045477D /* FocusTimerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,6 +178,29 @@
 			productReference = 8A3B5C7D9E1F234560000001 /* FocusTimer.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F6791DAE30AF1AC60045477D /* FocusTimerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F6791DB530AF1AC70045477D /* Build configuration list for PBXNativeTarget "FocusTimerTests" */;
+			buildPhases = (
+				F6791DAB30AF1AC60045477D /* Sources */,
+				F6791DAC30AF1AC60045477D /* Frameworks */,
+				F6791DAD30AF1AC60045477D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F6791DB430AF1AC70045477D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F6791DB030AF1AC70045477D /* FocusTimerTests */,
+			);
+			name = FocusTimerTests;
+			packageProductDependencies = (
+			);
+			productName = FocusTimerTests;
+			productReference = F6791DAF30AF1AC60045477D /* FocusTimerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -161,11 +208,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2720;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					8A3B5C7D9E1F234560000060 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					F6791DAE30AF1AC60045477D = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = 8A3B5C7D9E1F234560000060;
 					};
 				};
 			};
@@ -183,6 +234,7 @@
 			projectRoot = "";
 			targets = (
 				8A3B5C7D9E1F234560000060 /* FocusTimer */,
+				F6791DAE30AF1AC60045477D /* FocusTimerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -193,6 +245,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A3B5C7D9E1F234560000025 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6791DAD30AF1AC60045477D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,7 +291,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F6791DAB30AF1AC60045477D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F6791DB430AF1AC70045477D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8A3B5C7D9E1F234560000060 /* FocusTimer */;
+			targetProxy = F6791DB330AF1AC70045477D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		8A3B5C7D9E1F234560000040 /* Debug */ = {
@@ -390,6 +464,55 @@
 			};
 			name = Release;
 		};
+		F6791DB630AF1AC70045477D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.7;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = it.mattiapanzeri.FocusTimerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTimer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTimer";
+			};
+			name = Debug;
+		};
+		F6791DB730AF1AC70045477D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.7;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = it.mattiapanzeri.FocusTimerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTimer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTimer";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -407,6 +530,15 @@
 			buildConfigurations = (
 				8A3B5C7D9E1F234560000042 /* Debug */,
 				8A3B5C7D9E1F234560000043 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F6791DB530AF1AC70045477D /* Build configuration list for PBXNativeTarget "FocusTimerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6791DB630AF1AC70045477D /* Debug */,
+				F6791DB730AF1AC70045477D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

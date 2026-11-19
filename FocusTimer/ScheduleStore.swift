@@ -19,7 +19,12 @@ final class ScheduleStore: ObservableObject {
     private static let migratedKey = "schedules.migrated_v1"
     private static let goalMigrationKey = "schedules.goalPerSchedule_v4"
 
-    private init() {
+    private let defaults: UserDefaults
+
+    /// Injectable defaults so tests run in an isolated domain; the app
+    /// singleton uses `.standard` (behavior unchanged).
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         bootstrap()
     }
 
@@ -45,7 +50,7 @@ final class ScheduleStore: ObservableObject {
     func setActive(id: UUID) {
         guard schedules.contains(where: { $0.id == id }) else { return }
         activeScheduleId = id
-        UserDefaults.standard.set(id.uuidString, forKey: Self.activeKey)
+        defaults.set(id.uuidString, forKey: Self.activeKey)
     }
 
     func delete(id: UUID) {
@@ -58,15 +63,15 @@ final class ScheduleStore: ObservableObject {
 
     private func persist() {
         if let data = try? JSONEncoder().encode(schedules) {
-            UserDefaults.standard.set(data, forKey: Self.storeKey)
+            defaults.set(data, forKey: Self.storeKey)
         }
         if let id = activeScheduleId {
-            UserDefaults.standard.set(id.uuidString, forKey: Self.activeKey)
+            defaults.set(id.uuidString, forKey: Self.activeKey)
         }
     }
 
     private func bootstrap() {
-        let ud = UserDefaults.standard
+        let ud = defaults
 
         if let data = ud.data(forKey: Self.storeKey),
            let decoded = try? JSONDecoder().decode([Schedule].self, from: data),
