@@ -54,13 +54,13 @@ final class SyncCoordinator: ObservableObject {
         self.folderOverride = folderOverride
         self.defaults = defaults
         self.store = store
-        lastSyncAt = defaults.object(forKey: "icloud.lastSyncAt") as? Date
+        lastSyncAt = defaults.object(forKey: UserDefaultsKeys.iCloudLastSyncAt) as? Date
 
-        if let saved = defaults.string(forKey: "sync.deviceId") {
+        if let saved = defaults.string(forKey: UserDefaultsKeys.syncDeviceId) {
             deviceId = saved
         } else {
             let fresh = UUID().uuidString
-            defaults.set(fresh, forKey: "sync.deviceId")
+            defaults.set(fresh, forKey: UserDefaultsKeys.syncDeviceId)
             deviceId = fresh
         }
         deviceName = Host.current().localizedName ?? "Mac"
@@ -90,7 +90,7 @@ final class SyncCoordinator: ObservableObject {
     /// First-use default follows plan: on when iCloud Drive is detected,
     /// off otherwise; an explicit toggle always wins afterwards.
     var isEnabled: Bool {
-        defaults.object(forKey: "icloudSyncEnabled") as? Bool
+        defaults.object(forKey: UserDefaultsKeys.icloudSyncEnabled) as? Bool
             ?? Self.iCloudDriveAvailable
     }
 
@@ -347,7 +347,7 @@ final class SyncCoordinator: ObservableObject {
     private func markSynced() {
         if case .syncing = state { state = .ready } else { state = .ready }
         lastSyncAt = Date()
-        defaults.set(lastSyncAt, forKey: "icloud.lastSyncAt")
+        defaults.set(lastSyncAt, forKey: UserDefaultsKeys.iCloudLastSyncAt)
     }
 }
 

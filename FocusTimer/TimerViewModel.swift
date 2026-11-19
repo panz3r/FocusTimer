@@ -27,19 +27,19 @@ final class TimerViewModel: ObservableObject {
     /// setting was migrated into each stored schedule.
     var dailyGoal: Int { currentSchedule.dailyGoal }
     @Published var autoAdvance: Bool {
-        didSet { UserDefaults.standard.set(autoAdvance, forKey: "autoAdvance") }
+        didSet { UserDefaults.standard.set(autoAdvance, forKey: UserDefaultsKeys.autoAdvance) }
     }
     @Published var showTaskLabelInMenuBar: Bool {
-        didSet { UserDefaults.standard.set(showTaskLabelInMenuBar, forKey: "showTaskLabelInMenuBar") }
+        didSet { UserDefaults.standard.set(showTaskLabelInMenuBar, forKey: UserDefaultsKeys.showTaskLabelInMenuBar) }
     }
     @Published var hotkeysEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(hotkeysEnabled, forKey: "hotkeysEnabled")
+            UserDefaults.standard.set(hotkeysEnabled, forKey: UserDefaultsKeys.hotkeysEnabled)
             if hotkeysEnabled { HotkeyManager.shared.register() } else { HotkeyManager.shared.unregister() }
         }
     }
     @Published var notificationSound: NotificationSound {
-        didSet { UserDefaults.standard.set(notificationSound.rawValue, forKey: "notificationSound") }
+        didSet { UserDefaults.standard.set(notificationSound.rawValue, forKey: UserDefaultsKeys.notificationSound) }
     }
     @Published var launchAtLogin: Bool {
         didSet {
@@ -49,44 +49,44 @@ final class TimerViewModel: ObservableObject {
     }
     @Published var idleDetectionEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(idleDetectionEnabled, forKey: "idleDetectionEnabled")
+            UserDefaults.standard.set(idleDetectionEnabled, forKey: UserDefaultsKeys.idleDetectionEnabled)
             if idleDetectionEnabled { if isRunning { startIdleMonitor() } }
             else { stopIdleMonitor() }
         }
     }
     @Published var idlePauseThreshold: Int {
-        didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: "idlePauseThreshold") }
+        didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: UserDefaultsKeys.idlePauseThreshold) }
     }
     @Published var weeklyDigestEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(weeklyDigestEnabled, forKey: "weeklyDigestEnabled")
+            UserDefaults.standard.set(weeklyDigestEnabled, forKey: UserDefaultsKeys.weeklyDigestEnabled)
             if weeklyDigestEnabled { DigestChecker.shared.start() } else { DigestChecker.shared.stop() }
         }
     }
     @Published var weeklyBackupEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(weeklyBackupEnabled, forKey: "weeklyBackupEnabled")
+            UserDefaults.standard.set(weeklyBackupEnabled, forKey: UserDefaultsKeys.weeklyBackupEnabled)
             BackupScheduler.shared.restartIfNeeded()
         }
     }
     @Published var weeklyBackupMarkdownEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: "weeklyBackupMarkdownEnabled")
+            UserDefaults.standard.set(weeklyBackupMarkdownEnabled, forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled)
         }
     }
     @Published var icloudSyncEnabled: Bool {
         didSet {
-            UserDefaults.standard.set(icloudSyncEnabled, forKey: "icloudSyncEnabled")
+            UserDefaults.standard.set(icloudSyncEnabled, forKey: UserDefaultsKeys.icloudSyncEnabled)
             SyncCoordinator.shared.restartIfNeeded()
         }
     }
     @Published var notificationsEnabled: Bool {
-        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled") }
+        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: UserDefaultsKeys.notificationsEnabled) }
     }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
-        didSet { UserDefaults.standard.set(taskLabel, forKey: "taskLabel") }
+        didSet { UserDefaults.standard.set(taskLabel, forKey: UserDefaultsKeys.taskLabel) }
     }
 
     private var timerCancellable: AnyCancellable?
@@ -109,23 +109,23 @@ final class TimerViewModel: ObservableObject {
     init() {
         let ud = UserDefaults.standard
 
-        notificationsEnabled = ud.object(forKey: "notificationsEnabled") as? Bool ?? true
-        autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
-        showTaskLabelInMenuBar = ud.object(forKey: "showTaskLabelInMenuBar") as? Bool ?? false
-        hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true
-        let soundRaw = ud.string(forKey: "notificationSound") ?? NotificationSound.systemDefault.rawValue
+        notificationsEnabled = ud.object(forKey: UserDefaultsKeys.notificationsEnabled) as? Bool ?? true
+        autoAdvance = ud.object(forKey: UserDefaultsKeys.autoAdvance) as? Bool ?? true
+        showTaskLabelInMenuBar = ud.object(forKey: UserDefaultsKeys.showTaskLabelInMenuBar) as? Bool ?? false
+        hotkeysEnabled = ud.object(forKey: UserDefaultsKeys.hotkeysEnabled) as? Bool ?? true
+        let soundRaw = ud.string(forKey: UserDefaultsKeys.notificationSound) ?? NotificationSound.systemDefault.rawValue
         notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault
         launchAtLogin = SMAppService.mainApp.status == .enabled
-        idleDetectionEnabled = ud.object(forKey: "idleDetectionEnabled") as? Bool ?? true
-        let idleThresh = ud.integer(forKey: "idlePauseThreshold")
+        idleDetectionEnabled = ud.object(forKey: UserDefaultsKeys.idleDetectionEnabled) as? Bool ?? true
+        let idleThresh = ud.integer(forKey: UserDefaultsKeys.idlePauseThreshold)
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
-        weeklyDigestEnabled = ud.object(forKey: "weeklyDigestEnabled") as? Bool ?? true
-        weeklyBackupEnabled = ud.object(forKey: "weeklyBackupEnabled") as? Bool ?? false
-        weeklyBackupMarkdownEnabled = ud.object(forKey: "weeklyBackupMarkdownEnabled") as? Bool ?? false
-        icloudSyncEnabled = ud.object(forKey: "icloudSyncEnabled") as? Bool ?? SyncCoordinator.iCloudDriveAvailable
-        toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
-        skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
-        taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
+        weeklyDigestEnabled = ud.object(forKey: UserDefaultsKeys.weeklyDigestEnabled) as? Bool ?? true
+        weeklyBackupEnabled = ud.object(forKey: UserDefaultsKeys.weeklyBackupEnabled) as? Bool ?? false
+        weeklyBackupMarkdownEnabled = ud.object(forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled) as? Bool ?? false
+        icloudSyncEnabled = ud.object(forKey: UserDefaultsKeys.icloudSyncEnabled) as? Bool ?? SyncCoordinator.iCloudDriveAvailable
+        toggleHotkeyLabel = ud.string(forKey: UserDefaultsKeys.toggleHotkeyLabel) ?? "⌃⌥Space"
+        skipHotkeyLabel   = ud.string(forKey: UserDefaultsKeys.skipHotkeyLabel)   ?? "⌃⌥S"
+        taskLabel         = ud.string(forKey: UserDefaultsKeys.taskLabel)         ?? ""
 
         // Area 4: the active schedule (ScheduleStore bootstraps the legacy
         // Pomodoro migration on first launch).
@@ -151,30 +151,30 @@ final class TimerViewModel: ObservableObject {
 
     func updateToggleHotkey(code: Int, mods: Int, label: String) {
         let ud = UserDefaults.standard
-        let skipCode = ud.object(forKey: "skipHotkeyCode") as? Int ?? 1
-        let skipMods = ud.object(forKey: "skipHotkeyMods") as? Int ?? 6144
+        let skipCode = ud.object(forKey: UserDefaultsKeys.skipHotkeyCode) as? Int ?? 1
+        let skipMods = ud.object(forKey: UserDefaultsKeys.skipHotkeyMods) as? Int ?? 6144
         guard code != skipCode || mods != skipMods else {
             if hotkeysEnabled { HotkeyManager.shared.register() }
             return
         }
-        ud.set(code, forKey: "toggleHotkeyCode")
-        ud.set(mods, forKey: "toggleHotkeyMods")
-        ud.set(label, forKey: "toggleHotkeyLabel")
+        ud.set(code, forKey: UserDefaultsKeys.toggleHotkeyCode)
+        ud.set(mods, forKey: UserDefaultsKeys.toggleHotkeyMods)
+        ud.set(label, forKey: UserDefaultsKeys.toggleHotkeyLabel)
         toggleHotkeyLabel = label
         if hotkeysEnabled { HotkeyManager.shared.register() }
     }
 
     func updateSkipHotkey(code: Int, mods: Int, label: String) {
         let ud = UserDefaults.standard
-        let toggleCode = ud.object(forKey: "toggleHotkeyCode") as? Int ?? 49
-        let toggleMods = ud.object(forKey: "toggleHotkeyMods") as? Int ?? 6144
+        let toggleCode = ud.object(forKey: UserDefaultsKeys.toggleHotkeyCode) as? Int ?? 49
+        let toggleMods = ud.object(forKey: UserDefaultsKeys.toggleHotkeyMods) as? Int ?? 6144
         guard code != toggleCode || mods != toggleMods else {
             if hotkeysEnabled { HotkeyManager.shared.register() }
             return
         }
-        ud.set(code, forKey: "skipHotkeyCode")
-        ud.set(mods, forKey: "skipHotkeyMods")
-        ud.set(label, forKey: "skipHotkeyLabel")
+        ud.set(code, forKey: UserDefaultsKeys.skipHotkeyCode)
+        ud.set(mods, forKey: UserDefaultsKeys.skipHotkeyMods)
+        ud.set(label, forKey: UserDefaultsKeys.skipHotkeyLabel)
         skipHotkeyLabel = label
         if hotkeysEnabled { HotkeyManager.shared.register() }
     }

@@ -18,7 +18,7 @@ final class UpdateChecker: ObservableObject {
         // endpoint (e.g. your own repo) to enable:
         //   defaults write com.focustimer.app update.apiURL \
         //     "https://api.github.com/repos/YOUR/FocusTimer/releases/latest"
-        guard let apiString = UserDefaults.standard.string(forKey: "update.apiURL"),
+        guard let apiString = UserDefaults.standard.string(forKey: UserDefaultsKeys.updateApiURL),
               let apiURL = URL(string: apiString) else { return }
         Task {
             var req = URLRequest(url: apiURL)

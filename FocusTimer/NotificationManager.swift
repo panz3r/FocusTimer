@@ -223,7 +223,7 @@ final class NotificationManager {
 
     /// Session/schedule notifications are gated on the Notifications toggle.
     private func notificationsGate() -> Bool {
-        UserDefaults.standard.object(forKey: "notificationsEnabled") as? Bool ?? true
+        UserDefaults.standard.object(forKey: UserDefaultsKeys.notificationsEnabled) as? Bool ?? true
     }
 
     func sendWeeklyDigest(sessions: Int, minutes: Int, streak: Int) {

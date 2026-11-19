@@ -16,8 +16,8 @@ actor SupabaseProvider: SocialProvider {
 
     init(config: SocialConfig) {
         self.config = config
-        token = UserDefaults.standard.string(forKey: "_sb_tok")
-        uid = UserDefaults.standard.string(forKey: "_sb_uid")
+        token = UserDefaults.standard.string(forKey: UserDefaultsKeys.supabaseToken)
+        uid = UserDefaults.standard.string(forKey: UserDefaultsKeys.supabaseUserId)
     }
 
     nonisolated var isConfigured: Bool { config.baseURL != nil && config.anonKey != nil }
@@ -120,9 +120,9 @@ actor SupabaseProvider: SocialProvider {
     }
 
     private var deviceId: String {
-        if let id = UserDefaults.standard.string(forKey: "_sb_dev") { return id }
+        if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.supabaseDeviceId) { return id }
         let id = UUID().uuidString
-        UserDefaults.standard.set(id, forKey: "_sb_dev")
+        UserDefaults.standard.set(id, forKey: UserDefaultsKeys.supabaseDeviceId)
         return id
     }
 
@@ -133,8 +133,8 @@ actor SupabaseProvider: SocialProvider {
 
     private func store(token t: String, uid u: String) {
         token = t; uid = u
-        UserDefaults.standard.set(t, forKey: "_sb_tok")
-        UserDefaults.standard.set(u, forKey: "_sb_uid")
+        UserDefaults.standard.set(t, forKey: UserDefaultsKeys.supabaseToken)
+        UserDefaults.standard.set(u, forKey: UserDefaultsKeys.supabaseUserId)
     }
 
     // MARK: - HTTP

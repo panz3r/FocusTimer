@@ -8,7 +8,7 @@ private struct DayRecord: Codable {
 final class StatsStore {
     static let shared = StatsStore()
 
-    private let udKey = "v1_daily_stats"
+    private let udKey = UserDefaultsKeys.dailyStatsStore
     private let defaults: UserDefaults
     private var records: [String: DayRecord]
 
@@ -22,7 +22,7 @@ final class StatsStore {
         } else {
             records = [:]
         }
-        let logData = defaults.data(forKey: "v1_session_log")
+        let logData = defaults.data(forKey: UserDefaultsKeys.sessionLogStore)
         if let data = logData,
            let decoded = try? JSONDecoder().decode([SessionEntry].self, from: data) {
             sessionLog = decoded
@@ -95,7 +95,7 @@ final class StatsStore {
         var stepLabel: String? = nil
     }
 
-    private let logKey = "v1_session_log"
+    private let logKey = UserDefaultsKeys.sessionLogStore
     private(set) var sessionLog: [SessionEntry]
 
     func recentEntries(days: Int) -> [SessionEntry] {
@@ -139,7 +139,7 @@ final class StatsStore {
     // MARK: - Milestones
 
     private static let milestones = [10, 50, 100, 500, 1000]
-    private static let milestoneKey = "v1_milestones_reached"
+    private static let milestoneKey = UserDefaultsKeys.milestonesReached
 
     private func checkMilestone(totalSessions: Int) {
         var reached = Set(defaults.array(forKey: Self.milestoneKey) as? [Int] ?? [])

@@ -12,11 +12,11 @@ final class BackupScheduler {
     private init() {}
 
     private var jsonEnabled: Bool {
-        UserDefaults.standard.object(forKey: "weeklyBackupEnabled") as? Bool ?? false
+        UserDefaults.standard.object(forKey: UserDefaultsKeys.weeklyBackupEnabled) as? Bool ?? false
     }
 
     private var markdownEnabled: Bool {
-        UserDefaults.standard.object(forKey: "weeklyBackupMarkdownEnabled") as? Bool ?? false
+        UserDefaults.standard.object(forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled) as? Bool ?? false
     }
 
     private var isEnabled: Bool { jsonEnabled }
@@ -49,7 +49,7 @@ final class BackupScheduler {
         else { return }
 
         let thisWeek = cal.component(.weekOfYear, from: now)
-        let lastWeek = UserDefaults.standard.integer(forKey: "weeklyBackupLastRunWeek")
+        let lastWeek = UserDefaults.standard.integer(forKey: UserDefaultsKeys.weeklyBackupLastRunWeek)
         guard thisWeek != lastWeek else { return }
 
         do {
@@ -62,13 +62,13 @@ final class BackupScheduler {
                 let mdURL = folder.appendingPathComponent("FocusTimer-week-\(Self.stamp(now)).md")
                 try SessionExport.makeMarkdownData().write(to: mdURL, options: .atomic)
             }
-            UserDefaults.standard.set(thisWeek, forKey: "weeklyBackupLastRunWeek")
-            UserDefaults.standard.set(now, forKey: "weeklyBackupLastRunAt")
+            UserDefaults.standard.set(thisWeek, forKey: UserDefaultsKeys.weeklyBackupLastRunWeek)
+            UserDefaults.standard.set(now, forKey: UserDefaultsKeys.weeklyBackupLastRunAt)
         } catch {
             // A broken folder shouldn't nag every week: surface once, disable.
             NotificationManager.shared.sendBackupFailed(error.localizedDescription)
-            UserDefaults.standard.set(false, forKey: "weeklyBackupEnabled")
-            UserDefaults.standard.set(false, forKey: "weeklyBackupMarkdownEnabled")
+            UserDefaults.standard.set(false, forKey: UserDefaultsKeys.weeklyBackupEnabled)
+            UserDefaults.standard.set(false, forKey: UserDefaultsKeys.weeklyBackupMarkdownEnabled)
             stop()
         }
     }
@@ -83,7 +83,7 @@ final class BackupScheduler {
     /// ~/Documents/FocusTimer Backups, created on demand.
     static func backupFolder() throws -> URL {
         let fm = FileManager.default
-        if let data = UserDefaults.standard.data(forKey: "weeklyBackupFolderBookmark") {
+        if let data = UserDefaults.standard.data(forKey: UserDefaultsKeys.weeklyBackupFolderBookmark) {
             var stale = false
             if let url = try? URL(resolvingBookmarkData: data, options: [],
                                   relativeTo: nil, bookmarkDataIsStale: &stale) {
@@ -103,13 +103,13 @@ final class BackupScheduler {
     /// renames/moves, and harmless with the sandbox off).
     static func setFolder(_ url: URL) {
         if let data = try? url.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil) {
-            UserDefaults.standard.set(data, forKey: "weeklyBackupFolderBookmark")
+            UserDefaults.standard.set(data, forKey: UserDefaultsKeys.weeklyBackupFolderBookmark)
         }
     }
 
     /// Human-readable path of the current folder for the Settings row.
     static var folderDisplayPath: String {
-        if let data = UserDefaults.standard.data(forKey: "weeklyBackupFolderBookmark") {
+        if let data = UserDefaults.standard.data(forKey: UserDefaultsKeys.weeklyBackupFolderBookmark) {
             var stale = false
             if let url = try? URL(resolvingBookmarkData: data, options: [],
                                   relativeTo: nil, bookmarkDataIsStale: &stale) {
