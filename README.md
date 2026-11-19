@@ -7,6 +7,10 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/lumenworksco/FocusTimer?color=red)](https://github.com/lumenworksco/FocusTimer/releases/latest)
 
+> **Personal fork** — adds custom schedules (beyond Pomodoro), session
+> export/backup, iCloud Drive sync, and a pluggable social backend
+> (Supabase or any webhook). Based on [iPwnds/FocusTimer](https://github.com/iPwnds/FocusTimer).
+
 ---
 
 ## Download
@@ -37,37 +41,57 @@
 ### Timer
 - **Menu bar native** — one click away, never clutters the Dock
 - **Animated progress ring** — smooth arc with a pulsing glow while your session runs
-- **Session types** — Work, Short Break, and Long Break with distinct colors
-- **Pomodoro dots** — track completed sessions in the current cycle at a glance
-- **Auto-advance** — transitions automatically work → break → work
+- **Custom schedules** — data-driven step sequences beyond Pomodoro: Deep Work (90/20), 52/17 Flowtime, Sprint Focus, or build your own
+- **Long-break cadence** — an automatic long break replaces the next break after every N work steps
+- **Repeat modes** — run always, a fixed number of cycles, or against a total-minutes budget (the final step is trimmed to fit)
+- **Auto-advance** — transitions automatically between steps
 - **Idle detection** — auto-pauses when you step away, auto-resumes when you return
 
 ### Task management
 - **Task label** — name what you're working on; shows next to the timer in the menu bar
 - **Task autocomplete** — recent labels appear as suggestions when you click the field
+- **Per-schedule labels** — the label is remembered per schedule and restored on the next work step
 - **Session log** — every session recorded with task label, time, and duration
+
+### Schedules & goals
+- **Schedule picker** — switch between schedules (locked while a session runs; reset first)
+- **Per-schedule daily goal** — each schedule carries its own session target; the goal footer tracks progress
+- **Schedule editor** — name, ordered steps (label, minutes, kind), long-break cadence, repeat mode
 
 ### Stats & insights
 - **Activity heatmap** — 16-week GitHub-style day grid showing your focus history
 - **Daily bar chart** — sessions or focus time over 1, 2, or 4 weeks
 - **Time-of-day patterns** — hourly distribution chart revealing your peak focus hours
 - **Streak tracking** — current focus streak shown in the main window and Stats
-- **Daily goal** — set a session target; a progress bar tracks you toward it
+- **Unbounded session log** — full history is kept (no entry cap)
+
+### Export & backup
+- **JSON backup** — round-trippable restore with an idempotent merge (importing the same backup twice changes nothing)
+- **CSV export** — one row per session for spreadsheets
+- **Markdown summary** — weekly table (sessions, focus time, streak, top labels) for your notes app
+- **Weekly auto-backup** — optional Sunday-evening JSON (+ Markdown) snapshot to a folder of your choice
+
+### iCloud sync
+- **Multi-Mac sync** — daily stats and session history sync through iCloud Drive with convergent merges (max-of per day, union-by-session)
+- **Live session awareness** — a session running on one Mac appears on your other Macs ("Work on MacBook Pro · 12m left")
 
 ### Notifications
-- **Session alerts** — notification with optional sound when each session completes
+- **Session alerts** — notification with optional sound when each step completes
+- **Schedule-complete alerts** — fired when a finite schedule finishes
 - **Weekly digest** — Sunday evening summary of sessions, focus time, and streak
 - **Milestone celebrations** — one-time notifications at 10, 50, 100, 500, and 1,000 sessions
+- **Test notification** — one-tap pipeline check with permission guidance
 
 ### Social
-- **Focus friends** — add friends by username and see their session count, focus time, and streak in the Social window
-- **Supabase sync** — stats sync in the background so friend data is always current (optional; app works fully offline without it)
+- **Pluggable backend** — off by default; point it at Supabase or any custom webhook URL
+- **Focus friends** — add friends by username and see their session count, focus time, and streak
+- **Local friend list** — adding/removing friends never touches the network
 
 ### Comfort
 - **Break prompts** — a rotating micro-action suggestion on every break (stand up, breathe, etc.)
 - **Global hotkeys** — customizable keyboard shortcuts to start/pause and skip from anywhere
 - **Launch at login** — start automatically with macOS
-- **Auto-update** — checks for new releases and updates in-app with a single click
+- **Two-pane settings** — sidebar sections (Schedules, Behavior, Notifications, Shortcuts, Social, Sync, Data)
 
 ---
 
@@ -78,8 +102,10 @@
 | Open timer | Click the `⏱` icon in the menu bar |
 | Start / Pause | Click **Start** or press the global hotkey (default `⌃⌥Space`) |
 | Skip session | Click **Skip** or press `⌃⌥S` |
-| Reset session | Click **Reset** |
+| Reset session | Click **Reset** (also re-arms a finished schedule) |
+| Switch schedule | Settings → Schedules (locked while a session runs) |
 | Open full window | Click the app icon in the Dock |
+| Export / import | Settings → Data, or the export menu in the Stats window |
 | View stats | Click the chart icon `⊞` in the popover header |
 | Settings | Click the gear icon `⚙` or right-click the menu bar icon |
 
@@ -92,18 +118,19 @@ The classic Pomodoro cycle:
 
 | Setting | Default |
 |---------|---------|
-| Work session | 25 min |
-| Short break | 5 min |
-| Long break | 15 min |
-| Sessions before long break | 4 |
-| Daily goal | 8 sessions |
-| Auto-advance | On |
+| Schedule | Pomodoro — 25 min Focus / 5 min break, long break (15) every 4 work steps |
+| Repeat mode | Always (also: N cycles, N-minute budget) |
+| Daily goal | 8 sessions — per schedule |
+| Auto-advance sessions | On |
 | Show task label in menu bar | Off |
 | Pause when idle | On (5 min threshold) |
-| Global hotkeys | On |
+| Global hotkeys | On (`⌃⌥Space` start/pause, `⌃⌥S` skip) |
 | Notifications | On |
 | Weekly digest | On |
 | Launch at login | Off |
+| iCloud sync | On when iCloud Drive is available |
+| Weekly auto-backup | Off |
+| Social backend | Off (None; Supabase or custom webhook opt-in) |
 
 ---
 
@@ -116,10 +143,25 @@ git clone https://github.com/lumenworksco/FocusTimer.git
 cd FocusTimer
 
 xcodebuild -scheme FocusTimer -configuration Release \
-  CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+  CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO
 ```
 
 Or open `FocusTimer.xcodeproj` in Xcode and press **⌘R**.
+
+> **Signing note:** use `CODE_SIGN_IDENTITY="-"` (ad-hoc "Sign to Run
+> Locally"). A completely unsigned build (`CODE_SIGN_IDENTITY=""`) runs,
+> but macOS will never show its notification permission prompt or deliver
+> its banners — notifications silently do nothing. No Apple Developer
+> account is needed for ad-hoc signing.
+
+> **Update checks:** the fork never queries the upstream repo. To enable
+> update checks against your own releases, point it at a
+> GitHub-releases-compatible endpoint:
+>
+> ```bash
+> defaults write com.focustimer.app update.apiURL \
+>   "https://api.github.com/repos/YOUR/FocusTimer/releases/latest"
+> ```
 
 ---
 
