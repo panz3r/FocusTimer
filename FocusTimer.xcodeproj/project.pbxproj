@@ -67,6 +67,7 @@
 		8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BC /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleStore.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +121,7 @@
 				8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */,
 				8A3B5C7D9E1F2345600000BC /* Schedule.swift */,
 				8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */,
+				8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -235,6 +237,7 @@
 /* Begin XCBuildConfiguration section */
 		8A3B5C7D9E1F234560000040 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "FocusTimer/FocusTimer.entitlements";
@@ -247,7 +250,6 @@
 				INFOPLIST_FILE = "FocusTimer/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.focustimer.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -256,6 +258,7 @@
 		};
 		8A3B5C7D9E1F234560000041 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "FocusTimer/FocusTimer.entitlements";
@@ -268,7 +271,6 @@
 				INFOPLIST_FILE = "FocusTimer/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.focustimer.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

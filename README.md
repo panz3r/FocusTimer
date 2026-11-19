@@ -163,6 +163,20 @@ Or open `FocusTimer.xcodeproj` in Xcode and press **⌘R**.
 >   "https://api.github.com/repos/YOUR/FocusTimer/releases/latest"
 > ```
 
+> **Bundle identifier:** the default is `com.focustimer.app`, defined in
+> `FocusTimer/Config.xcconfig`. To personalize it (e.g. to run your fork
+> alongside the upstream release), create a gitignored
+> `FocusTimer/Local.xcconfig` next to it:
+>
+> ```bash
+> echo 'PRODUCT_BUNDLE_IDENTIFIER = com.yourhandle.FocusTimer' > FocusTimer/Local.xcconfig
+> ```
+>
+> Changing the bundle identifier starts a fresh identity (stats,
+> settings, and notification authorization are keyed to it) — export a
+> backup first and import it in the new install. Command-line builds can
+> also override per invocation: `xcodebuild ... PRODUCT_BUNDLE_IDENTIFIER=…`.
+
 ---
 
 ## Contributing
