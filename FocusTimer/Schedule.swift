@@ -12,6 +12,8 @@ struct Schedule: Codable, Identifiable, Equatable {
     var repeatMode: RepeatMode = .infinite
     /// Task label remembered when a non-work step clears it (item I).
     var lastUsedLabel: String? = nil
+    /// Daily goal target for this schedule (work steps only, decision D).
+    var dailyGoal: Int = 8
 
     var hasLongBreak: Bool { longBreak != nil }
 
@@ -134,6 +136,27 @@ enum RepeatMode: Codable, Equatable {
     case infinite
     case count(Int)                 // run the schedule N full cycles
     case untilTotalMinutes(Int)     // stop after N minutes of completed steps
+}
+
+// Tolerant decoding: fields added after v1 (like dailyGoal) default
+// gracefully when missing from older stores/backups, instead of failing
+// the whole decode. Lives in an extension so the memberwise init survives.
+extension Schedule {
+    enum CodingKeys: String, CodingKey {
+        case id, name, steps, longBreak, insertedLongBreakEvery, repeatMode, lastUsedLabel, dailyGoal
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id   = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Untitled"
+        steps = try container.decodeIfPresent([Step].self, forKey: .steps) ?? []
+        longBreak = try container.decodeIfPresent(Step.self, forKey: .longBreak)
+        insertedLongBreakEvery = try container.decodeIfPresent(Int.self, forKey: .insertedLongBreakEvery)
+        repeatMode = try container.decodeIfPresent(RepeatMode.self, forKey: .repeatMode) ?? .infinite
+        lastUsedLabel = try container.decodeIfPresent(String.self, forKey: .lastUsedLabel)
+        dailyGoal = try container.decodeIfPresent(Int.self, forKey: .dailyGoal) ?? 8
+    }
 }
 
 struct Step: Codable, Identifiable, Equatable {

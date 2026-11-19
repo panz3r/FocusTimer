@@ -23,9 +23,9 @@ final class TimerViewModel: ObservableObject {
     @Published private(set) var isScheduleFinished = false
     @Published var completedPomodoros = 0
 
-    @Published var dailyGoal: Int {
-        didSet { UserDefaults.standard.set(dailyGoal, forKey: "dailyGoal") }
-    }
+    /// Area 4 follow-up: the daily goal is per-schedule now; the global
+    /// setting was migrated into each stored schedule.
+    var dailyGoal: Int { currentSchedule.dailyGoal }
     @Published var autoAdvance: Bool {
         didSet { UserDefaults.standard.set(autoAdvance, forKey: "autoAdvance") }
     }
@@ -110,8 +110,6 @@ final class TimerViewModel: ObservableObject {
         let ud = UserDefaults.standard
 
         notificationsEnabled = ud.object(forKey: "notificationsEnabled") as? Bool ?? true
-        let goal = ud.integer(forKey: "dailyGoal")
-        dailyGoal = goal > 0 ? goal : 8
         autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
         showTaskLabelInMenuBar = ud.object(forKey: "showTaskLabelInMenuBar") as? Bool ?? false
         hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true

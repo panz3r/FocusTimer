@@ -17,6 +17,7 @@ final class ScheduleStore: ObservableObject {
     private static let storeKey = "schedules.v1"
     private static let activeKey = "schedules.active"
     private static let migratedKey = "schedules.migrated_v1"
+    private static let goalMigrationKey = "schedules.goalPerSchedule_v4"
 
     private init() {
         bootstrap()
@@ -78,6 +79,7 @@ final class ScheduleStore: ObservableObject {
             } else {
                 activeScheduleId = schedules.first?.id
             }
+            applyPerScheduleGoalMigrationIfNeeded()
             return
         }
 
@@ -87,16 +89,40 @@ final class ScheduleStore: ObservableObject {
         let short  = ud.integer(forKey: "shortBreakDuration")
         let long   = ud.integer(forKey: "longBreakDuration")
         let cadence = ud.integer(forKey: "sessionsBeforeLongBreak")
+        let legacyGoal = ud.object(forKey: "dailyGoal") as? Int ?? 8
 
-        schedules = Schedule.seedPresets
-        schedules[0] = Schedule.legacyPomodoro(
+        var seeded = Schedule.seedPresets
+        seeded[0] = Schedule.legacyPomodoro(
             work: work > 0 ? work : 25,
             shortBreak: short > 0 ? short : 5,
             longBreakMinutes: long > 0 ? long : 15,
             cadence: cadence > 0 ? cadence : 4
         )
+        schedules = seeded.map { schedule in
+            var updated = schedule
+            updated.dailyGoal = legacyGoal
+            return updated
+        }
         activeScheduleId = schedules.first?.id
         persist()
         ud.set(true, forKey: Self.migratedKey)
+        ud.set(true, forKey: Self.goalMigrationKey)
+    }
+
+    /// Area 4 follow-up: the daily goal moved from a global setting to a
+    /// per-schedule field. One-shot: seed every stored schedule with the
+    /// legacy global goal so the user's target carries over (they can then
+    /// differentiate per schedule). Required migration — preserves data.
+    private func applyPerScheduleGoalMigrationIfNeeded() {
+        let ud = UserDefaults.standard
+        guard ud.object(forKey: Self.goalMigrationKey) == nil else { return }
+        let legacyGoal = ud.object(forKey: "dailyGoal") as? Int ?? 8
+        schedules = schedules.map { schedule in
+            var updated = schedule
+            updated.dailyGoal = legacyGoal
+            return updated
+        }
+        persist()
+        ud.set(true, forKey: Self.goalMigrationKey)
     }
 }

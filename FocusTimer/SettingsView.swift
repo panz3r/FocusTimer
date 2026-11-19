@@ -180,6 +180,11 @@ struct SettingsView: View {
                 }
 
                 Divider()
+                settingRow("Daily goal") {
+                    Stepper("\(vm.currentSchedule.dailyGoal) sessions", value: $vm.currentSchedule.dailyGoal, in: 1...20)
+                }
+
+                Divider()
                 settingRow("Repeats") {
                     Picker("", selection: repeatKind) {
                         Text("Always").tag(RepeatKind.infinite)
@@ -209,12 +214,6 @@ struct SettingsView: View {
                 }
             }
             .disabled(vm.isRunning)
-
-            card {
-                settingRow("Daily goal") {
-                    Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
-                }
-            }
         }
     }
 
