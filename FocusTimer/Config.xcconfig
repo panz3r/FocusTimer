@@ -1,0 +1,20 @@
+// FocusTimer — build configuration overrides.
+//
+// The default bundle identifier lives here. To personalize it (e.g. to run
+// your fork alongside the upstream release), create a Local.xcconfig next
+// to this file — it is gitignored, so your override stays local:
+//
+//   echo 'PRODUCT_BUNDLE_IDENTIFIER = com.yourhandle.FocusTimer' > Local.xcconfig
+//
+// Note: the bundle identifier keys your UserDefaults (stats, settings) and
+// notification authorization. Changing it starts a fresh identity — export
+// a backup first and import it in the new install.
+//
+// Command-line builds can also override per-invocation:
+//
+//   xcodebuild ... PRODUCT_BUNDLE_IDENTIFIER=com.yourhandle.FocusTimer
+
+PRODUCT_BUNDLE_IDENTIFIER = com.focustimer.app
+
+// Local overrides last — they win over the default above.
+#include? "Local.xcconfig"

@@ -67,6 +67,7 @@
 		8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BC /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleStore.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +81,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8A3B5C7D9E1F234560000002 /* / */ = {
+		8A3B5C7D9E1F234560000002 = {
 			isa = PBXGroup;
 			children = (
 				8A3B5C7D9E1F234560000003 /* FocusTimer */,
@@ -99,7 +100,7 @@
 				8A3B5C7D9E1F234560000015 /* Assets.xcassets */,
 				8A3B5C7D9E1F234560000016 /* Info.plist */,
 				8A3B5C7D9E1F234560000017 /* FocusTimer.entitlements */,
-			8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */,
+				8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */,
 				8A3B5C7D9E1F234560000083 /* StatsStore.swift */,
 				8A3B5C7D9E1F234560000084 /* SupabaseProvider.swift */,
 				8A3B5C7D9E1F234560000085 /* SocialView.swift */,
@@ -120,6 +121,7 @@
 				8A3B5C7D9E1F2345600000BA /* SyncCoordinator.swift */,
 				8A3B5C7D9E1F2345600000BC /* Schedule.swift */,
 				8A3B5C7D9E1F2345600000BE /* ScheduleStore.swift */,
+				8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -235,19 +237,20 @@
 /* Begin XCBuildConfiguration section */
 		8A3B5C7D9E1F234560000040 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "FocusTimer/FocusTimer.entitlements";
+				CODE_SIGN_ENTITLEMENTS = FocusTimer/FocusTimer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "FocusTimer/Info.plist";
+				INFOPLIST_FILE = FocusTimer/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.focustimer.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -256,19 +259,20 @@
 		};
 		8A3B5C7D9E1F234560000041 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A3B5C7D9E1F2345600000C0 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "FocusTimer/FocusTimer.entitlements";
+				CODE_SIGN_ENTITLEMENTS = FocusTimer/FocusTimer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "FocusTimer/Info.plist";
+				INFOPLIST_FILE = FocusTimer/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.focustimer.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -408,7 +412,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 8A3B5C7D9E1F234560000070 /* Project object */;
 }

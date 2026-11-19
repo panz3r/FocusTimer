@@ -7,13 +7,19 @@ final class UpdateChecker: ObservableObject {
     @Published var downloadURL: String? = nil
 
     private let current: String
-    private let apiURL = URL(string: "https://api.github.com/repos/lumenworksco/FocusTimer/releases/latest")!
 
     private init() {
         current = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
     }
 
     func check() {
+        // Fork posture: update checks are opt-in — the upstream repo is
+        // never queried. Point update.apiURL at a GitHub-releases-compatible
+        // endpoint (e.g. your own repo) to enable:
+        //   defaults write com.focustimer.app update.apiURL \
+        //     "https://api.github.com/repos/YOUR/FocusTimer/releases/latest"
+        guard let apiString = UserDefaults.standard.string(forKey: "update.apiURL"),
+              let apiURL = URL(string: apiString) else { return }
         Task {
             var req = URLRequest(url: apiURL)
             req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
