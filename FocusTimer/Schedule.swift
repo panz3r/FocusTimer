@@ -94,7 +94,7 @@ struct Schedule: Codable, Identifiable, Equatable {
         Schedule(
             name: "Pomodoro",
             steps: [
-                Step(label: "Work", minutes: work, kind: .work),
+                Step(label: Step.Kind.work.defaultLabel, minutes: work, kind: .work),
                 Step(label: Step.Kind.break.defaultLabel, minutes: shortBreak, kind: .break)
             ],
             longBreak: Step(label: Step.Kind.longBreak.defaultLabel, minutes: longBreakMinutes, kind: .longBreak),
@@ -113,14 +113,14 @@ struct Schedule: Codable, Identifiable, Equatable {
             Schedule(
                 name: "52/17 Flowtime",
                 steps: [
-                    Step(label: "Work", minutes: 52, kind: .work),
+                    Step(label: Step.Kind.work.defaultLabel, minutes: 52, kind: .work),
                     Step(label: "Break", minutes: 17, kind: .break)
                 ]
             ),
             Schedule(
                 name: "Sprint Focus",
                 steps: [
-                    Step(label: "Work", minutes: 60, kind: .work),
+                    Step(label: Step.Kind.work.defaultLabel, minutes: 60, kind: .work),
                     Step(label: "Break", minutes: 10, kind: .break)
                 ]
             )
@@ -148,7 +148,7 @@ struct Step: Codable, Identifiable, Equatable {
 extension Step.Kind {
     var defaultLabel: String {
         switch self {
-        case .work:      return "Work"
+        case .work:      return "Focus"
         case .break:     return "Short Break"
         case .longBreak: return "Long Break"
         }

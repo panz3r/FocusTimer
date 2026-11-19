@@ -305,7 +305,7 @@ struct SettingsView: View {
             }
             .font(.callout)
             Picker("", selection: step.kind) {
-                Text("Work").tag(Step.Kind.work)
+                Text("Focus").tag(Step.Kind.work)
                 Text("Break").tag(Step.Kind.break)
             }
             .labelsHidden()

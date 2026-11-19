@@ -17,6 +17,7 @@ final class ScheduleStore: ObservableObject {
     private static let storeKey = "schedules.v1"
     private static let activeKey = "schedules.active"
     private static let migratedKey = "schedules.migrated_v1"
+    private static let workLabelMigrationKey = "schedules.workLabelFocus_v2"
 
     private init() {
         bootstrap()
@@ -78,6 +79,7 @@ final class ScheduleStore: ObservableObject {
             } else {
                 activeScheduleId = schedules.first?.id
             }
+            applyWorkLabelMigrationIfNeeded()
             return
         }
 
@@ -98,5 +100,27 @@ final class ScheduleStore: ObservableObject {
         activeScheduleId = schedules.first?.id
         persist()
         ud.set(true, forKey: Self.migratedKey)
+        ud.set(true, forKey: Self.workLabelMigrationKey)
+    }
+
+    /// Follow-up (Area 4): the work type is displayed as "Focus". One-shot
+    /// rename of legacy "Work" step labels in already-stored schedules so
+    /// existing installs pick up the new type name without rebuilding.
+    /// Deliberately exact-match: user-customized labels are left alone.
+    private func applyWorkLabelMigrationIfNeeded() {
+        let ud = UserDefaults.standard
+        guard ud.object(forKey: Self.workLabelMigrationKey) == nil else { return }
+        var changed = false
+        schedules = schedules.map { schedule in
+            var updated = schedule
+            for index in updated.steps.indices
+            where updated.steps[index].kind == .work && updated.steps[index].label == "Work" {
+                updated.steps[index].label = Step.Kind.work.defaultLabel
+                changed = true
+            }
+            return updated
+        }
+        if changed { persist() }
+        ud.set(true, forKey: Self.workLabelMigrationKey)
     }
 }

@@ -132,7 +132,7 @@ final class NotificationManager {
 
         switch kind {
         case .work:
-            content.title = "Work session complete!"
+            content.title = "Focus session complete!"
             switch taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
             case "🍅":
                 content.body = "Pomodoro complete! 🍅 Take a well-earned break."
