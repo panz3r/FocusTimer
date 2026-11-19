@@ -28,6 +28,8 @@
 		8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008C /* AppDelegate.swift */; };
 		8A3B5C7D9E1F23456000009E /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */; };
 		8A3B5C7D9E1F2345600000A0 /* DigestChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */; };
+		8A3B5C7D9E1F2345600000B1 /* SessionExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */; };
+		8A3B5C7D9E1F2345600000B3 /* BackupScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +57,8 @@
 		8A3B5C7D9E1F23456000008C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigestChecker.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExport.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupScheduler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +106,8 @@
 				8A3B5C7D9E1F23456000008C /* AppDelegate.swift */,
 				8A3B5C7D9E1F23456000009D /* HotkeyManager.swift */,
 				8A3B5C7D9E1F2345600000AF /* DigestChecker.swift */,
+				8A3B5C7D9E1F2345600000B0 /* SessionExport.swift */,
+				8A3B5C7D9E1F2345600000B2 /* BackupScheduler.swift */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -203,6 +209,8 @@
 				8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */,
 				8A3B5C7D9E1F23456000009E /* HotkeyManager.swift in Sources */,
 				8A3B5C7D9E1F2345600000A0 /* DigestChecker.swift in Sources */,
+				8A3B5C7D9E1F2345600000B1 /* SessionExport.swift in Sources */,
+				8A3B5C7D9E1F2345600000B3 /* BackupScheduler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

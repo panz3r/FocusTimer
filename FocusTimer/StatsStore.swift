@@ -86,6 +86,9 @@ final class StatsStore {
         let timestamp: Date
         let durationMinutes: Int
         let taskLabel: String
+        /// Active schedule step label; nil for entries recorded before
+        /// schedules exist (Area 4). Optional so old stores and backups decode.
+        var stepLabel: String? = nil
     }
 
     private let logKey = "v1_session_log"
@@ -122,7 +125,7 @@ final class StatsStore {
 
         let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel)
         sessionLog.append(entry)
-        if sessionLog.count > 500 { sessionLog.removeFirst(sessionLog.count - 500) }
+        // Area 1: no in-memory cap — the store is the source of truth.
         persistLog()
         persist()
 
@@ -144,6 +147,58 @@ final class StatsStore {
     }
 
     private var todayKey: String { Self.todayKey }
+
+    // MARK: - Export / import (Area 1)
+
+    struct DaySnapshot: Codable {
+        var sessions: Int
+        var focusMinutes: Int
+    }
+
+    /// All daily counters keyed by canonical "yyyy-MM-dd", for backup export.
+    var dailyStatsSnapshot: [String: DaySnapshot] {
+        records.mapValues { DaySnapshot(sessions: $0.sessions, focusMinutes: $0.focusMinutes) }
+    }
+
+    /// Current stored counters for a canonical day key ("yyyy-MM-dd").
+    func dayStats(for dayKey: String) -> DaySnapshot {
+        let r = records[dayKey] ?? DayRecord()
+        return DaySnapshot(sessions: r.sessions, focusMinutes: r.focusMinutes)
+    }
+
+    /// Current stored counters for the day containing `date`.
+    func dayRecord(for date: Date) -> DaySnapshot {
+        dayStats(for: key(for: date))
+    }
+
+    /// Merge-import (Area 1): per-day max-of, log union by id. Idempotent —
+    /// importing the same backup twice is a no-op the second time.
+    /// Milestones are deliberately not re-checked here; they fire on live
+    /// sessions only.
+    @discardableResult
+    func mergeImport(dailyStats: [String: DaySnapshot], sessionLog incoming: [SessionEntry]) -> (newSessions: Int, changedDays: Int) {
+        var changedDays = 0
+        for (day, inc) in dailyStats {
+            let existing = records[day] ?? DayRecord()
+            let merged = DayRecord(
+                sessions: max(existing.sessions, inc.sessions),
+                focusMinutes: max(existing.focusMinutes, inc.focusMinutes)
+            )
+            if merged.sessions != existing.sessions || merged.focusMinutes != existing.focusMinutes {
+                records[day] = merged
+                changedDays += 1
+            }
+        }
+        let known = Set(sessionLog.map(\.id))
+        let fresh = incoming.filter { !known.contains($0.id) }
+        if !fresh.isEmpty {
+            sessionLog.append(contentsOf: fresh)
+            sessionLog.sort { $0.timestamp < $1.timestamp }
+        }
+        persist()
+        persistLog()
+        return (fresh.count, changedDays)
+    }
 
     /// Day key for "now" in the store's canonical format. Exposed so
     /// TimerViewModel can detect day rollover (Item 0) without reaching

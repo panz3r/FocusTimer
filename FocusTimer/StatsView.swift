@@ -52,6 +52,18 @@ struct StatsView: View {
             Text("Stats History")
                 .font(.title2.weight(.semibold))
             Spacer()
+            Menu {
+                Button("JSON backup…") { SessionExport.runExportDialog(.jsonBackup) }
+                Button("CSV…") { SessionExport.runExportDialog(.csv) }
+                Button("Markdown summary…") { SessionExport.runExportDialog(.markdown) }
+            } label: {
+                Image(systemName: "square.and.arrow.up")
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .frame(width: 22)
+            .help("Export…")
+
             Picker("", selection: $range) {
                 Text("1 week").tag(7)
                 Text("2 weeks").tag(14)
