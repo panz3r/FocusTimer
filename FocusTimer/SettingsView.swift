@@ -133,12 +133,13 @@ struct SettingsView: View {
             }
 
             if vm.isRunning {
-                Text("Reset the timer to switch schedules.")
+                Text("Reset the timer to edit or switch schedules.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
 
-            // Active schedule editor
+            // Active schedule editor — fully locked while a session runs
+            // (locked decision: no mid-session schedule changes).
             card {
                 settingRow("Name") {
                     TextField("Schedule name", text: scheduleName)
@@ -207,17 +208,12 @@ struct SettingsView: View {
                     }
                 }
             }
+            .disabled(vm.isRunning)
 
             card {
                 settingRow("Daily goal") {
                     Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
                 }
-            }
-
-            if vm.isRunning {
-                Text("Schedule edits apply from the next step.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
             }
         }
     }
