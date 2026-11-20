@@ -23,7 +23,10 @@ enum BreakPrompts {
         "Refill your coffee or tea.",
     ]
 
-    static func roll() -> String { all.randomElement() ?? "" }
+    static func roll() -> String {
+        guard let pick = all.randomElement() else { return "" }
+        return String(localized: String.LocalizationValue(pick))
+    }
 }
 
 // MARK: - Header bar
@@ -239,18 +242,18 @@ struct TimerRingView: View {
     }
 
     private var statusLabel: String {
-        if secretActive { return "🎉 you found it!" }
+        if secretActive { return String(localized: "🎉 you found it!") }
         if engine.isRunning {
             switch engine.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
-            case "🍅":                  return "🍅 in progress"
-            case "coffee", "☕":        return "☕ brewing"
-            case "42":                  return "the answer 🌌"
-            case "debug", "debugging":  return "🐛 squashing bugs"
-            default:                    return "in progress"
+            case "🍅":                  return String(localized: "🍅 in progress")
+            case "coffee", "☕":        return String(localized: "☕ brewing")
+            case "42":                  return String(localized: "the answer 🌌")
+            case "debug", "debugging":  return String(localized: "🐛 squashing bugs")
+            default:                    return String(localized: "in progress")
             }
         }
-        if engine.progress > 0 { return "paused" }
-        return "ready"
+        if engine.progress > 0 { return String(localized: "paused") }
+        return String(localized: "ready")
     }
 }
 
@@ -303,7 +306,7 @@ struct RemoteSessionCaptionView: View {
     var body: some View {
         Group {
             if let remote = coordinator.remoteActiveSession, !engine.isRunning {
-                Text("\(remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
+                Text("\(Step.Kind(rawValue: remote.type)?.localizedName ?? remote.type) on \(remote.host) · \(remote.remainingSeconds / 60)m left")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .transition(.opacity)
@@ -477,7 +480,12 @@ struct UpdateBannersView: View {
             Image(systemName: "exclamationmark.triangle")
             Text(msg)
             Spacer()
-            Button("✕") { AutoUpdater.shared.phase = .idle }.font(.caption2.weight(.bold))
+            Button {
+                AutoUpdater.shared.phase = .idle
+            } label: {
+                Text(verbatim: "✕")
+            }
+            .font(.caption2.weight(.bold))
         }
         .font(.caption2)
         .foregroundStyle(.white.opacity(0.9))

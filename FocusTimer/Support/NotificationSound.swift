@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import UserNotifications
 
 /// The notification sound options offered in Settings. Named sounds play

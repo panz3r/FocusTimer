@@ -15,10 +15,10 @@ extension View {
 
 /// One labeled row inside a settings card.
 struct SettingsRow<Trailing: View>: View {
-    let label: String
+    let label: LocalizedStringKey
     @ViewBuilder var trailing: () -> Trailing
 
-    init(_ label: String, @ViewBuilder trailing: @escaping () -> Trailing) {
+    init(_ label: LocalizedStringKey, @ViewBuilder trailing: @escaping () -> Trailing) {
         self.label = label
         self.trailing = trailing
     }

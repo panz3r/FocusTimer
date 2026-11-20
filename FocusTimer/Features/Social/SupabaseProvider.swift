@@ -192,10 +192,10 @@ enum SupabaseError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .authFailed:          return "Sign-in failed. Check your Supabase config and make sure email confirmation is disabled."
-        case .notAuthenticated:    return "Not signed in."
-        case .conflict:            return "Username already taken."
-        case .decodingError:       return "Unexpected server response."
+        case .authFailed:          return String(localized: "Sign-in failed. Check your Supabase config and make sure email confirmation is disabled.")
+        case .notAuthenticated:    return String(localized: "Not signed in.")
+        case .conflict:            return String(localized: "Username already taken.")
+        case .decodingError:       return String(localized: "Unexpected server response.")
         case .serverError(let m):  return m
         }
     }

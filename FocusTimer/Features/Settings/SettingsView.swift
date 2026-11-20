@@ -25,6 +25,20 @@ struct SettingsView: View {
 
         var id: String { rawValue }
 
+        /// Localized display name — rawValue is a runtime value, so the
+        /// catalog needs literal keys.
+        var localizedName: LocalizedStringKey {
+            switch self {
+            case .schedules:     return "Schedules"
+            case .behavior:      return "Behavior"
+            case .notifications: return "Notifications"
+            case .shortcuts:     return "Shortcuts"
+            case .social:        return "Social"
+            case .sync:          return "Sync"
+            case .data:          return "Data"
+            }
+        }
+
         var icon: String {
             switch self {
             case .schedules:     return "timer"
@@ -81,7 +95,7 @@ struct SettingsView: View {
             HStack(spacing: 8) {
                 Image(systemName: item.icon)
                     .frame(width: 16)
-                Text(item.rawValue)
+                Text(item.localizedName)
                 Spacer()
             }
             .font(.callout)
@@ -102,7 +116,7 @@ struct SettingsView: View {
     // MARK: - Content pane
 
     private var paneHeader: some View {
-        Label(section.rawValue, systemImage: section.icon)
+        Label(section.localizedName, systemImage: section.icon)
             .font(.title3.weight(.semibold))
             .padding(.bottom, 2)
     }

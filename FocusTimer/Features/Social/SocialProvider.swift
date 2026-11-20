@@ -76,10 +76,10 @@ enum SocialError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .notConfigured:          return "Social backend is not configured."
-        case .usernameTaken:          return "Username already taken."
-        case .invalidResponse:        return "Unexpected response from the social backend."
-        case .httpStatus(let code):   return "Social backend error (HTTP \(code))."
+        case .notConfigured:          return String(localized: "Social backend is not configured.")
+        case .usernameTaken:          return String(localized: "Username already taken.")
+        case .invalidResponse:        return String(localized: "Unexpected response from the social backend.")
+        case .httpStatus(let code):   return String(localized: "Social backend error (HTTP \(code)).")
         }
     }
 }

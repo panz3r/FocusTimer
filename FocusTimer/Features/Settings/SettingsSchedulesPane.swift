@@ -204,7 +204,7 @@ struct SchedulesPane: View {
     private var scheduleName: Binding<String> {
         Binding(
             get: { engine.currentSchedule.name },
-            set: { engine.currentSchedule.name = $0.isEmpty ? "Untitled" : $0 }
+            set: { engine.currentSchedule.name = $0.isEmpty ? String(localized: "Untitled") : $0 }
         )
     }
 
@@ -223,8 +223,12 @@ struct SchedulesPane: View {
             }
             .labelsHidden()
             .frame(width: 86)
-            Button("✕") { engine.removeStepFromCurrentSchedule(step.id) }
-                .buttonStyle(.plain)
+            Button {
+                engine.removeStepFromCurrentSchedule(step.id)
+            } label: {
+                Text(verbatim: "✕")
+            }
+            .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .help("Remove step")
         }

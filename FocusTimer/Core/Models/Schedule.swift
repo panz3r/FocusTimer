@@ -171,6 +171,17 @@ struct Step: Codable, Identifiable, Equatable {
 }
 
 extension Step.Kind {
+    /// Localized display name — used for cross-Mac captions and
+    /// notification titles. (defaultLabel stays English: it seeds
+    /// stored step data, per the localization decisions.)
+    var localizedName: String {
+        switch self {
+        case .work:      return String(localized: "Focus")
+        case .break:     return String(localized: "Short Break")
+        case .longBreak: return String(localized: "Long break")
+        }
+    }
+
     var defaultLabel: String {
         switch self {
         case .work:      return "Focus"

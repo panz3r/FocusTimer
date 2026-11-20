@@ -11,6 +11,13 @@ struct StatsOverviewView: View {
     enum Metric: String, CaseIterable {
         case sessions  = "Sessions"
         case focusTime = "Focus Time"
+
+        var localizedName: LocalizedStringKey {
+            switch self {
+            case .sessions:  return "Sessions"
+            case .focusTime: return "Focus Time"
+            }
+        }
     }
 
     private var data: [StatsStore.DayStat] { StatsStore.shared.history(days: range) }
@@ -40,7 +47,7 @@ struct StatsOverviewView: View {
             Divider().frame(height: 44)
             summaryCard(
                 value: StatsFormatting.hours(data.reduce(0) { $0 + $1.focusMinutes }),
-                label: "focus time",
+                label: "Focus Time",
                 icon: "clock"
             )
             Divider().frame(height: 44)
@@ -60,7 +67,7 @@ struct StatsOverviewView: View {
         .padding(.vertical, 12)
     }
 
-    private func summaryCard(value: String, label: String, icon: String) -> some View {
+    private func summaryCard(value: String, label: LocalizedStringKey, icon: String) -> some View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -92,6 +99,15 @@ struct StatsOverviewView: View {
     private var heatmapData: [[StatsStore.DayStat?]] { buildHeatmap(weeks: heatmapWeeks) }
     private var heatmapLabels: [String?] { monthLabels(for: heatmapData) }
 
+    /// Locale-aware day-of-week initials, Monday-first (matches the grid
+    /// column order). English renders M/_/W/_/F — identical to the previous
+    /// hardcoded array, but follows the system language.
+    private var dayOfWeekInitials: [String] {
+        var symbols = Calendar.current.veryShortWeekdaySymbols   // Sun-first
+        symbols.append(symbols.removeFirst())                    // rotate Sun to end
+        return symbols
+    }
+
     private var heatmapSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Month labels row
@@ -116,7 +132,7 @@ struct StatsOverviewView: View {
                 // Day-of-week labels
                 VStack(alignment: .trailing, spacing: cellGap) {
                     ForEach(0..<7, id: \.self) { d in
-                        Text(["M", "", "W", "", "F", "", ""][d])
+                        Text(verbatim: dayOfWeekInitials[d])
                             .font(.system(size: 9))
                             .foregroundStyle(.secondary)
                             .frame(width: 14, height: cellSize)
@@ -254,7 +270,7 @@ struct StatsOverviewView: View {
         HStack(spacing: 2) {
             ForEach(Metric.allCases, id: \.self) { m in
                 Button { metric = m } label: {
-                    Text(m.rawValue)
+                    Text(m.localizedName)
                         .font(.subheadline.weight(metric == m ? .semibold : .regular))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 5)

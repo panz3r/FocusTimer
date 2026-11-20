@@ -43,8 +43,8 @@ struct DataPane: View {
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.canCreateDirectories = true
-        panel.prompt = "Use Folder"
-        panel.message = "Weekly backups will be written to this folder."
+        panel.prompt = String(localized: "Use Folder")
+        panel.message = String(localized: "Weekly backups will be written to this folder.")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         BackupScheduler.setFolder(url)
     }

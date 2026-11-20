@@ -193,30 +193,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let menu = NSMenu()
 
         let toggleItem = NSMenuItem(
-            title: engine.isRunning ? "Pause" : "Start",
+            title: String(localized: engine.isRunning ? "Pause" : "Start"),
             action: #selector(menuToggle),
             keyEquivalent: ""
         )
         toggleItem.target = self
         menu.addItem(toggleItem)
 
-        let skipItem = NSMenuItem(title: "Skip", action: #selector(menuSkip), keyEquivalent: "")
+        let skipItem = NSMenuItem(title: String(localized: "Skip"), action: #selector(menuSkip), keyEquivalent: "")
         skipItem.target = self
         menu.addItem(skipItem)
 
-        let resetItem = NSMenuItem(title: "Reset", action: #selector(menuReset), keyEquivalent: "")
+        let resetItem = NSMenuItem(title: String(localized: "Reset"), action: #selector(menuReset), keyEquivalent: "")
         resetItem.target = self
         menu.addItem(resetItem)
 
         menu.addItem(.separator())
 
-        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(menuSettings), keyEquivalent: "")
+        let settingsItem = NSMenuItem(title: String(localized: "Settings…"), action: #selector(menuSettings), keyEquivalent: "")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Quit FocusTimer", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
+        let quitItem = NSMenuItem(title: String(localized: "Quit FocusTimer"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
         menu.addItem(quitItem)
 
         menu.delegate = self

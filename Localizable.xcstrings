@@ -1,0 +1,2663 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "": {},
+    "“%@” finished — nicely done.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Hai completato “%@”: ben fatto."
+          }
+        }
+      }
+    },
+    "@%@": {},
+    "%@ — take a well-earned break.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%@: concediti una pausa, te la sei meritata."
+          }
+        }
+      }
+    },
+    "%@ · Cycle %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%@ · Ciclo %lld"
+          }
+        }
+      }
+    },
+    "%@ · Step %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%@ · Passo %lld"
+          }
+        }
+      }
+    },
+    "%@ Auto-backup has been turned off — re-enable it in Settings.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%@ Il backup automatico è stato disattivato: riattivalo in Impostazioni."
+          }
+        }
+      }
+    },
+    "%@ on %@ · %lldm left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ on %2$@ · %3$lldm left"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%1$@ su %2$@ · %3$lld min al termine"
+          }
+        }
+      }
+    },
+    "%@ over!": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%@ finita!"
+          }
+        }
+      }
+    },
+    "%lld": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%lld"
+          }
+        }
+      }
+    },
+    "%lld hours focused. Serious dedication.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hour focused. Serious dedication."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hours focused. Serious dedication."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hours focused. Serious dedication."
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ora di concentrazione. Dedizione ammirevole."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ore di concentrazione. Dedizione ammirevole."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ore di concentrazione. Dedizione ammirevole."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld hours of deep work. Elite level.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hour of deep work. Elite level."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hours of deep work. Elite level."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld hours of deep work. Elite level."
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ora di lavoro profondo. Livello élite."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ore di lavoro profondo. Livello élite."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld ore di lavoro profondo. Livello élite."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld min": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%lld min"
+          }
+        }
+      }
+    },
+    "%lld of %lld sessions today": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%1$lld of %#@sessions@ today"
+          },
+          "substitutions": {
+            "sessions": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg session"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg sessions"
+                    }
+                  },
+                  "zero": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg sessions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%1$lld di %#@sessions@ oggi"
+          },
+          "substitutions": {
+            "sessions": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg sessione"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg sessioni"
+                    }
+                  },
+                  "zero": {
+                    "stringUnit": {
+                      "state": "machine_translated",
+                      "value": "%arg sessioni"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld session(s)": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld session"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessione"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld sessions": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld session"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessione"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld sessions completed": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld session completed"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions completed"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions completed"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessione completata"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni completate"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni completate"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld sessions today": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld session today"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions today"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessions today"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessione oggi"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni oggi"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld sessioni oggi"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld-day streak": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld-day streak"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld-day streak"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "%lld-day streak"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "serie di %lld giorno"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "serie di %lld giorni"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "serie di %lld giorni"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lldh": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%lldh"
+          }
+        }
+      }
+    },
+    "%lldh %lldm": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%lldh %lld min"
+          }
+        }
+      }
+    },
+    "%lldm": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "%lld min"
+          }
+        }
+      }
+    },
+    "☕ brewing": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "☕ in infusione"
+          }
+        }
+      }
+    },
+    "🍅 in progress": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "🍅 in corso"
+          }
+        }
+      }
+    },
+    "🎉 you found it!": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "🎉 l’hai trovato!"
+          }
+        }
+      }
+    },
+    "🐛 squashing bugs": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "🐛 a caccia di bug"
+          }
+        }
+      }
+    },
+    "1 week": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "1 settimana"
+          }
+        }
+      }
+    },
+    "2 weeks": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "2 settimane"
+          }
+        }
+      }
+    },
+    "4 weeks": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "4 settimane"
+          }
+        }
+      }
+    },
+    "42 minutes of deep thought. Don't panic. 🌌": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "42 minuti di pensiero profondo. Niente panico. 🌌"
+          }
+        }
+      }
+    },
+    "50 down. You're building something real.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "50 completate. Stai costruendo qualcosa di concreto."
+          }
+        }
+      }
+    },
+    "A major milestone — keep it up.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Un traguardo importante: continua così."
+          }
+        }
+      }
+    },
+    "A solid start — keep the habit going.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Un inizio solido: continua a coltivare l’abitudine."
+          }
+        }
+      }
+    },
+    "Active days": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Giorni attivi"
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aggiungi"
+          }
+        }
+      }
+    },
+    "Add by username": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aggiungi per nome utente"
+          }
+        }
+      }
+    },
+    "Add step": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aggiungi passo"
+          }
+        }
+      }
+    },
+    "Add…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aggiungi…"
+          }
+        }
+      }
+    },
+    "Already in your list.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "È già presente nella lista."
+          }
+        }
+      }
+    },
+    "Always": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sempre"
+          }
+        }
+      }
+    },
+    "Anon key": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Chiave anonima"
+          }
+        }
+      }
+    },
+    "Authorized": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Consentito"
+          }
+        }
+      }
+    },
+    "Auto long break": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pausa lunga automatica"
+          }
+        }
+      }
+    },
+    "Auto-advance sessions": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Avanzamento automatico delle sessioni"
+          }
+        }
+      }
+    },
+    "Auto-backup failed": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Backup automatico non riuscito"
+          }
+        }
+      }
+    },
+    "Avg / active day": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Media / giorno attivo"
+          }
+        }
+      }
+    },
+    "Backup failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Backup non riuscito"
+          }
+        }
+      }
+    },
+    "Backup folder": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cartella di backup"
+          }
+        }
+      }
+    },
+    "Bearer token": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Token Bearer"
+          }
+        }
+      }
+    },
+    "Behavior": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Comportamento"
+          }
+        }
+      }
+    },
+    "best day": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "giornata migliore"
+          }
+        }
+      }
+    },
+    "Break": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pausa"
+          }
+        }
+      }
+    },
+    "Bug squashing session complete 🐛 How many did you get?": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sessione di caccia ai bug completata 🐛 Quanti ne hai catturati?"
+          }
+        }
+      }
+    },
+    "Caffeine-fueled session complete ☕ — time to stretch.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sessione a colpi di caffeina completata ☕: è ora di sgranchirsi."
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Annulla"
+          }
+        }
+      }
+    },
+    "Choose…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Scegli…"
+          }
+        }
+      }
+    },
+    "Close your eyes and rest for 30 seconds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Chiudi gli occhi e riposa per 30 secondi."
+          }
+        }
+      }
+    },
+    "Complete a work session to see your log.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Completa una sessione di lavoro per vedere il registro."
+          }
+        }
+      }
+    },
+    "Complete work sessions to see your peak hours.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Completa delle sessioni di lavoro per vedere le ore di punta."
+          }
+        }
+      }
+    },
+    "Connect a backend in Settings → Social,\nthen reopen this window.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Connetti un backend in Impostazioni → Social,\npoi riapri questa finestra."
+          }
+        }
+      }
+    },
+    "Connecting…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Connessione…"
+          }
+        }
+      }
+    },
+    "Could not mount update": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile montare l’aggiornamento"
+          }
+        }
+      }
+    },
+    "Could not replace app — try dragging manually": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile sostituire l’app: prova a trascinarla manualmente."
+          }
+        }
+      }
+    },
+    "Couldn't create sync folder: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile creare la cartella di sincronizzazione: %@"
+          }
+        }
+      }
+    },
+    "Couldn't encode stats: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile codificare le statistiche: %@"
+          }
+        }
+      }
+    },
+    "Couldn't sync current session: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile sincronizzare la sessione corrente: %@"
+          }
+        }
+      }
+    },
+    "Couldn't write to %@.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile scrivere in %@."
+          }
+        }
+      }
+    },
+    "Couldn't write to iCloud Drive: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impossibile scrivere su iCloud Drive: %@"
+          }
+        }
+      }
+    },
+    "CSV…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "CSV…"
+          }
+        }
+      }
+    },
+    "Cycles": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cicli"
+          }
+        }
+      }
+    },
+    "Daily goal": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Obiettivo giornaliero"
+          }
+        }
+      }
+    },
+    "Data": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Dati"
+          }
+        }
+      }
+    },
+    "Date": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Data"
+          }
+        }
+      }
+    },
+    "day streak": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "serie"
+          }
+        }
+      }
+    },
+    "Denied — enable in System Settings → Notifications → FocusTimer": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Non autorizzate: attivale in Impostazioni di Sistema → Notifiche → FocusTimer"
+          }
+        }
+      }
+    },
+    "Do a quick neck stretch — left, right, forward.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Fai un rapido allungamento del collo: a sinistra, a destra, in avanti."
+          }
+        }
+      }
+    },
+    "Download failed: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Download non riuscito: %@"
+          }
+        }
+      }
+    },
+    "Downloading… %lld%%": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Download in corso… %lld%%"
+          }
+        }
+      }
+    },
+    "Elite level.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Livello élite."
+          }
+        }
+      }
+    },
+    "Enable them in System Settings → Notifications → FocusTimer, then try again.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Attivale in Impostazioni di Sistema → Notifiche → FocusTimer, poi riprova."
+          }
+        }
+      }
+    },
+    "Every %lld work steps": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ogni %lld passi di lavoro"
+          }
+        }
+      }
+    },
+    "Every N work steps": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni N step di concentrazione"
+          }
+        }
+      }
+    },
+    "Export backup…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Esporta backup…"
+          }
+        }
+      }
+    },
+    "Export…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Esporta…"
+          }
+        }
+      }
+    },
+    "Focus": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Concentrazione"
+          }
+        }
+      }
+    },
+    "Focus session complete!": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sessione di concentrazione completata!"
+          }
+        }
+      }
+    },
+    "Focus Time": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Tempo di concentrazione"
+          }
+        }
+      }
+    },
+    "FocusTimer": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "FocusTimer"
+          }
+        }
+      }
+    },
+    "FocusTimer can't show session alerts without notification permission. Enable it in System Settings → Notifications → FocusTimer.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "FocusTimer non può mostrare gli avvisi delle sessioni senza l’autorizzazione alle notifiche. Attivala in Impostazioni di Sistema → Notifiche → FocusTimer."
+          }
+        }
+      }
+    },
+    "Friend list is full (25 max).": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "La lista degli amici è piena (massimo 25)."
+          }
+        }
+      }
+    },
+    "Friend list is stored locally — make sure these usernames exist on the selected backend.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "La lista degli amici è archiviata localmente: verifica che questi nomi utente esistano sul backend selezionato."
+          }
+        }
+      }
+    },
+    "Friends (one per line, max 25)": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Amici (uno per riga, max 25)"
+          }
+        }
+      }
+    },
+    "Fully recharged? Let's go.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Batterie ricaricate? Si riparte."
+          }
+        }
+      }
+    },
+    "Get some water.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Bevi un po’ d’acqua."
+          }
+        }
+      }
+    },
+    "Get Started": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Inizia"
+          }
+        }
+      }
+    },
+    "Global shortcuts": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Scorciatoie globali"
+          }
+        }
+      }
+    },
+    "Goal reached · %lld sessions": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Goal reached · %lld session"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Goal reached · %lld sessions"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Goal reached · %lld sessions"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Obiettivo raggiunto · %lld sessione"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Obiettivo raggiunto · %lld sessioni"
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Obiettivo raggiunto · %lld sessioni"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Hour": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ora"
+          }
+        }
+      }
+    },
+    "https://…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "https://…"
+          }
+        }
+      }
+    },
+    "https://…supabase.co": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "https://…supabase.co"
+          }
+        }
+      }
+    },
+    "iCloud Drive isn't available on this Mac — sign in to iCloud, enable iCloud Drive, then reopen Settings.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "iCloud Drive non è disponibile su questo Mac: accedi a iCloud, attiva iCloud Drive, poi riapri Impostazioni."
+          }
+        }
+      }
+    },
+    "iCloud folder": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cartella iCloud"
+          }
+        }
+      }
+    },
+    "Idle threshold": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Soglia di inattività"
+          }
+        }
+      }
+    },
+    "If you see this as a banner (or in Notification Center), notifications work.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Se vedi questo banner (o lo vedi nel Centro notifiche), le notifiche funzionano."
+          }
+        }
+      }
+    },
+    "Import": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Importa"
+          }
+        }
+      }
+    },
+    "Import backup?": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Importare il backup?"
+          }
+        }
+      }
+    },
+    "Import backup…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Importa backup…"
+          }
+        }
+      }
+    },
+    "Import…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Importa…"
+          }
+        }
+      }
+    },
+    "in progress": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "in corso"
+          }
+        }
+      }
+    },
+    "Include Markdown summary": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Includi riepilogo Markdown"
+          }
+        }
+      }
+    },
+    "Installing…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Installazione…"
+          }
+        }
+      }
+    },
+    "Join the social layer": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Unisciti al livello social"
+          }
+        }
+      }
+    },
+    "JSON backup…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Backup JSON…"
+          }
+        }
+      }
+    },
+    "Keep it up!": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Continua così!"
+          }
+        }
+      }
+    },
+    "Label": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Etichetta"
+          }
+        }
+      }
+    },
+    "Last sync": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ultima sincronizzazione"
+          }
+        }
+      }
+    },
+    "Launch at Login": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Avvia all’accesso"
+          }
+        }
+      }
+    },
+    "Less": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Meno"
+          }
+        }
+      }
+    },
+    "Long break": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pausa lunga"
+          }
+        }
+      }
+    },
+    "Look out a window — give your eyes a rest.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Guarda fuori dalla finestra: concedi agli occhi un po’ di riposo."
+          }
+        }
+      }
+    },
+    "Markdown summary…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Riepilogo Markdown…"
+          }
+        }
+      }
+    },
+    "min": {},
+    "min focus": {},
+    "More": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Più"
+          }
+        }
+      }
+    },
+    "N cycles": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "N cicli"
+          }
+        }
+      }
+    },
+    "N minutes": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "N minuti"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nome"
+          }
+        }
+      }
+    },
+    "No friends yet — add one below.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nessun amico per ora: aggiungine uno qui sotto."
+          }
+        }
+      }
+    },
+    "No sessions in this range": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nessuna sessione in questo periodo"
+          }
+        }
+      }
+    },
+    "No sessions this week — ready to start fresh?": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nessuna sessione questa settimana: vuoi ricominciare da capo?"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nessuno"
+          }
+        }
+      }
+    },
+    "Not requested yet — toggle Notifications to trigger the prompt": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Non ancora richieste: attiva Notifiche per visualizzare la richiesta."
+          }
+        }
+      }
+    },
+    "Not signed in.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Accesso non effettuato."
+          }
+        }
+      }
+    },
+    "Nothing to import": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nessun dato da importare"
+          }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Notifiche"
+          }
+        }
+      }
+    },
+    "Notifications are turned off": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Le notifiche sono disattivate"
+          }
+        }
+      }
+    },
+    "Notifications were not allowed": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Notifiche non consentite"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Open in Finder": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Apri nel Finder"
+          }
+        }
+      }
+    },
+    "Open System Settings": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Apri Impostazioni di Sistema"
+          }
+        }
+      }
+    },
+    "optional": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "opzionale"
+          }
+        }
+      }
+    },
+    "Overview": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panoramica"
+          }
+        }
+      }
+    },
+    "Patterns": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pattern"
+          }
+        }
+      }
+    },
+    "Pause": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pausa"
+          }
+        }
+      }
+    },
+    "Pause when idle": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pausa in caso di inattività"
+          }
+        }
+      }
+    },
+    "paused": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "in pausa"
+          }
+        }
+      }
+    },
+    "Peak focus hour": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ora di punta"
+          }
+        }
+      }
+    },
+    "Pick a username so friends can find you.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Scegli un nome utente per farti trovare dagli amici."
+          }
+        }
+      }
+    },
+    "Pomodoro complete! 🍅 Take a well-earned break.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pomodoro completato! 🍅 Concediti una pausa, te la sei meritata."
+          }
+        }
+      }
+    },
+    "Provider": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Provider"
+          }
+        }
+      }
+    },
+    "Quit": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Esci"
+          }
+        }
+      }
+    },
+    "Quit FocusTimer": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Esci da FocusTimer"
+          }
+        }
+      }
+    },
+    "ready": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "pronto"
+          }
+        }
+      }
+    },
+    "Ready to get back to it?": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Pronto a rimetterti al lavoro?"
+          }
+        }
+      }
+    },
+    "Refill your coffee or tea.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Riempi la tazza di caffè o di tè."
+          }
+        }
+      }
+    },
+    "Remove step": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Rimuovi passo"
+          }
+        }
+      }
+    },
+    "Repeats": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ripetizioni"
+          }
+        }
+      }
+    },
+    "Reset": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Azzera"
+          }
+        }
+      }
+    },
+    "Reset the timer to edit or switch schedules.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Azzera il timer per modificare o scegliere un altro programma."
+          }
+        }
+      }
+    },
+    "Roll your shoulders back and relax your jaw.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ruota le spalle all’indietro e rilassa la mascella."
+          }
+        }
+      }
+    },
+    "sb_publishable_…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "sb_publishable_…"
+          }
+        }
+      }
+    },
+    "Schedule": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Programma"
+          }
+        }
+      }
+    },
+    "Schedule complete": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Programma completato"
+          }
+        }
+      }
+    },
+    "Schedule name": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nome programma"
+          }
+        }
+      }
+    },
+    "Schedules": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Programmi"
+          }
+        }
+      }
+    },
+    "Send…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Invia…"
+          }
+        }
+      }
+    },
+    "Serious dedication.": {},
+    "Session Log": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lista Sessioni"
+          }
+        }
+      }
+    },
+    "sessions": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessioni"
+          }
+        }
+      }
+    },
+    "Sessions": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sessioni"
+          }
+        }
+      }
+    },
+    "Sessions at peak": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sessioni di punta"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Impostazioni…"
+          }
+        }
+      }
+    },
+    "Short Break": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausa breve"
+          }
+        }
+      }
+    },
+    "Shortcuts": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Scorciatoie"
+          }
+        }
+      }
+    },
+    "Show label in menu bar": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Mostra etichetta nella barra dei menu"
+          }
+        }
+      }
+    },
+    "Sign-in failed. Check your Supabase config and make sure email confirmation is disabled.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Accesso non riuscito. Controlla la configurazione di Supabase e verifica che la conferma email sia disattivata."
+          }
+        }
+      }
+    },
+    "Skip": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Salta"
+          }
+        }
+      }
+    },
+    "Social": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Social"
+          }
+        }
+      }
+    },
+    "Social backend error (HTTP %lld).": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Errore del backend social (HTTP %lld)."
+          }
+        }
+      }
+    },
+    "Social backend is not configured.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Il backend social non è configurato."
+          }
+        }
+      }
+    },
+    "Social is off": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Social è disattivato"
+          }
+        }
+      }
+    },
+    "Sound": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Suono"
+          }
+        }
+      }
+    },
+    "Stand up and stretch for a minute.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Alzati e fai qualche allungamento per un minuto."
+          }
+        }
+      }
+    },
+    "Start": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Avvia"
+          }
+        }
+      }
+    },
+    "Start / Pause": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Avvia / Pausa"
+          }
+        }
+      }
+    },
+    "Stats History": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cronologia statistiche"
+          }
+        }
+      }
+    },
+    "Step outside if you can — even for 60 seconds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Esci all’aperto se puoi, anche solo per 60 secondi."
+          }
+        }
+      }
+    },
+    "Supabase": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Supabase"
+          }
+        }
+      }
+    },
+    "Supabase URL": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "URL Supabase"
+          }
+        }
+      }
+    },
+    "Sync": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sincronizza"
+          }
+        }
+      }
+    },
+    "Sync now": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sincronizza ora"
+          }
+        }
+      }
+    },
+    "Sync via iCloud Drive": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sincronizza con iCloud Drive"
+          }
+        }
+      }
+    },
+    "Take 5 slow, deep breaths.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Fai 5 respiri lenti e profondi."
+          }
+        }
+      }
+    },
+    "Task labels are written to your iCloud Drive.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Le etichette delle attività vengono scritte su iCloud Drive."
+          }
+        }
+      }
+    },
+    "Test notification": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Notifica di prova"
+          }
+        }
+      }
+    },
+    "That's %lld+ hours of deep work. Keep it up.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "That's %lld+ hour of deep work. Keep it up."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "That's %lld+ hours of deep work. Keep it up."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "That's %lld+ hours of deep work. Keep it up."
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "È %lld+ ora di lavoro profondo. Continua così."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Sono %lld+ ore di lavoro profondo. Continua così."
+                }
+              },
+              "zero": {
+                "stringUnit": {
+                  "state": "machine_translated",
+                  "value": "Sono %lld+ ore di lavoro profondo. Continua così."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "That's you!": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sei tu!"
+          }
+        }
+      }
+    },
+    "the answer 🌌": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "la risposta 🌌"
+          }
+        }
+      }
+    },
+    "This backup doesn't contain any data that isn't already in your history.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Il backup non contiene dati che non siano già nella cronologia."
+          }
+        }
+      }
+    },
+    "This file isn't a FocusTimer JSON backup.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Il file non è un backup JSON di FocusTimer."
+          }
+        }
+      }
+    },
+    "This will merge %lld new session(s) and update %lld day(s) of stats. Your current data is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nuove sessioni da unire: %lld. Giorni di statistiche da aggiornare: %lld. I dati attuali vengono mantenuti."
+          }
+        }
+      }
+    },
+    "Time to take a break. Great focus session.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "È ora di fare una pausa. Ottima sessione di concentrazione."
+          }
+        }
+      }
+    },
+    "Token (optional)": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Token (facoltativo)"
+          }
+        }
+      }
+    },
+    "Total focus": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Concentrazione totale"
+          }
+        }
+      }
+    },
+    "Total minutes": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Minuti totali"
+          }
+        }
+      }
+    },
+    "Unexpected response from the social backend.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Risposta imprevista dal backend social."
+          }
+        }
+      }
+    },
+    "Unexpected server response.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Risposta imprevista dal server."
+          }
+        }
+      }
+    },
+    "Unknown": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Sconosciuto"
+          }
+        }
+      }
+    },
+    "Untitled": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Senza titolo"
+          }
+        }
+      }
+    },
+    "Use Folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Usa cartella"
+          }
+        }
+      }
+    },
+    "Username": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nome utente"
+          }
+        }
+      }
+    },
+    "Username already taken.": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nome utente già in uso."
+          }
+        }
+      }
+    },
+    "v%@ available — Update Now": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "v%@ disponibile: aggiorna ora"
+          }
+        }
+      }
+    },
+    "Version %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Versione %@"
+          }
+        }
+      }
+    },
+    "Walk to another room and back.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cammina fino a un’altra stanza e torna indietro."
+          }
+        }
+      }
+    },
+    "Webhook": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Webhook"
+          }
+        }
+      }
+    },
+    "Webhook URL": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "URL Webhook"
+          }
+        }
+      }
+    },
+    "Weekly auto-backup": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Backup automatico settimanale"
+          }
+        }
+      }
+    },
+    "Weekly backups will be written to this folder.": {
+      "extractionState": "manual",
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "I backup settimanali verranno salvati in questa cartella."
+          }
+        }
+      }
+    },
+    "Weekly digest": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Riepilogo settimanale"
+          }
+        }
+      }
+    },
+    "Weekly focus summary": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Riepilogo settimanale della concentrazione"
+          }
+        }
+      }
+    },
+    "What are you working on?": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "A cosa stai lavorando?"
+          }
+        }
+      }
+    },
+    "you": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "tu"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.3"
+}

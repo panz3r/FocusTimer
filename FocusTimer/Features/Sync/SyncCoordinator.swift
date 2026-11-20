@@ -110,7 +110,7 @@ final class SyncCoordinator: ObservableObject {
         do {
             try FileManager.default.createDirectory(at: syncFolder, withIntermediateDirectories: true)
         } catch {
-            state = .error("Couldn't create sync folder: \(error.localizedDescription)")
+            state = .error(String(localized: "Couldn't create sync folder: \(error.localizedDescription)"))
             return
         }
         state = .ready
@@ -169,7 +169,7 @@ final class SyncCoordinator: ObservableObject {
         do {
             try FileManager.default.createDirectory(at: syncFolder, withIntermediateDirectories: true)
         } catch {
-            state = .error("Couldn't create sync folder: \(error.localizedDescription)")
+            state = .error(String(localized: "Couldn't create sync folder: \(error.localizedDescription)"))
             return
         }
 
@@ -179,7 +179,7 @@ final class SyncCoordinator: ObservableObject {
             logData = try makeSessionLogData()
             statsData = try makeDailyStatsData()
         } catch {
-            state = .error("Couldn't encode stats: \(error.localizedDescription)")
+            state = .error(String(localized: "Couldn't encode stats: \(error.localizedDescription)"))
             return
         }
 
@@ -193,7 +193,7 @@ final class SyncCoordinator: ObservableObject {
             try logData.write(to: sessionLogURL, options: .atomic)
             try statsData.write(to: dailyStatsURL, options: .atomic)
         } catch {
-            state = .error("Couldn't write to iCloud Drive: \(error.localizedDescription)")
+            state = .error(String(localized: "Couldn't write to iCloud Drive: \(error.localizedDescription)"))
             return
         }
 
@@ -268,7 +268,7 @@ final class SyncCoordinator: ObservableObject {
                 lastPushedCurrentHash = nil
             }
         } catch {
-            state = .error("Couldn't sync current session: \(error.localizedDescription)")
+            state = .error(String(localized: "Couldn't sync current session: \(error.localizedDescription)"))
         }
     }
 

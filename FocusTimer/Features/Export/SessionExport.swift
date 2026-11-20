@@ -48,8 +48,8 @@ enum SessionExportError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .decodingFailed:        return "This file isn't a FocusTimer JSON backup."
-        case .writeFailed(let path): return "Couldn't write to \(path)."
+        case .decodingFailed:        return String(localized: "This file isn't a FocusTimer JSON backup.")
+        case .writeFailed(let path): return String(localized: "Couldn't write to \(path).")
         }
     }
 }
@@ -275,16 +275,16 @@ enum SessionExport {
             let diff = diff(for: payload)
             if diff.newSessions == 0 && diff.changedDays == 0 {
                 let alert = NSAlert()
-                alert.messageText = "Nothing to import"
-                alert.informativeText = "This backup doesn't contain any data that isn't already in your history."
+                alert.messageText = String(localized: "Nothing to import")
+                alert.informativeText = String(localized: "This backup doesn't contain any data that isn't already in your history.")
                 alert.runModal()
                 return false
             }
             let alert = NSAlert()
-            alert.messageText = "Import backup?"
-            alert.informativeText = "This will merge \(diff.newSessions) new session\(diff.newSessions == 1 ? "" : "s") and update \(diff.changedDays) day\(diff.changedDays == 1 ? "" : "s") of stats. Your current data is kept."
-            alert.addButton(withTitle: "Import")
-            alert.addButton(withTitle: "Cancel")
+            alert.messageText = String(localized: "Import backup?")
+            alert.informativeText = String(localized: "This will merge \(diff.newSessions) new session(s) and update \(diff.changedDays) day(s) of stats. Your current data is kept.")
+            alert.addButton(withTitle: String(localized: "Import"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
             guard alert.runModal() == .alertFirstButtonReturn else { return false }
             apply(payload)
             onApplied?()
@@ -297,7 +297,7 @@ enum SessionExport {
 
     private static func failureAlert(_ error: Error) {
         let alert = NSAlert()
-        alert.messageText = "Backup failed"
+        alert.messageText = String(localized: "Backup failed")
         alert.informativeText = error.localizedDescription
         alert.runModal()
     }
