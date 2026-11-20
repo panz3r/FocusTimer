@@ -31,7 +31,7 @@ struct NotificationsPane: View {
 
                         Picker("", selection: $settings.notificationSound) {
                             ForEach(NotificationSound.allCases, id: \.self) {
-                                Text($0.localizedName).tag($0)
+                                Text($0.rawValue).tag($0)
                             }
                         }
                         .labelsHidden()

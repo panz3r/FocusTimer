@@ -849,7 +849,16 @@
         }
       }
     },
-    "best day": {},
+    "best day": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "giornata migliore"
+          }
+        }
+      }
+    },
     "Break": {
       "localizations": {
         "it": {
@@ -1072,8 +1081,16 @@
         }
       }
     },
-    "day streak": {},
-    "Default": {},
+    "day streak": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "serie"
+          }
+        }
+      }
+    },
     "Denied — enable in System Settings → Notifications → FocusTimer": {
       "localizations": {
         "it": {
@@ -1146,7 +1163,16 @@
         }
       }
     },
-    "Every N work steps": {},
+    "Every N work steps": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni N step di concentrazione"
+          }
+        }
+      }
+    },
     "Export backup…": {
       "localizations": {
         "it": {
@@ -1279,7 +1305,6 @@
         }
       }
     },
-    "Glass": {},
     "Global shortcuts": {
       "localizations": {
         "it": {
@@ -1768,8 +1793,26 @@
         }
       }
     },
-    "Overview": {},
-    "Patterns": {},
+    "Overview": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panoramica"
+          }
+        }
+      }
+    },
+    "Patterns": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pattern"
+          }
+        }
+      }
+    },
     "Pause": {
       "localizations": {
         "it": {
@@ -1820,7 +1863,6 @@
         }
       }
     },
-    "Ping": {},
     "Pomodoro complete! 🍅 Take a well-earned break.": {
       "localizations": {
         "it": {
@@ -2004,7 +2046,26 @@
       }
     },
     "Serious dedication.": {},
-    "Session Log": {},
+    "Session Log": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lista Sessioni"
+          }
+        }
+      }
+    },
+    "sessions": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessioni"
+          }
+        }
+      }
+    },
     "Sessions": {
       "localizations": {
         "it": {
@@ -2035,7 +2096,16 @@
         }
       }
     },
-    "Short Break": {},
+    "Short Break": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausa breve"
+          }
+        }
+      }
+    },
     "Shortcuts": {
       "localizations": {
         "it": {

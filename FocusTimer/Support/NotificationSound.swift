@@ -24,15 +24,6 @@ enum NotificationSound: String, CaseIterable {
         self == .glass || self == .ping
     }
 
-    var localizedName: LocalizedStringKey {
-        switch self {
-        case .systemDefault: return "Default"
-        case .glass:         return "Glass"
-        case .ping:          return "Ping"
-        case .none:          return "None"
-        }
-    }
-
     // Notification sound: named sounds play via NSSound at session-complete,
     // so the notification itself carries no sound (avoids double-play).
     var unSound: UNNotificationSound? {
