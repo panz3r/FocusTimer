@@ -47,7 +47,7 @@ struct StatsOverviewView: View {
             Divider().frame(height: 44)
             summaryCard(
                 value: StatsFormatting.hours(data.reduce(0) { $0 + $1.focusMinutes }),
-                label: "focus time",
+                label: "Focus Time",
                 icon: "clock"
             )
             Divider().frame(height: 44)

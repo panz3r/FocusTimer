@@ -178,7 +178,7 @@ extension Step.Kind {
         switch self {
         case .work:      return String(localized: "Focus")
         case .break:     return String(localized: "Short Break")
-        case .longBreak: return String(localized: "Long Break")
+        case .longBreak: return String(localized: "Long break")
         }
     }
 

@@ -73,7 +73,7 @@ struct MainWindowView: View {
 
     private var statsRow: some View {
         HStack {
-            statItem("\(engine.completedPomodoros)", "sessions")
+            statItem("\(engine.completedPomodoros)", "Sessions")
             Divider().frame(height: 32)
             statItem("\(StatsStore.shared.todayFocusMinutes)", "min focus")
             Divider().frame(height: 32)

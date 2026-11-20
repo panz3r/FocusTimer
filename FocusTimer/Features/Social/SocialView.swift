@@ -57,7 +57,7 @@ struct SocialView: View {
                     .multilineTextAlignment(.center)
             }
 
-            TextField("username", text: $vm.usernameInput)
+            TextField("Username", text: $vm.usernameInput)
                 .textFieldStyle(.roundedBorder)
                 .frame(maxWidth: 220)
                 .autocorrectionDisabled()
@@ -101,7 +101,7 @@ struct SocialView: View {
                 Text("@\(vm.myUsername)")
                     .font(.headline)
                 HStack(spacing: 16) {
-                    statPill("\(vm.todaySessions)", "sessions")
+                    statPill("\(vm.todaySessions)", "Sessions")
                     statPill("\(vm.todayMinutes)", "min")
                     statPill("\(vm.streak)", "day streak")
                 }
@@ -250,15 +250,15 @@ final class SocialViewModel: ObservableObject {
         guard !name.isEmpty else { return }
         var config = SocialConfig.load()
         if name == config.username {
-            errorMessage = "That's you!"
+            errorMessage = String(localized: "That's you!")
             return
         }
         if config.usernames.contains(name) {
-            errorMessage = "Already in your list."
+            errorMessage = String(localized: "Already in your list.")
             return
         }
         guard config.usernames.count < 25 else {
-            errorMessage = "Friend list is full (25 max)."
+            errorMessage = String(localized: "Friend list is full (25 max).")
             return
         }
         config.usernames.append(name)

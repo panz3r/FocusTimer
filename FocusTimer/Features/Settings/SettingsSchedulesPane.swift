@@ -204,7 +204,7 @@ struct SchedulesPane: View {
     private var scheduleName: Binding<String> {
         Binding(
             get: { engine.currentSchedule.name },
-            set: { engine.currentSchedule.name = $0.isEmpty ? "Untitled" : $0 }
+            set: { engine.currentSchedule.name = $0.isEmpty ? String(localized: "Untitled") : $0 }
         )
     }
 

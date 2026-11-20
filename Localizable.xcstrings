@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "": {},
     "“%@” finished — nicely done.": {
       "localizations": {
         "it": {
@@ -11,6 +12,7 @@
         }
       }
     },
+    "@%@": {},
     "%@ — take a well-earned break.": {
       "localizations": {
         "it": {
@@ -22,6 +24,7 @@
       }
     },
     "%@ · Cycle %lld": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -32,6 +35,7 @@
       }
     },
     "%@ · Step %lld": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -197,16 +201,6 @@
           "stringUnit": {
             "state": "machine_translated",
             "value": "%lld min"
-          }
-        }
-      }
-    },
-    "%lld of %lld": {
-      "localizations": {
-        "it": {
-          "stringUnit": {
-            "state": "machine_translated",
-            "value": "%lld di %lld"
           }
         }
       }
@@ -573,16 +567,6 @@
         }
       }
     },
-    "%lldm left": {
-      "localizations": {
-        "it": {
-          "stringUnit": {
-            "state": "machine_translated",
-            "value": "%lld min al termine"
-          }
-        }
-      }
-    },
     "☕ brewing": {
       "localizations": {
         "it": {
@@ -744,6 +728,7 @@
       }
     },
     "Already in your list.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -824,6 +809,7 @@
       }
     },
     "Backup failed": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -863,6 +849,7 @@
         }
       }
     },
+    "best day": {},
     "Break": {
       "localizations": {
         "it": {
@@ -894,6 +881,7 @@
       }
     },
     "Cancel": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -914,6 +902,7 @@
       }
     },
     "Close your eyes and rest for 30 seconds.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -949,16 +938,6 @@
           "stringUnit": {
             "state": "machine_translated",
             "value": "Connetti un backend in Impostazioni → Social,\npoi riapri questa finestra."
-          }
-        }
-      }
-    },
-    "Connect a backend in Settings → Social, then reopen this window.": {
-      "localizations": {
-        "it": {
-          "stringUnit": {
-            "state": "machine_translated",
-            "value": "Connetti un backend in Impostazioni → Social, poi riapri questa finestra."
           }
         }
       }
@@ -1093,6 +1072,8 @@
         }
       }
     },
+    "day streak": {},
+    "Default": {},
     "Denied — enable in System Settings → Notifications → FocusTimer": {
       "localizations": {
         "it": {
@@ -1104,6 +1085,7 @@
       }
     },
     "Do a quick neck stretch — left, right, forward.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1154,6 +1136,7 @@
       }
     },
     "Every %lld work steps": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1163,6 +1146,7 @@
         }
       }
     },
+    "Every N work steps": {},
     "Export backup…": {
       "localizations": {
         "it": {
@@ -1234,6 +1218,7 @@
       }
     },
     "Friend list is full (25 max).": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1274,6 +1259,7 @@
       }
     },
     "Get some water.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1293,6 +1279,7 @@
         }
       }
     },
+    "Glass": {},
     "Global shortcuts": {
       "localizations": {
         "it": {
@@ -1426,6 +1413,7 @@
       }
     },
     "Import": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1436,6 +1424,7 @@
       }
     },
     "Import backup?": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1576,6 +1565,7 @@
       }
     },
     "Look out a window — give your eyes a rest.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1595,6 +1585,8 @@
         }
       }
     },
+    "min": {},
+    "min focus": {},
     "More": {
       "localizations": {
         "it": {
@@ -1696,6 +1688,7 @@
       }
     },
     "Nothing to import": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1775,6 +1768,8 @@
         }
       }
     },
+    "Overview": {},
+    "Patterns": {},
     "Pause": {
       "localizations": {
         "it": {
@@ -1825,6 +1820,7 @@
         }
       }
     },
+    "Ping": {},
     "Pomodoro complete! 🍅 Take a well-earned break.": {
       "localizations": {
         "it": {
@@ -1886,6 +1882,7 @@
       }
     },
     "Refill your coffee or tea.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -1936,6 +1933,7 @@
       }
     },
     "Roll your shoulders back and relax your jaw.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2005,6 +2003,8 @@
         }
       }
     },
+    "Serious dedication.": {},
+    "Session Log": {},
     "Sessions": {
       "localizations": {
         "it": {
@@ -2035,6 +2035,7 @@
         }
       }
     },
+    "Short Break": {},
     "Shortcuts": {
       "localizations": {
         "it": {
@@ -2126,6 +2127,7 @@
       }
     },
     "Stand up and stretch for a minute.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2166,6 +2168,7 @@
       }
     },
     "Step outside if you can — even for 60 seconds.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2191,16 +2194,6 @@
           "stringUnit": {
             "state": "machine_translated",
             "value": "URL Supabase"
-          }
-        }
-      }
-    },
-    "Switched from %@ to %@. Make sure the friend list maps to accounts on the new backend.": {
-      "localizations": {
-        "it": {
-          "stringUnit": {
-            "state": "machine_translated",
-            "value": "Passaggio da %@ a %@. Verifica che la lista degli amici corrisponda agli account sul nuovo backend."
           }
         }
       }
@@ -2236,6 +2229,7 @@
       }
     },
     "Take 5 slow, deep breaths.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2318,6 +2312,7 @@
       }
     },
     "That's you!": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2338,6 +2333,7 @@
       }
     },
     "This backup doesn't contain any data that isn't already in your history.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2358,6 +2354,7 @@
       }
     },
     "This will merge %lld new session(s) and update %lld day(s) of stats. Your current data is kept.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2438,6 +2435,7 @@
       }
     },
     "Untitled": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2448,21 +2446,12 @@
       }
     },
     "Use Folder": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
             "state": "machine_translated",
             "value": "Usa cartella"
-          }
-        }
-      }
-    },
-    "username": {
-      "localizations": {
-        "it": {
-          "stringUnit": {
-            "state": "machine_translated",
-            "value": "nome utente"
           }
         }
       }
@@ -2508,6 +2497,7 @@
       }
     },
     "Walk to another room and back.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2548,6 +2538,7 @@
       }
     },
     "Weekly backups will be written to this folder.": {
+      "extractionState": "manual",
       "localizations": {
         "it": {
           "stringUnit": {
@@ -2596,8 +2587,7 @@
           }
         }
       }
-    },
-    "min": {}
+    }
   },
   "version": "1.3"
 }
