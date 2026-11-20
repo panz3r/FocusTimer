@@ -113,7 +113,7 @@ struct SocialView: View {
         .padding(.vertical, 14)
     }
 
-    private func statPill(_ value: String, _ label: String) -> some View {
+    private func statPill(_ value: String, _ label: LocalizedStringKey) -> some View {
         HStack(spacing: 3) {
             Text(value).fontWeight(.semibold)
             Text(label).foregroundStyle(.secondary)

@@ -11,6 +11,13 @@ struct StatsOverviewView: View {
     enum Metric: String, CaseIterable {
         case sessions  = "Sessions"
         case focusTime = "Focus Time"
+
+        var localizedName: LocalizedStringKey {
+            switch self {
+            case .sessions:  return "Sessions"
+            case .focusTime: return "Focus Time"
+            }
+        }
     }
 
     private var data: [StatsStore.DayStat] { StatsStore.shared.history(days: range) }
@@ -60,7 +67,7 @@ struct StatsOverviewView: View {
         .padding(.vertical, 12)
     }
 
-    private func summaryCard(value: String, label: String, icon: String) -> some View {
+    private func summaryCard(value: String, label: LocalizedStringKey, icon: String) -> some View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
@@ -263,7 +270,7 @@ struct StatsOverviewView: View {
         HStack(spacing: 2) {
             ForEach(Metric.allCases, id: \.self) { m in
                 Button { metric = m } label: {
-                    Text(m.rawValue)
+                    Text(m.localizedName)
                         .font(.subheadline.weight(metric == m ? .semibold : .regular))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 5)

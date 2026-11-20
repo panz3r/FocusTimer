@@ -48,8 +48,8 @@ enum SessionExportError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .decodingFailed:        return "This file isn't a FocusTimer JSON backup."
-        case .writeFailed(let path): return "Couldn't write to \(path)."
+        case .decodingFailed:        return String(localized: "This file isn't a FocusTimer JSON backup.")
+        case .writeFailed(let path): return String(localized: "Couldn't write to \(path).")
         }
     }
 }

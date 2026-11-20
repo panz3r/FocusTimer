@@ -82,7 +82,7 @@ struct MainWindowView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func statItem(_ value: String, _ label: String) -> some View {
+    private func statItem(_ value: String, _ label: LocalizedStringKey) -> some View {
         VStack(spacing: 3) {
             Text(value)
                 .font(.title2.weight(.semibold))

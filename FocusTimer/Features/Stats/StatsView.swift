@@ -13,6 +13,14 @@ struct StatsView: View {
         case overview  = "Overview"
         case patterns  = "Patterns"
         case log       = "Session Log"
+
+        var localizedName: LocalizedStringKey {
+            switch self {
+            case .overview: return "Overview"
+            case .patterns: return "Patterns"
+            case .log:      return "Session Log"
+            }
+        }
     }
 
     private var data: [StatsStore.DayStat] { StatsStore.shared.history(days: range) }
@@ -72,7 +80,7 @@ struct StatsView: View {
 
     private var tabBar: some View {
         Picker("", selection: $tab) {
-            ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            ForEach(Tab.allCases, id: \.self) { Text($0.localizedName).tag($0) }
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 24)
@@ -110,7 +118,7 @@ struct StatsFooterView: View {
         .padding(.vertical, 12)
     }
 
-    private func footerStat(_ label: String, _ value: String) -> some View {
+    private func footerStat(_ label: LocalizedStringKey, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(value).font(.caption.weight(.semibold))
             Text(label).font(.caption2).foregroundStyle(.secondary)

@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import UserNotifications
 
 /// The notification sound options offered in Settings. Named sounds play
@@ -21,6 +22,15 @@ enum NotificationSound: String, CaseIterable {
 
     var canPreview: Bool {
         self == .glass || self == .ping
+    }
+
+    var localizedName: LocalizedStringKey {
+        switch self {
+        case .systemDefault: return "Default"
+        case .glass:         return "Glass"
+        case .ping:          return "Ping"
+        case .none:          return "None"
+        }
     }
 
     // Notification sound: named sounds play via NSSound at session-complete,

@@ -47,7 +47,7 @@ final class AutoUpdater: ObservableObject {
 
             try buffer.write(to: tmp)
         } catch {
-            phase = .failed("Download failed: \(error.localizedDescription)")
+            phase = .failed(String(localized: "Download failed: \(error.localizedDescription)"))
             return
         }
 
@@ -62,7 +62,7 @@ final class AutoUpdater: ObservableObject {
 
         guard run("/usr/bin/hdiutil", ["attach", dmg.path, "-readonly", "-nobrowse",
                                        "-noautoopen", "-mountpoint", mountPoint.path]) == 0 else {
-            phase = .failed("Could not mount update"); return
+            phase = .failed(String(localized: "Could not mount update")); return
         }
 
         // Identity-aware: install next to the RUNNING app, so a fork under a
@@ -80,7 +80,7 @@ final class AutoUpdater: ObservableObject {
             _ = run("/usr/bin/xattr", ["-cr", dst.path])
         } catch {
             _ = run("/usr/bin/hdiutil", ["detach", mountPoint.path, "-force"])
-            phase = .failed("Could not replace app — try dragging manually")
+            phase = .failed(String(localized: "Could not replace app — try dragging manually"))
             return
         }
 
