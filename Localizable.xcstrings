@@ -1,0 +1,100 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ on %@ · %lldm left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ on %2$@ · %3$lldm left"
+          }
+        }
+      }
+    },
+    "%lld": {},
+    "%lld min": {},
+    "%lld of %lld sessions today": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld of %2$lld sessions today"
+          }
+        }
+      }
+    },
+    "%lld sessions": {},
+    "%lld sessions today": {},
+    "%lld-day streak": {},
+    "%lldm": {},
+    "1 week": {},
+    "2 weeks": {},
+    "4 weeks": {},
+    "Add": {},
+    "Add by username": {},
+    "Add…": {},
+    "Always": {},
+    "Break": {},
+    "Choose…": {},
+    "Complete a work session to see your log.": {},
+    "Complete work sessions to see your peak hours.": {},
+    "Connect a backend in Settings → Social,\nthen reopen this window.": {},
+    "Connecting…": {},
+    "CSV…": {},
+    "Date": {},
+    "Downloading… %lld%%": {},
+    "Export…": {},
+    "Focus": {},
+    "FocusTimer": {},
+    "Friend list is stored locally — make sure these usernames exist on the selected backend.": {},
+    "Friends (one per line, max 25)": {},
+    "Get Started": {},
+    "Goal reached · %lld sessions": {},
+    "Hour": {},
+    "https://…": {},
+    "https://…supabase.co": {},
+    "iCloud Drive isn't available on this Mac — sign in to iCloud, enable iCloud Drive, then reopen Settings.": {},
+    "Import…": {},
+    "Installing…": {},
+    "Join the social layer": {},
+    "JSON backup…": {},
+    "Label": {},
+    "Less": {},
+    "Markdown summary…": {},
+    "More": {},
+    "N cycles": {},
+    "N minutes": {},
+    "No friends yet — add one below.": {},
+    "No sessions in this range": {},
+    "None": {},
+    "Open in Finder": {},
+    "optional": {},
+    "Pause": {},
+    "Peak focus hour": {},
+    "Pick a username so friends can find you.": {},
+    "Quit": {},
+    "Remove step": {},
+    "Reset": {},
+    "Reset the timer to edit or switch schedules.": {},
+    "sb_publishable_…": {},
+    "Schedule name": {},
+    "Send…": {},
+    "Sessions": {},
+    "Sessions at peak": {},
+    "Skip": {},
+    "Social is off": {},
+    "Start": {},
+    "Stats History": {},
+    "Supabase": {},
+    "Sync": {},
+    "Task labels are written to your iCloud Drive.": {},
+    "Token (optional)": {},
+    "username": {},
+    "v%@ available — Update Now": {},
+    "Version %@": {},
+    "Webhook": {},
+    "What are you working on?": {},
+    "you": {}
+  },
+  "version": "1.3"
+}

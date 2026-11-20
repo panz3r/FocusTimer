@@ -477,7 +477,12 @@ struct UpdateBannersView: View {
             Image(systemName: "exclamationmark.triangle")
             Text(msg)
             Spacer()
-            Button("✕") { AutoUpdater.shared.phase = .idle }.font(.caption2.weight(.bold))
+            Button {
+                AutoUpdater.shared.phase = .idle
+            } label: {
+                Text(verbatim: "✕")
+            }
+            .font(.caption2.weight(.bold))
         }
         .font(.caption2)
         .foregroundStyle(.white.opacity(0.9))

@@ -223,8 +223,12 @@ struct SchedulesPane: View {
             }
             .labelsHidden()
             .frame(width: 86)
-            Button("✕") { engine.removeStepFromCurrentSchedule(step.id) }
-                .buttonStyle(.plain)
+            Button {
+                engine.removeStepFromCurrentSchedule(step.id)
+            } label: {
+                Text(verbatim: "✕")
+            }
+            .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .help("Remove step")
         }

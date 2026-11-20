@@ -92,6 +92,15 @@ struct StatsOverviewView: View {
     private var heatmapData: [[StatsStore.DayStat?]] { buildHeatmap(weeks: heatmapWeeks) }
     private var heatmapLabels: [String?] { monthLabels(for: heatmapData) }
 
+    /// Locale-aware day-of-week initials, Monday-first (matches the grid
+    /// column order). English renders M/_/W/_/F — identical to the previous
+    /// hardcoded array, but follows the system language.
+    private var dayOfWeekInitials: [String] {
+        var symbols = Calendar.current.veryShortWeekdaySymbols   // Sun-first
+        symbols.append(symbols.removeFirst())                    // rotate Sun to end
+        return symbols
+    }
+
     private var heatmapSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Month labels row
@@ -116,7 +125,7 @@ struct StatsOverviewView: View {
                 // Day-of-week labels
                 VStack(alignment: .trailing, spacing: cellGap) {
                     ForEach(0..<7, id: \.self) { d in
-                        Text(["M", "", "W", "", "F", "", ""][d])
+                        Text(verbatim: dayOfWeekInitials[d])
                             .font(.system(size: 9))
                             .foregroundStyle(.secondary)
                             .frame(width: 14, height: cellSize)
