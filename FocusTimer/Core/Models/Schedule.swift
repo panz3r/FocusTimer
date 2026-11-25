@@ -80,6 +80,11 @@ struct Schedule: Codable, Identifiable, Equatable {
         return (nextStep, nextIndex, wrapped, false)
     }
 
+    /// The default (pre-schedules) strategy's name — also the fallback
+    /// schedule name for session-log entries recorded before schedules
+    /// existed.
+    static let legacyName = "Pomodoro"
+
     /// Compact description for pickers ("25/5 × 4 → 15 long break").
     var summary: String {
         var text = steps.map { "\($0.minutes)" }.joined(separator: "/")

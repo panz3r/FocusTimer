@@ -83,6 +83,14 @@ struct StatsLogView: View {
 
             Spacer()
 
+            // Schedule snapshot — which strategy produced this session
+            Text(entry.effectiveScheduleName)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(Color.secondary.opacity(0.12)))
+
             Text("\(entry.durationMinutes)m")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)

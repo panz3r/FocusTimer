@@ -251,7 +251,8 @@ final class SessionEngine: ObservableObject {
             StatsStore.shared.recordSession(
                 durationMinutes: completedMinutes,
                 taskLabel: taskLabel,
-                stepLabel: currentStep.label
+                stepLabel: currentStep.label,
+                scheduleName: currentSchedule.name
             )
             // Item 0: read the post-increment count from the store instead of
             // `+= 1` on a possibly stale value.

@@ -72,13 +72,19 @@ struct StatsStoreMergeTests {
         #expect(store.sessionLog.count == countAfterFirst)
     }
 
-    @Test func recordSessionCarriesStepLabel() {
+    @Test func recordSessionCarriesStepAndScheduleLabels() {
         let (store, _) = makeStore()
-        store.recordSession(durationMinutes: 25, taskLabel: "writing", stepLabel: "Focus")
+        store.recordSession(durationMinutes: 25, taskLabel: "writing", stepLabel: "Focus", scheduleName: "Deep Work")
         #expect(store.sessionLog.count == 1)
         #expect(store.sessionLog[0].stepLabel == "Focus")
+        #expect(store.sessionLog[0].scheduleName == "Deep Work")
         #expect(store.sessionLog[0].taskLabel == "writing")
         #expect(store.todaySessions == 1)
+
+        // Legacy entries (no schedule recorded) fall back to Pomodoro.
+        #expect(store.sessionLog[0].effectiveScheduleName == "Deep Work")
+        let legacy = StatsStore.SessionEntry(timestamp: Date(), durationMinutes: 25, taskLabel: "")
+        #expect(legacy.effectiveScheduleName == Schedule.legacyName)
     }
 
     @Test func importDoesNotFireMilestones() {
