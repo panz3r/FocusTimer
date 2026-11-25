@@ -77,10 +77,15 @@
 
 ### Notifications
 - **Session alerts** — notification with optional sound when each step completes
+- **Sound palette** — 8 curated system sounds (Bottle, Glass, Hero, Morse, Ping, Pop, Submarine, Tink), the notification default, or none — all previewable from Settings
+- **Foreground delivery** — alerts banner and sound even while the timer window is focused (a `willPresent` delegate opts back in to macOS's frontmost suppression)
 - **Schedule-complete alerts** — fired when a finite schedule finishes
 - **Weekly digest** — Sunday evening summary of sessions, focus time, and streak
 - **Milestone celebrations** — one-time notifications at 10, 50, 100, 500, and 1,000 sessions
 - **Test notification** — one-tap pipeline check with permission guidance
+
+> Note: notification sounds obey the separate alert volume — System
+> Settings → Sound, not the output volume.
 
 ### Social
 - **Pluggable backend** — off by default; point it at Supabase or any custom webhook URL
