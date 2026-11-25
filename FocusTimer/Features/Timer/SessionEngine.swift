@@ -369,6 +369,10 @@ final class SessionEngine: ObservableObject {
         guard !isRunning else { return }
         guard let schedule = ScheduleStore.shared.schedule(id: id) else { return }
         currentSchedule = schedule
+        // Mark the new schedule active — the didSet above saves schedule
+        // DATA only; without this the stored active id stays stale and the
+        // selection is lost on relaunch (bootstrap restores the old id).
+        ScheduleStore.shared.setActive(id: id)
         isScheduleFinished = false
         currentStepIndex = 0
         cycleCount = 0
