@@ -93,6 +93,16 @@ final class StatsStore: ObservableObject {
         /// Active schedule step label; nil for entries recorded before
         /// schedules exist (Area 4). Optional so old stores and backups decode.
         var stepLabel: String? = nil
+        /// Name snapshot of the schedule the session ran under, captured at
+        /// record time (stays accurate across schedule renames/deletes).
+        /// nil for legacy entries — they ran under the default schedule.
+        var scheduleName: String? = nil
+
+        /// Display name for the log/exports: legacy entries count as
+        /// Pomodoro (the pre-schedules default).
+        var effectiveScheduleName: String {
+            scheduleName ?? Schedule.legacyName
+        }
     }
 
     private let logKey = UserDefaultsKeys.sessionLogStore
@@ -121,14 +131,14 @@ final class StatsStore: ObservableObject {
     var allTimeSessions:    Int { records.values.reduce(0) { $0 + $1.sessions } }
     var allTimeFocusMinutes: Int { records.values.reduce(0) { $0 + $1.focusMinutes } }
 
-    func recordSession(durationMinutes: Int, taskLabel: String = "", stepLabel: String? = nil) {
+    func recordSession(durationMinutes: Int, taskLabel: String = "", stepLabel: String? = nil, scheduleName: String? = nil) {
         objectWillChange.send()
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
         record.focusMinutes += durationMinutes
         records[todayKey] = record
 
-        let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel, stepLabel: stepLabel)
+        let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel, stepLabel: stepLabel, scheduleName: scheduleName)
         sessionLog.append(entry)
         // Area 1: no in-memory cap — the store is the source of truth.
         persistLog()

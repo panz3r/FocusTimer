@@ -51,7 +51,7 @@
 - **Task label** — name what you're working on; shows next to the timer in the menu bar
 - **Task autocomplete** — recent labels appear as suggestions when you click the field
 - **Per-schedule labels** — the label is remembered per schedule and restored on the next work step
-- **Session log** — every session recorded with task label, time, and duration
+- **Session log** — every session recorded with task label, schedule, time, and duration
 
 ### Schedules & goals
 - **Schedule picker** — switch between schedules (locked while a session runs; reset first)
@@ -67,7 +67,7 @@
 
 ### Export & backup
 - **JSON backup** — round-trippable restore with an idempotent merge (importing the same backup twice changes nothing)
-- **CSV export** — one row per session for spreadsheets
+- **CSV export** — one row per session (with schedule) for spreadsheets
 - **Markdown summary** — weekly table (sessions, focus time, streak, top labels) for your notes app
 - **Weekly auto-backup** — optional Sunday-evening JSON (+ Markdown) snapshot to a folder of your choice
 

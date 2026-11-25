@@ -8,8 +8,8 @@ struct SessionExportTests {
 
     private func makeStore() -> StatsStore {
         let store = StatsStore(defaults: UserDefaults(suiteName: "test-export-\(UUID().uuidString)")!)
-        store.recordSession(durationMinutes: 25, taskLabel: "has \"quotes\", and, commas", stepLabel: "Focus")
-        store.recordSession(durationMinutes: 30, taskLabel: "plain", stepLabel: "Focus")
+        store.recordSession(durationMinutes: 25, taskLabel: "has \"quotes\", and, commas", stepLabel: "Focus", scheduleName: "Deep Work")
+        store.recordSession(durationMinutes: 30, taskLabel: "plain", stepLabel: "Focus", scheduleName: "Pomodoro")
         return store
     }
 
@@ -33,8 +33,9 @@ struct SessionExportTests {
         let csv = String(data: SessionExport.makeCSVData(store: store), encoding: .utf8)!
         let lines = csv.split(separator: "\n").map(String.init)
 
-        #expect(lines[0] == "timestamp,kind,duration_minutes,task_label")
+        #expect(lines[0] == "timestamp,kind,schedule,duration_minutes,task_label")
         #expect(lines.count == 3)                                  // header + 2 sessions
+        #expect(lines[1].contains("Deep Work"))                    // schedule snapshot
         #expect(lines[1].contains("\"has \"\"quotes\"\", and, commas\""))
         #expect(lines[1].contains(",work,"))                       // kind column
     }

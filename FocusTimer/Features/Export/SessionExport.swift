@@ -91,10 +91,10 @@ enum SessionExport {
     }
 
     static func makeCSVData(store: StatsStore = .shared) -> Data {
-        var lines = ["timestamp,kind,duration_minutes,task_label"]
+        var lines = ["timestamp,kind,schedule,duration_minutes,task_label"]
         for e in store.sessionLog {
-            // The current codebase records work sessions only; Area 4 widens this.
-            lines.append("\(iso8601.string(from: e.timestamp)),work,\(e.durationMinutes),\(csvField(e.taskLabel))")
+            // The current codebase records work steps only; Area 4 widens this.
+            lines.append("\(iso8601.string(from: e.timestamp)),work,\(csvField(e.effectiveScheduleName)),\(e.durationMinutes),\(csvField(e.taskLabel))")
         }
         return Data(lines.joined(separator: "\n").utf8)
     }
