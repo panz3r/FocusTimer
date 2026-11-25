@@ -37,12 +37,15 @@ enum UserDefaultsKeys {
     static let skipHotkeyCode = "skipHotkeyCode"
     static let skipHotkeyMods = "skipHotkeyMods"
 
+    static let resumeOnRelaunch = "resumeOnRelaunch"
+
     // MARK: Stores (JSON blobs)
     static let dailyStatsStore = "v1_daily_stats"
     static let sessionLogStore = "v1_session_log"
     static let milestonesReached = "v1_milestones_reached"
     static let schedulesStore = "schedules.v1"
     static let schedulesActive = "schedules.active"
+    static let sessionSnapshot = "session.snapshot_v1"
 
     // MARK: Sync (Area 3)
     static let socialConfig = "social.config"

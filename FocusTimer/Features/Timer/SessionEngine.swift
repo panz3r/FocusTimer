@@ -74,6 +74,12 @@ final class SessionEngine: ObservableObject {
     @Published var taskLabel: String {
         didSet { UserDefaults.standard.set(taskLabel, forKey: UserDefaultsKeys.taskLabel) }
     }
+    /// Restores a session parked by a clean quit as RUNNING at relaunch
+    /// (instead of paused). Crash-restored sessions always resume — this
+    /// knob only governs the quit-as-pause path.
+    @Published var resumeOnRelaunch: Bool {
+        didSet { UserDefaults.standard.set(resumeOnRelaunch, forKey: UserDefaultsKeys.resumeOnRelaunch) }
+    }
 
     private var timerCancellable: AnyCancellable?
     private var idleMonitorCancellable: AnyCancellable?
@@ -100,6 +106,7 @@ final class SessionEngine: ObservableObject {
         let idleThresh = ud.integer(forKey: UserDefaultsKeys.idlePauseThreshold)
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
         taskLabel = ud.string(forKey: UserDefaultsKeys.taskLabel) ?? ""
+        resumeOnRelaunch = ud.object(forKey: UserDefaultsKeys.resumeOnRelaunch) as? Bool ?? false
 
         // Area 4: the active schedule (ScheduleStore bootstraps the legacy
         // Pomodoro migration on first launch).
@@ -115,6 +122,9 @@ final class SessionEngine: ObservableObject {
         sessionStartDuration = firstDuration
         timeRemaining = firstDuration
         completedPomodoros = StatsStore.shared.todaySessions
+
+        // Restart resilience: bring back the session the app quit with.
+        restoreSnapshot()
 
         // Item 0: poll once a minute so the UI's "today" counters reset
         // when the date rolls over without an app restart.
@@ -343,6 +353,7 @@ final class SessionEngine: ObservableObject {
         pausedAtLocally = nil
         sessionStartDuration = step.minutes * 60
         timeRemaining = sessionStartDuration
+        persistSnapshotIfInSession()
     }
 
     private func finishSchedule() {
@@ -403,6 +414,7 @@ final class SessionEngine: ObservableObject {
     // MARK: - Live-session mirror (Area 3, via events)
 
     private func pushMirror(paused: Bool) {
+        persistSnapshot()
         events.send(.mirrorChanged(SessionMirror(
             id: activeSessionId,
             kind: currentStep.kind,
@@ -414,6 +426,106 @@ final class SessionEngine: ObservableObject {
     }
 
     private func clearMirror() {
+        clearSnapshot()
         events.send(.mirrorChanged(nil))
+    }
+
+    // MARK: - Restart resilience (local snapshots)
+
+    private static let snapshotKey = UserDefaultsKeys.sessionSnapshot
+
+    /// Captures the full session state. Only called while a session exists
+    /// (running or paused) — piggybacks on the mirror transitions, which
+    /// already fire at every meaningful change.
+    private func persistSnapshot() {
+        let snapshot = SessionSnapshot(
+            scheduleId: currentSchedule.id,
+            stepIndex: currentStepIndex,
+            cycleCount: cycleCount,
+            completedWorkSteps: completedWorkSteps,
+            accumulatedMinutes: accumulatedMinutes,
+            isScheduleFinished: isScheduleFinished,
+            taskLabel: taskLabel,
+            sessionId: activeSessionId,
+            startedAt: sessionStartedAt,
+            durationSeconds: sessionStartDuration,
+            timeRemainingAtSave: timeRemaining,
+            pausedAt: pausedAtLocally,
+            savedAt: Date()
+        )
+        if let data = try? JSONEncoder().encode(snapshot) {
+            UserDefaults.standard.set(data, forKey: Self.snapshotKey)
+        }
+    }
+
+    /// Between transitions the engine can be merely idle on a step (e.g. a
+    /// completed step without auto-advance): nothing worth restoring.
+    private func persistSnapshotIfInSession() {
+        if isRunning || pausedAtLocally != nil {
+            persistSnapshot()
+        } else {
+            clearSnapshot()
+        }
+    }
+
+    private func clearSnapshot() {
+        UserDefaults.standard.removeObject(forKey: Self.snapshotKey)
+    }
+
+    /// Quit = pause: parks a running session paused (snapshot + mirror)
+    /// so the relaunch restores it truthfully. Must run BEFORE
+    /// SyncCoordinator.flushNow() so the paused mirror reaches iCloud.
+    func prepareForTermination() {
+        guard isRunning else { return }
+        pause()
+    }
+
+    /// Rebuilds a session from the local snapshot at init.
+    ///
+    /// - Clean quit mid-step (`pausedAt != nil`): restore paused, frozen at
+    ///   the saved countdown; auto-starts only when `resumeOnRelaunch` is on.
+    /// - Crash mid-step (`pausedAt == nil`): restore running if still live
+    ///   by wall clock — otherwise drop (can't claim unworked time).
+    /// - Anything expired (paused > 24 h, shared with the awareness
+    ///   contract), finished, or referencing a schedule that is not the
+    ///   active one drops to a fresh idle state.
+    private func restoreSnapshot() {
+        guard let data = UserDefaults.standard.data(forKey: Self.snapshotKey),
+              let snapshot = try? JSONDecoder().decode(SessionSnapshot.self, from: data),
+              !snapshot.isExpired,
+              !snapshot.isScheduleFinished,
+              let schedule = ScheduleStore.shared.schedule(id: snapshot.scheduleId),
+              schedule.id == ScheduleStore.shared.active?.id,
+              schedule.steps.indices.contains(snapshot.stepIndex) else {
+            clearSnapshot()
+            return
+        }
+
+        currentSchedule = schedule
+        currentStepIndex = snapshot.stepIndex
+        currentStep = schedule.steps[snapshot.stepIndex]
+        cycleCount = snapshot.cycleCount
+        completedWorkSteps = snapshot.completedWorkSteps
+        accumulatedMinutes = snapshot.accumulatedMinutes
+        taskLabel = snapshot.taskLabel
+        activeSessionId = snapshot.sessionId
+        sessionStartedAt = snapshot.startedAt
+        sessionStartDuration = snapshot.durationSeconds
+
+        if snapshot.pausedAt != nil {
+            // Parked by a clean quit (or idle-pause): restore paused with
+            // the exact countdown the user saw, then honor the toggle.
+            pausedAtLocally = snapshot.pausedAt
+            timeRemaining = snapshot.timeRemainingAtSave
+            isRunning = false
+            pushMirror(paused: true)
+            if resumeOnRelaunch { start() }
+        } else {
+            // Crash: the wall clock decides; resume what's still live.
+            pausedAtLocally = nil
+            timeRemaining = snapshot.wallClockRemaining
+            isRunning = false
+            start()
+        }
     }
 }
