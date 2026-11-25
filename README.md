@@ -94,6 +94,7 @@
 
 ### Comfort
 - **Break prompts** — a rotating micro-action suggestion on every break (stand up, breathe, etc.)
+- **Session restore** — quitting or crashing mid-step no longer loses the session: a relaunch restores it (paused, or running with the auto-resume toggle); other Macs stop counting down for a quit app
 - **Global hotkeys** — customizable keyboard shortcuts to start/pause and skip from anywhere
 - **Launch at login** — start automatically with macOS
 - **Two-pane settings** — sidebar sections (Schedules, Behavior, Notifications, Shortcuts, Social, Sync, Data)
