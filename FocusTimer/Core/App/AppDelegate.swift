@@ -1,9 +1,10 @@
 import AppKit
 import SwiftUI
 import Combine
+import UserNotifications
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotificationCenterDelegate {
     let engine = SessionEngine.shared
     private let settings = AppSettings.shared
 
@@ -12,6 +13,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // ~/Library/Logs/FocusTimer-exception.log and on stderr, instead of a
     // reason-less SIGTRAP report. Silent unless a crash happens.
     func applicationWillFinishLaunching(_ notification: Notification) {
+        // Foreground delivery: without a delegate, macOS silently drops every
+        // notification this app posts while it holds focus (no banner, no
+        // sound) — exactly when the user is watching the timer. Opt back in.
+        UNUserNotificationCenter.current().delegate = self
+
         NSSetUncaughtExceptionHandler { exception in
             let report = """
 
@@ -34,6 +40,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 try? report.write(to: logURL, atomically: true, encoding: .utf8)
             }
         }
+    }
+
+    /// Foreground presentation: banner + sound even while the app is active.
+    /// UNNotification cannot be instantiated in unit tests — verified manually.
+    /// `nonisolated`: the delegate is called off-main; this body touches no
+    /// MainActor state.
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .list, .sound])
     }
 
     private var statusItem: NSStatusItem!

@@ -35,7 +35,7 @@ struct NotificationsPane: View {
                             }
                         }
                         .labelsHidden()
-                        .frame(width: 90)
+                        .frame(width: 100) // fits "Submarine", the longest name
                     }
                 }
                 Divider()
