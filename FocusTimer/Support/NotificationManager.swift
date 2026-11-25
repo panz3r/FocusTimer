@@ -147,9 +147,6 @@ final class NotificationManager {
 
     func sendMilestone(sessions: Int, focusMinutes: Int) {
         let content = UNMutableNotificationContent()
-        let formatted = sessions >= 1000
-            ? sessions.formatted(.number)
-            : "\(sessions)"
         content.title = String(localized: "\(sessions) sessions completed")
         let hours = focusMinutes / 60
         content.body = switch sessions {

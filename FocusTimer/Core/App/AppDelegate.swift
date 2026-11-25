@@ -97,7 +97,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUser
     }
 
     // Area 3: push any pending local change before the process dies.
+    // The engine parks a running session paused FIRST so the paused
+    // mirror is part of what gets flushed.
     func applicationWillTerminate(_ notification: Notification) {
+        SessionEngine.shared.prepareForTermination()
         SyncCoordinator.shared.flushNow()
     }
 

@@ -2657,6 +2657,16 @@
           }
         }
       }
+    },
+    "Auto-resume after relaunch": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ripresa automatica dopo il riavvio"
+          }
+        }
+      }
     }
   },
   "version": "1.3"

@@ -16,6 +16,10 @@ struct BehaviorPane: View {
                 Toggle("", isOn: $engine.autoAdvance).labelsHidden()
             }
             Divider()
+            SettingsRow("Auto-resume after relaunch") {
+                Toggle("", isOn: $engine.resumeOnRelaunch).labelsHidden()
+            }
+            Divider()
             SettingsRow("Show label in menu bar") {
                 Toggle("", isOn: $settings.showTaskLabelInMenuBar).labelsHidden()
             }

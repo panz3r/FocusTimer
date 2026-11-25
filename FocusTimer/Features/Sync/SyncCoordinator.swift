@@ -117,7 +117,11 @@ final class SyncCoordinator: ObservableObject {
         pullFromRemote()
 
         let timer = Timer(timeInterval: 15, repeats: true) { [weak self] _ in
-            self?.pollRemote()
+            // Fires on the main RunLoop; assumeIsolated matches the
+            // engine's event-sink pattern (MainActor from main thread).
+            MainActor.assumeIsolated {
+                self?.pollRemote()
+            }
         }
         RunLoop.main.add(timer, forMode: .common)
         pollTimer = timer
